@@ -624,6 +624,62 @@ public class ToolBox {
 	}
 
 
+	public static String getShortName(String name) {
+		String shortName = "";
+		for (String s : name.split("_")) {
+			shortName += s.substring(0, 1).toUpperCase();
+		}	
+		return (shortName.length() < 4) ? shortName : shortName.substring(0, 3);
+	}
+
+
+	public static String createLaTeXTable(double[][] data, String[][] dataStr, List<Integer> ints, 
+		List<String> names, int maxLenDouble, int totalNumChars) {
+		String table = "";
+		String lineBr = " \\" + "\\" + "\r\n";
+		
+		for (int i = 0; i < ((data != null) ? data.length : dataStr.length); i++) {
+			// double case
+			if (data != null) {
+				double[] row = data[i];
+				for (int j = 0; j < row.length; j++) {
+					if (j == 0) {
+						table += names.get(i) + " & ";
+					}
+					else {
+						if (ints.contains(j)) {
+							table += (int) row[j];
+						}
+						else {
+							table += ToolBox.formatDouble(row[j], maxLenDouble, totalNumChars);
+						}
+						if (j != row.length-1) {
+							table += " & ";
+						}
+						else {
+							table += lineBr;
+						}
+					}
+				}
+			}
+			// String case
+			if (dataStr != null) {
+				String[] row = dataStr[i];
+				for (int j = 0; j < row.length; j++) {
+					table += row[j];
+					if (j != row.length-1) {
+						table += " & ";
+					}
+					else {
+						table += lineBr;
+					}
+				}
+			}
+		}		
+		return table;
+	}
+
+
 	/**
 	 * Formats the given double by adding leading zeroes so that the part before the 
 	 * decimal point equals maxLen, and by cutting so that its number of characters does
