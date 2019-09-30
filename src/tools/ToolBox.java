@@ -632,48 +632,58 @@ public class ToolBox {
 		return (shortName.length() < 4) ? shortName : shortName.substring(0, 3);
 	}
 
+	
+	public static String[] getAveragesForMixedList(Integer[] intsToAvg, Double[] doublesToAvg, 
+		int divisor, int maxLenDouble, int totalNumChars) {
+		String[] res = new String[intsToAvg.length];
+		res[0] = "avg";
+		for (int i = 0; i < intsToAvg.length; i++) {
+			if (intsToAvg[i] != null) {
+				res[i] = String.valueOf(Math.round(intsToAvg[i] / (double) divisor));
+			}
+			if (doublesToAvg[i] != null) {
+				res[i] = ToolBox.formatDouble((doublesToAvg[i] / (double) divisor), 
+					maxLenDouble, totalNumChars);
+			}
+		}
+		return res;
+	}
 
-	public static String createLaTeXTable(double[][] data, String[][] dataStr, List<Integer> ints, 
-		List<String> names, int maxLenDouble, int totalNumChars) {
+	public static String createLaTeXTable(String[][] dataStr, Integer[] intsToAvg, 
+		Double[] doublesToAvg, int maxLenDouble, int totalNumChars, boolean includeAvgs) {
 		String table = "";
 		String lineBr = " \\" + "\\" + "\r\n";
 		
-		for (int i = 0; i < ((data != null) ? data.length : dataStr.length); i++) {
-			// double case
-			if (data != null) {
-				double[] row = data[i];
-				for (int j = 0; j < row.length; j++) {
-					if (j == 0) {
-						table += names.get(i) + " & ";
-					}
-					else {
-						if (ints.contains(j)) {
-							table += (int) row[j];
-						}
-						else {
-							table += ToolBox.formatDouble(row[j], maxLenDouble, totalNumChars);
-						}
-						if (j != row.length-1) {
-							table += " & ";
-						}
-						else {
-							table += lineBr;
-						}
-					}
-				}
+		int numRows = dataStr.length;
+		
+		// Set any averages
+		if (includeAvgs) {
+			dataStr[numRows-1] = 
+				getAveragesForMixedList(intsToAvg, doublesToAvg, numRows-1, maxLenDouble, 
+				totalNumChars);
+//			dataStr[numRows-1][0] = "avg";
+//			for (int i = 0; i < intsToAvg.length; i++) {
+//				if (intsToAvg[i] != null) {
+//					dataStr[numRows-1][i] = 
+//						String.valueOf(Math.round(intsToAvg[i] / (double) (numRows-1)));
+//				}
+//				if (doublesToAvg[i] != null) {
+//					dataStr[numRows-1][i] = 
+//						ToolBox.formatDouble((doublesToAvg[i] / (double) (numRows-1)), 
+//							maxLenDouble, totalNumChars);
+//				}
+//			}
+		}
+
+		// Create table
+		for (int i = 0; i < numRows; i++) {
+			String[] row = dataStr[i];
+			for (int j = 0; j < row.length; j++) {
+				table += row[j] + ( (j != row.length-1) ? " & " : lineBr );
 			}
-			// String case
-			if (dataStr != null) {
-				String[] row = dataStr[i];
-				for (int j = 0; j < row.length; j++) {
-					table += row[j];
-					if (j != row.length-1) {
-						table += " & ";
-					}
-					else {
-						table += lineBr;
-					}
-				}
+			// In case of any averages: add \hline below penultimate line
+			if (i == numRows-2 && includeAvgs) {
+				table += "\\hline" + "\r\n";
 			}
 		}		
 		return table;
