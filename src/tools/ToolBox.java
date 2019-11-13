@@ -632,7 +632,7 @@ public class ToolBox {
 		return (shortName.length() < 4) ? shortName : shortName.substring(0, 3);
 	}
 
-	
+
 	public static String[] getAveragesForMixedList(Integer[] intsToAvg, Double[] doublesToAvg, 
 		int divisor, int maxLenDouble, int totalNumChars) {
 		String[] res = new String[intsToAvg.length];
@@ -648,6 +648,7 @@ public class ToolBox {
 		}
 		return res;
 	}
+
 
 	public static String createLaTeXTable(String[][] dataStr, Integer[] intsToAvg, 
 		Double[] doublesToAvg, int maxLenDouble, int totalNumChars, boolean includeAvgs) {
