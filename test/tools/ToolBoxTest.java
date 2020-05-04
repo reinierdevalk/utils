@@ -1246,8 +1246,28 @@ public class ToolBoxTest extends TestCase {
 		assertEquals(expected.size(), actual.size());
 		assertEquals(expected, actual);	
 	}
-	
-	
+
+
+	public void testGetItemsAtIndexRational() {
+		List<Rational[]> aList = new ArrayList<>();
+		aList.add(new Rational[]{new Rational(3, 1), new Rational(20, 1)});
+		aList.add(new Rational[]{new Rational(1, 1), new Rational(50, 1)});
+		aList.add(new Rational[]{new Rational(5, 1), new Rational(10, 1)});
+		aList.add(new Rational[]{new Rational(2, 1), new Rational(30, 1)});
+		
+		List<Rational> expected = Arrays.asList(new Rational[]{
+			new Rational(3, 1), new Rational(1, 1), new Rational(5, 1), new Rational(2, 1),
+			new Rational(20, 1), new Rational(50, 1), new Rational(10, 1), new Rational(30, 1),
+		});
+		
+		List<Rational> actual = ToolBox.getItemsAtIndexRational(aList, 0);
+		actual.addAll(ToolBox.getItemsAtIndexRational(aList, 1));
+		
+		assertEquals(expected.size(), actual.size());
+		assertEquals(expected, actual);	
+	}
+
+
 	public void thestGetIndexOfNthItem() {
 		List<Integer> l = Arrays.asList(new Integer[]{10, 11, 10, 12, 10, 12, 11, 11});
 		

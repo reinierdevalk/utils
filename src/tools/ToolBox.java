@@ -1763,6 +1763,23 @@ public class ToolBox {
 
 
 	/**
+	 * Returns a list containing, for each list element, the item at the given index in the element.
+	 *  
+	 * @param l
+	 * @param colInd
+	 * @return
+	 */
+	// TESTED
+	public static List<Rational> getItemsAtIndexRational(List<Rational[]> l, int colInd) {
+		List<Rational> col = new ArrayList<>();
+		for (Rational[] in : l) {
+			col.add(in[colInd]);
+		}
+		return col;
+	}
+
+
+	/**
 	 * Returns the index of the nth specified item in the list.
 	 * 
 	 * @param l
