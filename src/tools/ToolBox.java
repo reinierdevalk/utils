@@ -1117,17 +1117,17 @@ public class ToolBox {
 	 * @param aList
 	 * @return
 	 */
-  // TESTED
+	// TESTED
 	public static Rational sumListRational(List<Rational> aList) {
 		Rational sum = new Rational(0, 1); 
-    for (Rational r: aList) {
-      sum = sum.add(r);
-    }
-    sum.reduce();
-    return sum;
+		for (Rational r: aList) {
+			sum = sum.add(r);
+		}
+		sum.reduce();
+		return sum;
 	}
-	
-	
+
+
 	/**
 	 * Returns a String representation of the given double, with no unnecessary trailing zeros. 
 	 * 
