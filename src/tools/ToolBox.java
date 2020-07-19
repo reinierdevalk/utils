@@ -1129,19 +1129,37 @@ public class ToolBox {
 
 
 	/**
+	 * Checks whether the first given Rational is a multiple of second given Rational.
+	 * 
+	 * @param r1
+	 * @param r2
+	 * @return
+	 */
+	// TESTED 
+	public static boolean isMultiple(Rational r1, Rational r2) {
+		if (r1.div(r2).getDenom() == 1) {
+			return true;
+		}
+		else {
+			return false;			
+		}
+	}
+
+
+	/**
 	 * Returns a String representation of the given double, with no unnecessary trailing zeros. 
 	 * 
 	 * @param aDouble
 	 * @return 
 	 */
-  // TESTED
+	// TESTED
 	public static String convertToStringNoTrailingZeros(double aDouble) {
 		String doubleAsString = Double.toString(aDouble);
 		boolean endsWithZero = doubleAsString.endsWith("0");
 		boolean endsWithPointZero = doubleAsString.endsWith(".0");
 		while (endsWithZero == true && endsWithPointZero == false) {
-		  doubleAsString = doubleAsString.substring(0, doubleAsString.length() - 1);
-		 	endsWithZero = doubleAsString.endsWith("0");
+			doubleAsString = doubleAsString.substring(0, doubleAsString.length() - 1);
+			endsWithZero = doubleAsString.endsWith("0");
 		}
 		return doubleAsString;
 	}

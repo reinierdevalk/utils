@@ -696,8 +696,31 @@ public class ToolBoxTest extends TestCase {
 			assertEquals(expected.get(i).getDenom(), actual.get(i).getDenom());
 		}	
 	}
-	
-	
+
+
+	public void testIsMultiple() {
+		List<Rational> rs = Arrays.asList(new Rational[]{
+			new Rational(17, 12), // true
+			new Rational(192, 1), // true
+			new Rational(18496, 96), // true
+			new Rational(13, 7), // false
+			new Rational(21, 7), // true
+			new Rational(197291, 1024), // false
+		});
+		
+		List<Boolean> expected = 
+			Arrays.asList(new Boolean[]{true, true, true, false, true, false});
+		
+		List<Boolean> actual = new ArrayList<>();
+		for (Rational r : rs) {
+			actual.add(ToolBox.isMultiple(r, new Rational(1, 12)));
+		}
+		
+		assertEquals(expected.size(), actual.size());
+		assertEquals(expected, actual);
+	}
+
+
 	public void testConvertToStringNoTrailingZeros(){
 		List<String> expected = new ArrayList<String>(Arrays.asList(new String[]{"1.0", "1.0", "1.0", "0.1",
 			"0.01", "0.001", "1.0E-4", "1.0E-5", "0.0"}));
