@@ -195,6 +195,54 @@ public class ToolBoxTest extends TestCase {
 	}
 
 
+	public void testTabify() {
+		String one = "test";
+		String two = "longer test";
+		
+		List<String> expected = Arrays.asList(new String[]{
+			"test\t", // the \t fills the String up to a full \t (8 spaces) 
+			"test\t" + "\t",
+			"longer test\t",
+			"longer test\t" + "\t"
+		});
+
+		List<String> actual = new ArrayList<>();
+		actual.add(ToolBox.tabify(one, 1));
+		actual.add(ToolBox.tabify(one, 2));
+		actual.add(ToolBox.tabify(two, 2));
+		actual.add(ToolBox.tabify(two, 3));
+
+		assertEquals(expected, actual);
+	}
+
+
+	public void testBreakIntoLines() {
+		List<String> strings = Arrays.asList(new String[]{
+			"fits on a line", 
+			"fits on two  lines",
+			"does not fit on two lines but fits on three"
+		});
+
+		List<List<String>> expected = new ArrayList<>();
+		expected.add(Arrays.asList(new String[]{"fits on a line"}));
+		expected.add(Arrays.asList(new String[]{"fits on two", "lines"}));
+		expected.add(Arrays.asList(new String[]{
+			"does not fit on", "two lines but", "fits on three"}));
+		List<List<String>> actual = new ArrayList<>();
+		for (String s : strings) {
+			actual.add(ToolBox.breakIntoLines(s, 16));
+		}
+		
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).size(), actual.get(i).size());
+			for (int j = 0; j < expected.get(i).size(); j++) {
+				assertEquals(expected.get(i).get(j), actual.get(i).get(j));
+			}
+		}
+	}
+
+
 	public void testToInt() {
 		assertEquals(0, ToolBox.toInt(false));
 		assertEquals(1, ToolBox.toInt(true));
@@ -247,19 +295,16 @@ public class ToolBoxTest extends TestCase {
 			completeString3, completeString4}); 
 		String marker = "After this: ";
 
-		// Determine expected values
 		List<String> expected = new ArrayList<String>();
 		expected.add("0.001234"); expected.add("0.001234"); expected.add("12/34"); expected.add("0.1234");
 		expected.add("0.1234");
 
-		// Determine actual values
 		List<String> actual = new ArrayList<String>();
 		for (int i = 0; i < completeStrings.size(); i++) {
 			String currentActual = ToolBox.getAllowedCharactersAfterMarker(completeStrings.get(i), marker);
 			actual.add(currentActual);
 		}
 
-		// Assert equality
 		assertEquals(expected, actual);
 	}
 	

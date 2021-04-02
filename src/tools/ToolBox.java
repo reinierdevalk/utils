@@ -34,6 +34,8 @@ import de.uos.fmt.musitech.utility.math.Rational;
 
 
 public class ToolBox {
+	
+	public static final int TAB_LEN = 8;
 
 	/**
 	 * Stores the given object in the given file.
@@ -755,9 +757,10 @@ public class ToolBox {
 	 * @param numTabs
 	 * @return
 	 */
+	// TESTED
 	public static String tabify(String s, int numTabs) {
 		StringBuffer sb = new StringBuffer();
-		int tabLen = 8;
+		int tabLen = TAB_LEN;
 		int totalLen = numTabs*tabLen;
 
 		sb.append(s);
@@ -776,9 +779,11 @@ public class ToolBox {
 		// b. If not: find the closest tabLen multiple and determine the number of tabs to add
 		else {
 			for (int i = s.length(); i <= totalLen; i++) {	
-				d =  i / (double) tabLen;
+				d = i / (double) tabLen;
 				// When d is a multiple of tabLen, i.e., a positive integer
-				// NB The first tab added completes the length of s to tabLength
+				// NB The first tab added completes the length of s to tabLength - but if
+				// a string is prepended to s (e.g., in a print statement) this shortens
+				// \t with the length of the prepended String
 				if (d == (int) d) {
 					tabsToAdd = numTabs - ((int) d - 1);
 					break;
@@ -792,6 +797,43 @@ public class ToolBox {
 		}
 
 		return sb.toString();
+	}
+
+
+	/**
+	 * Breaks the given string up into separate lines shorter than the given maximum
+	 * line length.
+	 * 
+	 * @param s
+	 * @param maxLineLen
+	 * @return A <code>List</code> of <code>String<code>s, each of which is a
+	 */
+	// TESTED
+	public static List<String> breakIntoLines(String s, int maxLineLen) {		
+		// Remove any double spaces
+		while (s.contains("  ")) {
+			s = s.replace("  ", " ");
+		}
+		String[] split = s.split(" ");
+		List<String> lines = new ArrayList<>();
+		String currLine = "";
+		for (int j = 0; j < split.length; j++) {
+			String word = split[j];
+			// If word fits on currentLine, add
+			if (currLine.length() + word.length() < maxLineLen) {
+				currLine += word + " ";
+			}
+			// If not, add currentLine to lines and add word to reset currentLine
+			else {
+				lines.add(currLine.trim());
+				currLine = word + " ";
+			}
+			// In case of last word: add currentLine to lines
+			if (j == split.length - 1) {
+				lines.add(currLine.trim());
+			}
+		}
+		return lines;
 	}
 
 
