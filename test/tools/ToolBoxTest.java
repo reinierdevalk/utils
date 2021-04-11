@@ -216,15 +216,83 @@ public class ToolBoxTest extends TestCase {
 	}
 
 
+	public void testReplaceFirstInString() {
+		List<String> strings = Arrays.asList(new String[]{
+			"some text bla some more bla text", 
+			"some text bla some more bla text", 
+			"some text some more text"	
+		});
+		List<String> replacements = Arrays.asList(new String[]{
+			"and", "or", "but"		
+		});
+		
+		List<String> expected = Arrays.asList(new String[]{
+			"some text and some more bla text", 
+			"some text or some more bla text", 
+			"some text some more text" 			
+		});
+		
+		List<String> actual = new ArrayList<>();
+		for (int i = 0; i < strings.size(); i++) {
+			actual.add(ToolBox.replaceFirstInString(strings.get(i), 
+				"bla", replacements.get(i)));
+		}
+ 		
+		assertEquals(expected, actual);
+	}
+
+
+	public void testInsertIntoString() {
+		List<Integer> indices = Arrays.asList(new Integer[]{0, 10, 6});
+		
+		List<String> strings = Arrays.asList(new String[]{
+			"string one", "string two", "string three"		
+		});
+		
+		List<String> expected = Arrays.asList(new String[]{
+			"HEREstring one", "string twoHERE", "stringHERE three"		
+		});
+		
+		List<String> actual = new ArrayList<>();
+		for (int i = 0; i < strings.size(); i++) {
+			actual.add(ToolBox.insertIntoString(strings.get(i), "HERE", indices.get(i)));
+		}
+		
+		assertEquals(expected, actual);	
+	}
+
+
+	public void testGetFirstIndexOfNot() {
+		List<String> strings = Arrays.asList(new String[]{
+			"---x--", "- - - x - -", "bananas", "doesn't matter"		
+		});
+		
+		List<List<String>> notLists = new ArrayList<>();
+		notLists.add(Arrays.asList(new String[]{"-"}));
+		notLists.add(Arrays.asList(new String[]{" ", "-"}));
+		notLists.add(Arrays.asList(new String[]{"a", "b", "n"}));
+		notLists.add(Arrays.asList(new String[]{}));
+
+		List<Integer> expected = Arrays.asList(new Integer[]{3, 6, 6, 0});
+		
+		List<Integer> actual = new ArrayList<>();
+		for (int i = 0; i < strings.size(); i++) {
+			actual.add(ToolBox.getFirstIndexOfNot(strings.get(i), notLists.get(i)));
+		}
+		
+		assertEquals(expected, actual);
+	}
+
+
 	public void testBreakIntoLines() {
 		List<String> strings = Arrays.asList(new String[]{
-			"fits on a line", 
+			"yes fits on line", 
 			"fits on two  lines",
 			"does not fit on two lines but fits on three"
 		});
 
 		List<List<String>> expected = new ArrayList<>();
-		expected.add(Arrays.asList(new String[]{"fits on a line"}));
+		expected.add(Arrays.asList(new String[]{"yes fits on line"}));
 		expected.add(Arrays.asList(new String[]{"fits on two", "lines"}));
 		expected.add(Arrays.asList(new String[]{
 			"does not fit on", "two lines but", "fits on three"}));

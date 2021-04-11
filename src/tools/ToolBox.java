@@ -801,6 +801,61 @@ public class ToolBox {
 
 
 	/**
+	 * Inserts the given substring into the given string before the given index.
+	 * 
+	 * @param s
+	 * @param substr
+	 * @param ind
+	 * @return
+	 */
+	// TESTED
+	public static String insertIntoString(String s, String substr, int ind) {
+		return s.substring(0, ind) + substr + s.substring(ind);
+	}
+
+
+	/**
+	 * Replaces the first occurrence of the given substring in the given string with
+	 * the given replacement.
+	 * 
+	 * @param s
+	 * @param substr
+	 * @param replacement
+	 * @return If <code>s</code> contains <code>substr</code>, s with the replacement;
+	 *         else the original <code>s</code>.
+	 */
+	// TESTED
+	public static String replaceFirstInString(String s, String substr, String replacement) {
+		if (s.contains(substr)) {
+			int ind = s.indexOf(substr);
+			s = s.substring(0, ind) + replacement + s.substring(ind + substr.length()); 
+			return s;
+		}
+		return s;
+	}
+
+
+	/**
+	 * Get the index of the first char in the string that is not any of the given
+	 * characters.
+	 * 
+	 * @param s
+	 * @param not
+	 * @return
+	 */
+	// TESTED
+	public static int getFirstIndexOfNot(String s, List<String> not) {
+		int first = -1;
+		for (int i = 0; i < s.length(); i++) {
+			if (!not.contains(s.substring(i, i+1))) {
+				return i;
+			}
+		}
+		return first;
+	}
+
+
+	/**
 	 * Breaks the given string up into separate lines shorter than the given maximum
 	 * line length.
 	 * 
@@ -820,7 +875,7 @@ public class ToolBox {
 		for (int j = 0; j < split.length; j++) {
 			String word = split[j];
 			// If word fits on currentLine, add
-			if (currLine.length() + word.length() < maxLineLen) {
+			if (currLine.length() + word.length() <= maxLineLen) {
 				currLine += word + " ";
 			}
 			// If not, add currentLine to lines and add word to reset currentLine
