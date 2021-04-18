@@ -264,7 +264,7 @@ public class ToolBoxTest extends TestCase {
 
 	public void testGetFirstIndexOfNot() {
 		List<String> strings = Arrays.asList(new String[]{
-			"---x--", "- - - x - -", "bananas", "doesn't matter"		
+			"---x--", "- - - x - -", "bananas", "doesn't matter", "abababab"		
 		});
 		
 		List<List<String>> notLists = new ArrayList<>();
@@ -272,8 +272,9 @@ public class ToolBoxTest extends TestCase {
 		notLists.add(Arrays.asList(new String[]{" ", "-"}));
 		notLists.add(Arrays.asList(new String[]{"a", "b", "n"}));
 		notLists.add(Arrays.asList(new String[]{}));
+		notLists.add(Arrays.asList(new String[]{"a", "b"}));
 
-		List<Integer> expected = Arrays.asList(new Integer[]{3, 6, 6, 0});
+		List<Integer> expected = Arrays.asList(new Integer[]{3, 6, 6, 0, -1});
 		
 		List<Integer> actual = new ArrayList<>();
 		for (int i = 0; i < strings.size(); i++) {

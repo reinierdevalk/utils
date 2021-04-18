@@ -837,11 +837,12 @@ public class ToolBox {
 
 	/**
 	 * Get the index of the first char in the string that is not any of the given
-	 * characters.
+	 * characters. If none such char is found, -1 is returned. 
 	 * 
 	 * @param s
 	 * @param not
-	 * @return
+	 * @return The index of the first char in the string that is not any of the 
+	 *         given characters, or, if none such char is found, -1. 
 	 */
 	// TESTED
 	public static int getFirstIndexOfNot(String s, List<String> not) {
@@ -856,8 +857,8 @@ public class ToolBox {
 
 
 	/**
-	 * Breaks the given string up into separate lines shorter than the given maximum
-	 * line length.
+	 * Breaks the given string up into separate lines shorter than or equal to the
+	 * given maximum line length.
 	 * 
 	 * @param s
 	 * @param maxLineLen
