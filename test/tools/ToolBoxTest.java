@@ -1075,8 +1075,72 @@ public class ToolBoxTest extends TestCase {
 		}
 		assertEquals(expected, actual);
 	}
-	
-	
+
+
+	public void testGroupListOfIntegers() {
+		List<List<Integer>> lists = new ArrayList<>();
+		// Single item
+		lists.add(Arrays.asList(new Integer[]{1}));
+		// All separate
+		lists.add(Arrays.asList(new Integer[]{1, 3, 5, 7}));
+		// Starts with separate, ends with combined
+		lists.add(Arrays.asList(new Integer[]{1, 3, 4, 5, 7, 9, 10, 11}));
+		// Starts with combined, ends with separate
+		lists.add(Arrays.asList(new Integer[]{1, 2, 3, 5, 6, 7, 9}));
+		// All combined
+		lists.add(Arrays.asList(new Integer[]{1, 2, 3, 5, 6, 7, 9, 10, 11}));
+		
+		List<List<List<Integer>>> expected = new ArrayList<>();
+		//
+		List<List<Integer>> expected0 = new ArrayList<>();
+		expected0.add(Arrays.asList(new Integer[]{1}));
+		expected.add(expected0);
+		//
+		List<List<Integer>> expected1 = new ArrayList<>();
+		expected1.add(Arrays.asList(new Integer[]{1}));
+		expected1.add(Arrays.asList(new Integer[]{3}));
+		expected1.add(Arrays.asList(new Integer[]{5}));
+		expected1.add(Arrays.asList(new Integer[]{7}));
+		expected.add(expected1);
+		//
+		List<List<Integer>> expected2 = new ArrayList<>();
+		expected2.add(Arrays.asList(new Integer[]{1}));
+		expected2.add(Arrays.asList(new Integer[]{3, 4, 5}));
+		expected2.add(Arrays.asList(new Integer[]{7}));
+		expected2.add(Arrays.asList(new Integer[]{9, 10, 11}));
+		expected.add(expected2);
+		//
+		List<List<Integer>> expected3 = new ArrayList<>();
+		expected3.add(Arrays.asList(new Integer[]{1, 2, 3}));
+		expected3.add(Arrays.asList(new Integer[]{5, 6, 7}));
+		expected3.add(Arrays.asList(new Integer[]{9}));
+		expected.add(expected3);
+		//
+		List<List<Integer>> expected4 = new ArrayList<>();
+		expected4.add(Arrays.asList(new Integer[]{1, 2, 3}));
+		expected4.add(Arrays.asList(new Integer[]{5, 6, 7}));
+		expected4.add(Arrays.asList(new Integer[]{9, 10, 11}));
+		expected.add(expected4);
+		
+		List<List<List<Integer>>> actual = new ArrayList<>();
+		for (List<Integer> l : lists) {
+			actual.add(ToolBox.groupListOfIntegers(l));
+		}
+		
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).size(), actual.get(i).size());
+			for (int j = 0; j < expected.get(i).size(); j++) {
+				assertEquals(expected.get(i).get(j).size(), actual.get(i).get(j).size());
+				for (int k = 0; k < expected.get(i).get(j).size(); k++) {
+					assertEquals(expected.get(i).get(j).get(k), actual.get(i).get(j).get(k));
+				}
+			}
+		}
+		assertEquals(expected, actual);
+	}
+
+
 	public void testMax() {
 		List<double[]> doubles = new ArrayList<double[]>();
 		doubles.add(new double[]{1.1, 1.2, 1.3, 1.4, 1.5});

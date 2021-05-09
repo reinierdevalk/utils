@@ -1524,6 +1524,33 @@ public class ToolBox {
 
 
 	/**
+	 * Groups any successive elements in the given list and adds them as separate lists
+	 * to the list returned.
+	 * 
+	 * @param l
+	 * @return
+	 */
+	// TESTED
+	public static List<List<Integer>> groupListOfIntegers(List<Integer> l) {
+		List<List<Integer>> grouped = new ArrayList<>();
+		List<Integer> group = new ArrayList<>();
+		group.add(l.get(0));
+		for (int i = 1; i < l.size(); i++) {
+			int curr = l.get(i);
+			int prev = l.get(i-1);
+			if (curr != prev+1) {
+				grouped.add(group);
+				group = new ArrayList<>();
+			}
+			group.add(curr);
+		}
+		// Add last group
+		grouped.add(group);
+		return grouped;
+	}
+
+
+	/**
 	 * Gets the highest value contained in the given Array.
 	 * 
 	 * @param arg
