@@ -586,13 +586,41 @@ public class ToolBox {
 	 * @param matrix
 	 * @param file
 	 */
-	public static void storeListOfListsAsCSVFile(List<List<Integer>> listOfLists, File file) {
+	public static void storeListOfListsAsCSVFileOLD(List<List<Integer>> listOfLists, File file) {
 		try {
 			file.getParentFile().mkdirs();
 			String listOfListsAsString = "";
 			for (List<Integer> list : listOfLists) {
 				String currentRow = "";
 				for (int element : list) {
+					currentRow += element;
+					currentRow += ",";
+				}
+				currentRow = currentRow.substring(0, currentRow.length() - 1); 
+				currentRow += "\r\n";
+				listOfListsAsString += currentRow;
+			} 
+			storeTextFile(listOfListsAsString, file);
+		} catch(Exception i) {
+			i.printStackTrace();
+		}
+	}
+
+
+	/**
+	 * Stores the given List<List>> as a CSV-file.
+	 * @param <T>
+	 * 
+	 * @param matrix
+	 * @param file
+	 */
+	public static <T> void storeListOfListsAsCSVFile(List<List<T>> listOfLists, File file) {
+		try {
+			file.getParentFile().mkdirs();
+			String listOfListsAsString = "";
+			for (List<T> list : listOfLists) {
+				String currentRow = "";
+				for (T element : list) {
 					currentRow += element;
 					currentRow += ",";
 				}
