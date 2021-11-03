@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
@@ -825,6 +826,48 @@ public class ToolBox {
 		}
 
 		return sb.toString();
+	}
+
+
+	/**
+	 * Returns a list containing the names of all files with the given extension in 
+	 * the given folder.
+	 * 
+	 * @param f The folder
+	 * @param e The extension
+	 * @return
+	 */
+	public static List<String> getFileNamesWithExtension(File f, String e) {
+		if (!e.startsWith(".")) {
+			throw new RuntimeException("ERROR: The extension must start with a dot.");
+		}
+
+		List<String> fileNames = new ArrayList<String>();
+		for (String s : f.list()) {
+			if (s.endsWith(e)) {
+				fileNames.add(s.substring(0, s.indexOf(e)));
+			}
+		}
+		return fileNames;
+	}
+
+
+	public static String pathify(String[] dirs) {
+		String path = "";
+		for (int i = 0; i < dirs.length; i++) {
+			String s = dirs[i];
+			path = path.concat(s);
+			if (!s.endsWith("/")) {
+				path = path.concat("/");
+			}
+		}
+		if (path.contains("//")) {
+			path = path.replace("//", "/");
+		}
+		if (path.contains("\\")) {
+			path = path.replace("\\", "/");
+		}
+		return path;
 	}
 
 
@@ -1968,6 +2011,35 @@ public class ToolBox {
 			}
 		}
 		return -1;
+	}
+
+
+	/**
+	 * Reorders the given list according to the given list of indices.
+	 *  
+	 * Example: 
+	 * list of indices 	[2, 4, 1, 3, 0]
+	 * original list	[[0.0], [1.0], [2.0], [3.0], [4.0]]
+	 * reordered list	[[4.0], [2.0], [0.0], [3.0], [1.0]]
+	 * 
+	 * @param l
+	 * @param inds
+	 * @return The reordered list, or <code>null</code> if the given lists are of 
+	 *         different size.
+	 */
+	// TESTED
+	public static <T> List<T> reorderByIndex(List<T> l, List<Integer> inds) {
+		if (l.size() != inds.size()) {
+			return null;
+		}
+		else {
+			List<T> reordered = new ArrayList<>();
+			inds.forEach(i -> reordered.add(null));
+			for (int i = 0; i < l.size(); i++) {
+				reordered.set(inds.get(i), l.get(i));
+			}
+			return reordered;
+		}
 	}
 
 

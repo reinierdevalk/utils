@@ -1487,6 +1487,47 @@ public class ToolBoxTest extends TestCase {
 	}
 
 
+	public void testReorderByIndex() {
+		List<Integer> inds = Arrays.asList(new Integer[]{2, 4, 1, 3, 0});
+		
+		List<double[]> l1 = new ArrayList<>();
+		l1.add(new double[]{0.0, 0.0, 0.0});
+		l1.add(new double[]{1.0, 1.0, 1.0});
+		l1.add(new double[]{2.0, 2.0, 2.0});
+		l1.add(new double[]{3.0, 3.0, 3.0});
+		l1.add(new double[]{4.0, 4.0, 4.0});
+
+		List<double[]> expected1 = new ArrayList<>();
+		expected1.add(new double[]{4.0, 4.0, 4.0});
+		expected1.add(new double[]{2.0, 2.0, 2.0});
+		expected1.add(new double[]{0.0, 0.0, 0.0});
+		expected1.add(new double[]{3.0, 3.0, 3.0});
+		expected1.add(new double[]{1.0, 1.0, 1.0});
+		
+		List<Integer> l2 = new ArrayList<>();
+		l2.add(0); l2.add(1); l2.add(2); l2.add(3); l2.add(4);
+
+		List<Integer> expected2 = new ArrayList<>();
+		expected2.add(4); expected2.add(2); expected2.add(0);
+		expected2.add(3); expected2.add(1);
+		
+		List<double[]> actual1 = ToolBox.reorderByIndex(l1, inds);
+		List<Integer> actual2 = ToolBox.reorderByIndex(l2, inds);
+
+		assertEquals(expected1.size(), actual1.size());
+		for (int i = 0; i < expected1.size(); i++) {
+			assertEquals(expected1.get(i).length, actual1.get(i).length);
+			for (int j = 0; j < expected1.get(i).length; j++) {
+				assertEquals(expected1.get(i)[j], actual1.get(i)[j]);
+			}
+		}
+		assertEquals(expected2.size(), actual2.size());
+		for (int i = 0; i < expected2.size(); i++) {
+			assertEquals(expected2.get(i), actual2.get(i));
+		}
+	}
+
+
 	public void testSortBy() {
 		List<Integer[]> toSort = new ArrayList<Integer[]>();
 		toSort.add(new Integer[]{3, 20});
