@@ -2015,7 +2015,8 @@ public class ToolBox {
 
 
 	/**
-	 * Reorders the given list according to the given list of indices.
+	 * Reorders the given list by moving each element to the index provided at the 
+	 * corresponding element in the given list of indices.
 	 *  
 	 * Example: 
 	 * list of indices 	[2, 4, 1, 3, 0]
