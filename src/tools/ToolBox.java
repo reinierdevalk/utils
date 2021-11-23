@@ -355,7 +355,7 @@ public class ToolBox {
 
 
 	/**
-	 * Stores the given matrix as a CSV-file.
+	 * Stores the given matrix as a CSV file.
 	 * 
 	 * @param matrix
 	 * @param file
