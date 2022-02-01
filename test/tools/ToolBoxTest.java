@@ -1432,20 +1432,106 @@ public class ToolBoxTest extends TestCase {
 	}
 
 
+	public void testRemoveDuplicateItems() {
+		List<List<Integer>> ints = new ArrayList<>();
+		ints.add(Arrays.asList(new Integer[]{0, 0}));
+		ints.add(Arrays.asList(new Integer[]{1, 1}));
+		ints.add(Arrays.asList(new Integer[]{2, 2}));
+		ints.add(null);
+		ints.add(Arrays.asList(new Integer[]{0, 0}));
+		ints.add(Arrays.asList(new Integer[]{5, 5}));
+		ints.add(Arrays.asList(new Integer[]{5, 5}));
+		ints.add(null);
+		ints.add(Arrays.asList(new Integer[]{8, 8}));
+		ints.add(Arrays.asList(new Integer[]{2, 2}));
+
+		List<List<Double>> doubles = new ArrayList<>();
+		doubles.add(Arrays.asList(new Double[]{0.0, 0.0})); 
+		doubles.add(Arrays.asList(new Double[]{1.0, 1.0}));
+		doubles.add(Arrays.asList(new Double[]{2.0, 2.0}));
+		doubles.add(null);
+		doubles.add(Arrays.asList(new Double[]{0.0, 0.0}));
+		doubles.add(Arrays.asList(new Double[]{5.0, 5.0}));
+		doubles.add(Arrays.asList(new Double[]{5.0, 5.0}));
+		doubles.add(null);
+		doubles.add(Arrays.asList(new Double[]{8.0, 8.0}));
+		doubles.add(Arrays.asList(new Double[]{2.0, 2.0}));
+		
+		List<List<Integer>> expected1 = new ArrayList<>();
+		expected1.add(Arrays.asList(new Integer[]{0, 0}));
+		expected1.add(Arrays.asList(new Integer[]{1, 1}));
+		expected1.add(Arrays.asList(new Integer[]{2, 2}));
+		expected1.add(null);
+		expected1.add(Arrays.asList(new Integer[]{5, 5}));
+		expected1.add(Arrays.asList(new Integer[]{8, 8}));
+		
+		List<List<Double>> expected2 = new ArrayList<>();
+		expected2.add(Arrays.asList(new Double[]{0.0, 0.0})); 
+		expected2.add(Arrays.asList(new Double[]{1.0, 1.0}));
+		expected2.add(Arrays.asList(new Double[]{2.0, 2.0}));
+		expected2.add(null);
+		expected2.add(Arrays.asList(new Double[]{5.0, 5.0}));
+		expected2.add(Arrays.asList(new Double[]{8.0, 8.0}));
+		
+		List<List<Integer>> actual1 = ToolBox.removeDuplicateItems(ints);
+		List<List<Double>> actual2 = ToolBox.removeDuplicateItems(doubles);
+		
+		assertEquals(expected1.size(), actual1.size());
+		for (int i = 0; i < expected1.size(); i++) {
+			if (expected1.get(i) != null) {
+				assertEquals(expected1.get(i).size(), actual1.get(i).size());
+				for (int j = 0; j < expected1.get(i).size(); j++) {
+					assertEquals(expected1.get(i).get(j), actual1.get(i).get(j));
+				}
+			}
+			else {
+				assertEquals(expected1.get(i), actual1.get(i));
+			}
+		}
+		assertEquals(expected1, actual1);
+		
+		assertEquals(expected2.size(), actual2.size());
+		for (int i = 0; i < expected2.size(); i++) {
+			if (expected2.get(i) != null) {
+				assertEquals(expected2.get(i).size(), actual2.get(i).size());
+				for (int j = 0; j < expected2.get(i).size(); j++) {
+					assertEquals(expected2.get(i).get(j), actual2.get(i).get(j));
+				}
+			}
+			else {
+				assertEquals(expected2.get(i), actual2.get(i));
+			}
+		}
+		assertEquals(expected2, actual2);
+	}
+
+
 	public void testGetItemsAtIndex() {
-		List<Integer[]> aList = new ArrayList<Integer[]>();
-		aList.add(new Integer[]{3, 20});
-		aList.add(new Integer[]{1, 50});
-		aList.add(new Integer[]{5, 10});
-		aList.add(new Integer[]{2, 30});
+		List<Integer[]> list1 = new ArrayList<Integer[]>();
+		list1.add(new Integer[]{3, 20});
+		list1.add(new Integer[]{1, 50});
+		list1.add(new Integer[]{5, 10});
+		list1.add(new Integer[]{2, 30});
 		
-		List<Integer> expected = Arrays.asList(new Integer[]{3, 1, 5, 2, 20, 50, 10, 30});
+		List<Double[]> list2 = new ArrayList<Double[]>();
+		list2.add(new Double[]{3.0, 20.0});
+		list2.add(new Double[]{1.0, 50.0});
+		list2.add(new Double[]{5.0, 10.0});
+		list2.add(new Double[]{2.0, 30.0});
 		
-		List<Integer> actual = ToolBox.getItemsAtIndex(aList, 0);
-		actual.addAll(ToolBox.getItemsAtIndex(aList, 1));
+		List<Integer> expected1 = Arrays.asList(new Integer[]{3, 1, 5, 2, 20, 50, 10, 30});		
+		List<Double> expected2 = 
+			Arrays.asList(new Double[]{3.0, 1.0, 5.0, 2.0, 20.0, 50.0, 10.0, 30.0});
 		
-		assertEquals(expected.size(), actual.size());
-		assertEquals(expected, actual);	
+		List<Integer> actual1 = ToolBox.getItemsAtIndex(list1, 0);
+		actual1.addAll(ToolBox.getItemsAtIndex(list1, 1));
+		List<Double> actual2 = ToolBox.getItemsAtIndex(list2, 0);
+		actual2.addAll(ToolBox.getItemsAtIndex(list2, 1));
+		
+		assertEquals(expected1.size(), actual1.size());
+		assertEquals(expected1, actual1);
+		assertEquals(expected2.size(), actual2.size());
+		assertEquals(expected2, actual2);
 	}
 
 

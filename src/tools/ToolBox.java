@@ -1393,8 +1393,8 @@ public class ToolBox {
 		}  
 		return arraysConcatenated;
 	}
-	
-	
+
+
 	/**
 	 * Concatenates the arrays contained by the List given as argument, in the order they are set in the List.
 	 * 
@@ -1403,27 +1403,33 @@ public class ToolBox {
 	 */
 	// TESTED
 	public static Object[] concatArrays(List<Object[]> listOfArrays) {
-		int length = 0;
+//	public static <T> T[] concatArrays(List<T[]> listOfArrays) {
+
+		int length = 0;		
 		for (Object[] d : listOfArrays) {
+//		for (T[] d : listOfArrays) {			
 			length +=d.length;
 		}
+		// See https://stackoverflow.com/questions/2927391/whats-the-reason-i-cant-create-generic-array-types-in-java
 		Object[] arraysConcatenated = new Object[length];
+//		T[] arraysConcatenated = (T[]) new Object[length];
 		
+
 		int startIndex = 0;
+
 		for (Object[] currentArray : listOfArrays) {
-//		for (int i = 0; i < listOfArrays.size(); i++) {
-//		  Object[] currentArray = listOfArrays.get(i);
-		  for (int j = 0; j < currentArray.length; j++) {
-			  arraysConcatenated[startIndex + j] = currentArray[j];
-	 	  }
-		  startIndex += currentArray.length;
-		}  
+//		for (T[] currentArray : listOfArrays) {
+//			for (int i = 0; i < listOfArrays.size(); i++) {
+//			Object[] currentArray = listOfArrays.get(i);
+			for (int j = 0; j < currentArray.length; j++) {
+				arraysConcatenated[startIndex + j] = currentArray[j];
+			}
+			startIndex += currentArray.length;
+		}
 		return arraysConcatenated;
 	}
-	
-	
-	
-	
+
+
 	/**
 	 * Calculates the precision, recall and F1-Score (in %) from the given numbers. Returns a Rational[] containing
 	 *   as element 0: the precision (tP / (tP + fP))
@@ -1943,11 +1949,6 @@ public class ToolBox {
 	 */
 	// TESTED
 	public static <T> List<T> removeItemsAtIndices(List<T> data, List<Integer> inds) {
-//		for (int i : inds) {
-//			data.set(i, null);
-//		}
-//		data.removeIf(d -> d == null);
-
 		List<T> dataPruned = new ArrayList<>();
 		for (int i = 0; i < data.size(); i++) {
 			if (!inds.contains(i)) {
@@ -1959,6 +1960,26 @@ public class ToolBox {
 
 
 	/**
+	 * Removes all non-first occurrences of all items occurring more than once in the given
+	 * list from the list. 
+	 * 
+	 * @param data
+	 * @return
+	 */
+	// TESTED
+	public static <T> List<T> removeDuplicateItems(List<T> data) {
+		List<Integer> indsToRemove = new ArrayList<>();
+		for (int i = 0; i < data.size(); i++) {
+			T d = data.get(i);
+			if (Collections.frequency(data, d) > 1 && i > data.indexOf(d)) {
+				indsToRemove.add(i);
+			}
+		}	
+		return removeItemsAtIndices(data, indsToRemove);
+	}
+
+
+	/**
 	 * Returns a list containing, for each list element, the item at the given index in the element.
 	 *  
 	 * @param l
@@ -1966,9 +1987,9 @@ public class ToolBox {
 	 * @return
 	 */
 	// TESTED
-	public static List<Integer> getItemsAtIndex(List<Integer[]> l, int colInd) {
-		List<Integer> col = new ArrayList<>();
-		for (Integer[] in : l) {
+	public static <T> List<T> getItemsAtIndex(List<T[]> l, int colInd) {
+		List<T> col = new ArrayList<>();
+		for (T[] in : l) {
 			col.add(in[colInd]);
 		}
 		return col;
@@ -2592,6 +2613,23 @@ public class ToolBox {
 //		}
 //		double correlationCoefficient = numerator / denominator;
 //		return correlationCoefficient;
+	}
+
+
+	/**
+	 * Returns a list containing, for each list element, the item at the given index in the element.
+	 *  
+	 * @param l
+	 * @param colInd
+	 * @return
+	 */
+	// TESTED
+	private static List<Integer> getItemsAtIndexOld(List<Integer[]> l, int colInd) {
+		List<Integer> col = new ArrayList<>();
+		for (Integer[] in : l) {
+			col.add(in[colInd]);
+		}
+		return col;
 	}
 		
 }
