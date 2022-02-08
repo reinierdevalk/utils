@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDateTime;
@@ -206,10 +208,19 @@ public class ToolBox {
 			} catch (IOException e) { 
 				e.printStackTrace();           
 			}       
-		}   
-		// Show file contents here
+		}
 		return contents.toString();
 //		return contents.toString().replace("\r\n\r\n", "\r\n");
+	}
+
+
+	public static String getFilename(File f, String extension) {
+		if (extension != null) {
+			return f.getName().substring(0, f.getName().indexOf(extension));
+		}
+		else {
+			return f.getName();
+		}
 	}
 
 
