@@ -180,15 +180,27 @@ public class ToolBox {
 	}
 
 
+	// TESTED
+	public static String getFilename(File f, String extension) {
+		if (extension != null) {
+			return f.getName().substring(0, f.getName().indexOf(extension));
+		}
+		else {
+			return f.getName();
+		}
+	}
+
+
 	/**
 	 * Returns the contents of the given File as a String.
 	 * 
 	 * @param file
 	 * @return
 	 */
+	// TESTED
 	public static String readTextFile(File file) {
 		StringBuffer contents = new StringBuffer(); 
-		BufferedReader reader = null; 
+		BufferedReader reader = null;
 		try { 
 			reader = new BufferedReader(new FileReader(file)); 
 			String text = null; 
@@ -214,13 +226,14 @@ public class ToolBox {
 	}
 
 
-	public static String getFilename(File f, String extension) {
-		if (extension != null) {
-			return f.getName().substring(0, f.getName().indexOf(extension));
+	public static String readTextFileAlt(File f) {
+		String s = "";
+		try {
+			s = new String(Files.readAllBytes(Paths.get(f.getAbsolutePath())));
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
-		else {
-			return f.getName();
-		}
+		return s;
 	}
 
 

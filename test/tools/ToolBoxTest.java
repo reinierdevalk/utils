@@ -21,6 +21,43 @@ public class ToolBoxTest extends TestCase {
 	}
 
 
+	public void testGetFilename() {
+		File f = new File("F:/research/data/annotated/encodings/test/testpiece.tbp");
+
+		List<String> expected = Arrays.asList(new String[]{"testpiece", "testpiece.tbp"});
+		List<String> actual = new ArrayList<>();
+		actual.add(ToolBox.getFilename(f, ".tbp"));
+		actual.add(ToolBox.getFilename(f, null));
+
+		assertEquals(expected, actual);
+	}
+
+
+	public void testReadTextFile() {
+		File f = new File("F:/research/data/annotated/encodings/test/testpiece.tbp");
+
+		String expected = 
+			"{AUTHOR: Author }" + "\r\n" + 
+			"{TITLE:Title}" + "\r\n" + 
+			"{SOURCE:Source (year)}" + "\r\n" +	"\r\n" + 
+			"{TABSYMBOLSET:FrenchTab}" + "\r\n" + 
+			"{TUNING:A}" + "\r\n" + 
+			"{TUNING_SEVENTH_COURSE: }" + "\r\n" +
+			"{METER_INFO:2/2 (1-3)}" + "\r\n" + 
+			"{DIMINUTION:1}" + "\r\n" + "\r\n" +
+			"{bar 1}" + "\r\n" +
+			"McC3.>.sb.>.mi.>.mi.a5.c4.b2.a1.>.|{@Footnote 1}." + "\r\n" +
+			"{bar 2}" + "\r\n" +
+			"sm*.a6.c4.i2.a1.>.fu.d6.>.sm.c6.a5.e4.b2.>.a6.>.mi.a6.h5.c4.b3.f2{@'mi.a6.' in source}.>.sm.a6.b3.a2.a1.>.a3.e2.>.|./" + "\r\n" + 
+			"{bar 3}" + "\r\n" +
+			"fu.a6.c4.a2.a1.>.e2.>.sf.a1.>.e2.>.|.c2.>.e2.>.mi.a1.>.mi.>.mi.a6.c4.a2.a1.>.||.//" + "\r\n";
+		
+		String actual = ToolBox.readTextFile(f);
+		
+		assertEquals(expected, actual);
+	}
+
+
 	public void testWeightedGeometricMean() {
 		double one = Math.E; // ln = 1.0
 		double two = Math.pow(Math.E, 2); // ln = 2.0
