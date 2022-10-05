@@ -2003,6 +2003,22 @@ public class ToolBox {
 	}
 
 
+//	/**
+//	 * Retuns the column at the given index in the given matrix.
+//	 * 
+//	 * @param matrix
+//	 * @param colInd
+//	 * @return
+//	 */
+//	public static double[] getItemsAtIndex(double[][] matrix, int colInd) {
+//		double[] col = new double[matrix.length];
+//		for (int i = 0; i < matrix.length; i++) {
+//			col[i] = matrix[i][colInd];
+//		}
+//		return col;
+//	}
+
+
 	/**
 	 * Returns a list containing, for each list element, the item at the given index in the element.
 	 *  
