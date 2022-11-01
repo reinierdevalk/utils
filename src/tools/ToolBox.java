@@ -2189,7 +2189,7 @@ public class ToolBox {
 
 
 	/**
-	 * Sorts the given List<List>> so that the values at position pos of each List are in ascending numerical order.
+	 * Sorts the given List<List> so that the values at position pos of each List are in ascending numerical order.
 	 * NB: this is the implementation of bubblesort as given on http://nl.wikipedia.org/wiki/Bubblesort
 	 * 
 	 * @param listToSort
