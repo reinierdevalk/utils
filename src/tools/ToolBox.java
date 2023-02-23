@@ -696,7 +696,7 @@ public class ToolBox {
 				res[i] = String.valueOf(Math.round(intsToAvg[i] / (double) divisor));
 			}
 			if (doublesToAvg[i] != null) {
-				res[i] = ToolBox.formatDouble((doublesToAvg[i] / (double) divisor), 
+				res[i] = ToolBox.formatDouble((doublesToAvg[i] / divisor), 
 					maxLenDouble, totalNumChars);
 			}
 		}
@@ -1051,25 +1051,6 @@ public class ToolBox {
 			combined.add(currentPair);
 		}
 		return combined;
-	}
-
-
-	/**
-	 * Returns the given metric position as a String.
-	 * 
-	 * @param metricPosition
-	 * @return
-	 */
-	public static String getMetricPositionAsString(Rational[] metricPosition) {
-		int currentBar = metricPosition[0].getNumer();
-		Rational currentPositionInBar = metricPosition[1];
-		currentPositionInBar.reduce();
-		if (currentPositionInBar.getNumer() != 0) {
-			return Integer.toString(currentBar).concat(" ").concat(currentPositionInBar.toString());
-		}
-		else {
-			return Integer.toString(currentBar);
-		}
 	}
 
 
