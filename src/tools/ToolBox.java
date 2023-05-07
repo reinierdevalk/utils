@@ -250,7 +250,7 @@ public class ToolBox {
 			FileWriter fstream = new FileWriter(file);
 			BufferedWriter out = new BufferedWriter(fstream);
 			out.write(contents);
-			//Close the output stream
+			// Close the output stream
 			out.close();
 		} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
