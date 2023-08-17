@@ -40,7 +40,6 @@ public class PythonInterface {
 			while((line = bfr.readLine()) != null) {
 				scriptOutput += line + "\r\n";
 				if (VERBOSE) System.out.println(line);
-				System.out.println(line);
 			}
 
 			// bfrErr reads Process) errors (i.e., reads any errors given by the commands passed to Process). 
@@ -133,6 +132,7 @@ public class PythonInterface {
 			BufferedReader bfr = new BufferedReader(new InputStreamReader(pr.getInputStream()));
 			if (VERBOSE_APP) System.out.println(">>> output received from Process (IPython)");
 			String line = null;
+			if (VERBOSE_APP) System.out.println(bfr.readLine());
 			while (!(line = bfr.readLine()).endsWith("#")) {
 //			while ((line = bfr.readLine()) != null) {
 				if (VERBOSE_APP) System.out.println(line);
