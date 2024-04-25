@@ -10,6 +10,7 @@ import java.util.List;
 import junit.framework.TestCase;
 import de.uos.fmt.musitech.utility.math.Rational;
 
+
 public class ToolBoxTest extends TestCase {
 		
 	@Override
@@ -237,19 +238,35 @@ public class ToolBoxTest extends TestCase {
 	public void testTabify() {
 		String one = "test";
 		String two = "longer test";
+		String three = "(1)  Footnote 1";
+		String spaces = "        ";
 		
 		List<String> expected = Arrays.asList(new String[]{
 			"test\t", // the \t fills the String up to a full \t (8 spaces) 
 			"test\t" + "\t",
 			"longer test\t",
-			"longer test\t" + "\t"
+			"longer test\t" + "\t",
+			"(1)  Footnote 1\t" + "\t",
+			//
+			"test    ", // the \t fills the String up to a full \t (8 spaces) 
+			"test    " + spaces,
+			"longer test     ",
+			"longer test     " + spaces,
+			"(1)  Footnote 1 " + spaces
 		});
 
 		List<String> actual = new ArrayList<>();
-		actual.add(ToolBox.tabify(one, 1));
-		actual.add(ToolBox.tabify(one, 2));
-		actual.add(ToolBox.tabify(two, 2));
-		actual.add(ToolBox.tabify(two, 3));
+		actual.add(ToolBox.tabify(one, 1, true));
+		actual.add(ToolBox.tabify(one, 2, true));
+		actual.add(ToolBox.tabify(two, 2, true));
+		actual.add(ToolBox.tabify(two, 3, true));
+		actual.add(ToolBox.tabify(three, 3, true));
+		//
+		actual.add(ToolBox.tabify(one, 1, false));
+		actual.add(ToolBox.tabify(one, 2, false));
+		actual.add(ToolBox.tabify(two, 2, false));
+		actual.add(ToolBox.tabify(two, 3, false));
+		actual.add(ToolBox.tabify(three, 3, false));
 
 		assertEquals(expected, actual);
 	}
@@ -500,20 +517,18 @@ public class ToolBoxTest extends TestCase {
 			}
 		}
 	}
-	
-	
+
+
 	public void testParseStringOfIntegers() {
 		String testString0 = "1\n2\n3\n4\n5";
 		String testString1 = "2-3-4-5-6";
 		String testString2 = "3 4 5 6 7";
-		
-		// Make expected
+
 		List<List<Integer>> expected = new ArrayList<List<Integer>>();
 		expected.add(new ArrayList<Integer>(Arrays.asList(new Integer[]{1, 2, 3, 4, 5})));
 		expected.add(new ArrayList<Integer>(Arrays.asList(new Integer[]{2, 3, 4, 5, 6})));
 		expected.add(new ArrayList<Integer>(Arrays.asList(new Integer[]{3, 4, 5, 6, 7})));
-		
-		// Calculate actual
+
 		String regEx0 = "\n";
 		String regEx1 = "-";
 		String regEx2 = " "; 
@@ -521,8 +536,7 @@ public class ToolBoxTest extends TestCase {
 		actual.add(ToolBox.parseStringOfIntegers(testString0, regEx0));
 		actual.add(ToolBox.parseStringOfIntegers(testString1, regEx1));
 		actual.add(ToolBox.parseStringOfIntegers(testString2, regEx2));
-		
-		// Assert equality
+
 		assertEquals(expected.size(), actual.size());
 		for (int i = 0; i < expected.size(); i++) {
 			assertEquals(expected.get(i).size(), actual.get(i).size());
@@ -780,7 +794,7 @@ public class ToolBoxTest extends TestCase {
 			for (int j = 0; j < expected.get(i).size(); j++) {
 				assertEquals(expected.get(i).get(j), actual.get(i).get(j));
 			}
-		} 
+		}
 	}
 
 
@@ -1248,7 +1262,7 @@ public class ToolBoxTest extends TestCase {
 				assertEquals(expected.get(i).get(j), actual.get(i).get(j));
 			}
 		}
-		assertEquals(expected, actual);	
+		assertEquals(expected, actual);
 	}
 	
 	
@@ -1483,7 +1497,7 @@ public class ToolBoxTest extends TestCase {
 		ints.add(null);
 		ints.add(Arrays.asList(new Integer[]{8, 8}));
 		ints.add(Arrays.asList(new Integer[]{2, 2}));
-
+		//
 		List<List<Double>> doubles = new ArrayList<>();
 		doubles.add(Arrays.asList(new Double[]{0.0, 0.0})); 
 		doubles.add(Arrays.asList(new Double[]{1.0, 1.0}));
@@ -1503,7 +1517,7 @@ public class ToolBoxTest extends TestCase {
 		expected1.add(null);
 		expected1.add(Arrays.asList(new Integer[]{5, 5}));
 		expected1.add(Arrays.asList(new Integer[]{8, 8}));
-		
+		//
 		List<List<Double>> expected2 = new ArrayList<>();
 		expected2.add(Arrays.asList(new Double[]{0.0, 0.0})); 
 		expected2.add(Arrays.asList(new Double[]{1.0, 1.0}));
@@ -1528,7 +1542,7 @@ public class ToolBoxTest extends TestCase {
 			}
 		}
 		assertEquals(expected1, actual1);
-		
+		//
 		assertEquals(expected2.size(), actual2.size());
 		for (int i = 0; i < expected2.size(); i++) {
 			if (expected2.get(i) != null) {
@@ -1542,6 +1556,83 @@ public class ToolBoxTest extends TestCase {
 			}
 		}
 		assertEquals(expected2, actual2);
+	}
+
+
+	public void testGetRange() {
+		List<List<Integer>> expected = Arrays.asList(
+			Arrays.asList(new Integer[]{-3, -2, -1, 0, 1, 2}),
+			Arrays.asList(new Integer[]{3, 4, 5, 6, 7, 8})
+		);
+
+		List<List<Integer>> actual = Arrays.asList(
+			ToolBox.getRange(-3, 3),
+			ToolBox.getRange(3, 9)
+		);
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).size(), actual.get(i).size());
+			for (int j = 0; j < expected.get(i).size(); j++) {
+				assertEquals(expected.get(i).get(j), actual.get(i).get(j));
+			}
+		}
+		assertEquals(expected, actual);	
+	}
+
+
+	public void testGetDuplicates() {		
+		List<List<String>> strs = Arrays.asList(
+			Arrays.asList("a", "b", "c", "d"),
+			Arrays.asList("a", "b", "c", "c", "d"),
+			Arrays.asList("a", "b", "b", "c", "c")
+		);
+		//
+		List<List<Integer>> ints = Arrays.asList(
+			Arrays.asList(1, 2, 3, 4),
+			Arrays.asList(1, 2, 3, 3, 4),
+			Arrays.asList(1, 2, 2, 3, 3)
+		);
+
+		List<List<String>> expectedStr = Arrays.asList(
+			new ArrayList<String>(),
+			Arrays.asList("c"),
+			Arrays.asList("b", "c")
+		);
+		//
+		List<List<Integer>> expectedInt = Arrays.asList(
+			new ArrayList<Integer>(),
+			Arrays.asList(3),
+			Arrays.asList(2, 3)
+		);
+
+		List<List<String>> actualStr = new ArrayList<>();
+		for (List<String> l : strs) {
+			actualStr.add(ToolBox.getDuplicates(l));
+		}
+		//
+		List<List<Integer>> actualInt = new ArrayList<>();
+		for (List<Integer> l : ints) {
+			actualInt.add(ToolBox.getDuplicates(l));
+		}
+		
+		assertEquals(expectedStr.size(), actualStr.size());
+		for (int i = 0; i < expectedStr.size(); i++) {
+			assertEquals(expectedStr.get(i).size(), actualStr.get(i).size());
+			for (int j = 0; j < expectedStr.get(i).size(); j++) {
+				assertEquals(expectedStr.get(i).get(j), actualStr.get(i).get(j));
+			}
+		}
+		assertEquals(expectedStr, actualStr);
+		//
+		assertEquals(expectedInt.size(), actualInt.size());
+		for (int i = 0; i < expectedInt.size(); i++) {
+			assertEquals(expectedInt.get(i).size(), actualInt.get(i).size());
+			for (int j = 0; j < expectedInt.get(i).size(); j++) {
+				assertEquals(expectedInt.get(i).get(j), actualInt.get(i).get(j));
+			}
+		}
+		assertEquals(expectedInt, actualInt);
 	}
 
 
@@ -1689,6 +1780,53 @@ public class ToolBoxTest extends TestCase {
 	}
 
 
+	public void testSortByAlt() {
+		List<Integer[]> toSort = Arrays.asList(
+			new Integer[]{3, 20},
+			new Integer[]{1, 50},
+			new Integer[]{5, 10},
+			new Integer[]{2, 30}
+		);
+
+		List<Integer[]> expected = Arrays.asList(
+			// Addition
+			new Integer[]{5, 10},
+			new Integer[]{3, 20},
+			new Integer[]{2, 30},
+			new Integer[]{1, 50},
+			// Subtraction
+			new Integer[]{1, 50},
+			new Integer[]{2, 30},
+			new Integer[]{3, 20},
+			new Integer[]{5, 10},
+			// Multiplication
+			new Integer[]{1, 50},
+			new Integer[]{5, 10},
+			new Integer[]{2, 30},
+			new Integer[]{3, 20},
+			// Division
+			new Integer[]{1, 50},
+			new Integer[]{2, 30},
+			new Integer[]{3, 20},
+			new Integer[]{5, 10}
+		);
+
+		List<Integer[]> actual = new ArrayList<>();
+		actual.addAll(ToolBox.sortBy(toSort, 0, 1, "addition"));
+		actual.addAll(ToolBox.sortBy(toSort, 0, 1, "subtraction"));
+		actual.addAll(ToolBox.sortBy(toSort, 0, 1, "multiplication"));
+		actual.addAll(ToolBox.sortBy(toSort, 0, 1, "division"));
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).length, actual.get(i).length);
+			for (int j = 0; j < expected.get(i).length; j++) {
+				assertEquals(expected.get(i)[j], actual.get(i)[j]);
+			}
+		}
+	}
+
+
 	public void testSortByRational() {
 		List<Rational[]> toSort = new ArrayList<Rational[]>();
 		toSort.add(new Rational[]{new Rational(3, 2), new Rational(20, 2)});
@@ -1726,30 +1864,25 @@ public class ToolBoxTest extends TestCase {
 
 
 	public void testSortByString() {
-		List<String[]> toSort = new ArrayList<String[]>();
-		toSort.add(new String[]{"3", "20"});
-		toSort.add(new String[]{"1", "50"});
-		toSort.add(new String[]{"5", "10"});
-		toSort.add(new String[]{"2", "30"});
-		
-		List<String[]> expected = new ArrayList<String[]>();
-		expected.add(new String[]{"1", "50"});
-		expected.add(new String[]{"2", "30"});
-		expected.add(new String[]{"3", "20"});
-		expected.add(new String[]{"5", "10"});
-		//
-		expected.add(new String[]{"5", "10"});
-		expected.add(new String[]{"3", "20"});
-		expected.add(new String[]{"2", "30"});
-		expected.add(new String[]{"1", "50"});
-		
-		List<String[]> actual = ToolBox.sortByString(toSort, 0, "int");
-		toSort = new ArrayList<String[]>();
-		toSort.add(new String[]{"3", "20"});
-		toSort.add(new String[]{"1", "50"});
-		toSort.add(new String[]{"5", "10"});
-		toSort.add(new String[]{"2", "30"});
-		actual.addAll(ToolBox.sortByString(toSort, 1, "int"));
+		// int
+		String[] a = new String[]{"1", "50", "1.50"};
+		String[] b = new String[]{"2", "30", "2.30"};
+		String[] c = new String[]{"3", "20", "3.20"};
+		String[] d = new String[]{"5", "10", "5.10"};
+		List<String[]> toSort = Arrays.asList(c, a, d, b);
+		List<String[]> expected = Arrays.asList(
+			a, b, c, d, 
+			//
+			d, c, b, a,
+			// 
+			a, b, c, d,
+			//
+			d, c, b, a
+		);
+		List<String[]> actual = ToolBox.sortByString(new ArrayList<String[]>(toSort), 0, "int", null, null);
+		actual.addAll(ToolBox.sortByString(new ArrayList<String[]>(toSort), 1, "int", null, null));
+		actual.addAll(ToolBox.sortByString(new ArrayList<String[]>(toSort), 2, "int", ".", "first"));
+		actual.addAll(ToolBox.sortByString(new ArrayList<String[]>(toSort), 2, "int", ".", "last"));
 
 		assertEquals(expected.size(), actual.size());
 		for (int i = 0; i < expected.size(); i++) {
@@ -1758,20 +1891,16 @@ public class ToolBoxTest extends TestCase {
 				assertEquals(expected.get(i)[j], actual.get(i)[j]);
 			}
 		}
-		
-		toSort = new ArrayList<String[]>();
-		toSort.add(new String[]{"1/1", "50"});
-		toSort.add(new String[]{"3/2", "10"});
-		toSort.add(new String[]{"1/2", "30"});
-		toSort.add(new String[]{"0/1", "20"});
-		
-		expected = new ArrayList<String[]>();
-		expected.add(new String[]{"0/1", "20"});
-		expected.add(new String[]{"1/2", "30"});
-		expected.add(new String[]{"1/1", "50"});
-		expected.add(new String[]{"3/2", "10"});
-		
-		actual = ToolBox.sortByString(toSort, 0, "Rational");
+
+		// Rational
+		String[] ra = new String[]{"0/1", "20"};
+		String[] rb = new String[]{"1/2", "30"}; 
+		String[] rc = new String[]{"1/1", "50"}; 
+		String[] rd = new String[]{"3/2", "10"}; 	
+		toSort = Arrays.asList(rc, rd, rb, ra);		
+		expected = Arrays.asList(ra, rb, rc, rd);
+		actual = ToolBox.sortByString(toSort, 0, "Rational", null, null);
+
 		assertEquals(expected.size(), actual.size());
 		for (int i = 0; i < expected.size(); i++) {
 			assertEquals(expected.get(i).length, actual.get(i).length);

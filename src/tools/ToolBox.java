@@ -26,8 +26,12 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
@@ -271,7 +275,7 @@ public class ToolBox {
 				sb.append(spaceBefore);
 				for (int j = itemInd; j < itemInd + numCols; j++) {
 					if (j < numItems) {
-						sb.append(ToolBox.tabify(arg.get(j) + "", 1));
+						sb.append(ToolBox.tabify(arg.get(j) + "", 1, true));
 					}
 				}
 				if (i < numRows - 1) {
@@ -402,6 +406,9 @@ public class ToolBox {
 			i.printStackTrace();
 		}
 	}
+
+
+
 
 
 	/**
@@ -807,48 +814,56 @@ public class ToolBox {
 	 * 
 	 * @param s
 	 * @param numTabs
+	 * @param useTabs If set to <code>true</code>, tabs are used to complete the String; otherwise,
+	 *                spaces are used.
 	 * @return
 	 */
 	// TESTED
-	public static String tabify(String s, int numTabs) {
-		StringBuffer sb = new StringBuffer();
+	public static String tabify(String s, int numTabs, boolean useTabs) {
 		int tabLen = TAB_LEN;
 		int totalLen = numTabs*tabLen;
 
-		sb.append(s);
-		
-		if (s == null) {
-			s = "";
-		}
+		if (useTabs) {
+			StringBuffer sb = new StringBuffer();
+			sb.append(s);
 
-		int tabsToAdd = 0;
-		// a. If s has a length that is a multiple of tabLen: determine the number of tabs to add
-		double d = s.length() / (double)tabLen;
-		// When d is a multiple of tabLen, i.e., a positive integer
-		if (d == (int) d) {
-			tabsToAdd = numTabs - (int) d; 
-		}
-		// b. If not: find the closest tabLen multiple and determine the number of tabs to add
-		else {
-			for (int i = s.length(); i <= totalLen; i++) {	
-				d = i / (double) tabLen;
-				// When d is a multiple of tabLen, i.e., a positive integer
-				// NB The first tab added completes the length of s to tabLength - but if
-				// a string is prepended to s (e.g., in a print statement) this shortens
-				// \t with the length of the prepended String
-				if (d == (int) d) {
-					tabsToAdd = numTabs - ((int) d - 1);
-					break;
+			if (s == null) {
+				s = "";
+			}
+
+			int tabsToAdd = 0;
+			// a. If s has a length that is a multiple of tabLen: determine the number of tabs to add
+			double d = s.length() / (double) tabLen;
+			// When d is a multiple of tabLen, i.e., a positive integer
+			if (d == (int) d) {
+				tabsToAdd = numTabs - (int) d; 
+			}
+			// b. If not: find the closest tabLen multiple and determine the number of tabs to add
+			else {
+				for (int i = s.length(); i <= totalLen; i++) {	
+					d = i / (double) tabLen;
+					// When d is a multiple of tabLen, i.e., a positive integer
+					// NB The first tab added completes the length of s to tabLength - but if
+					// a string is prepended to s (e.g., in a print statement) this shortens
+					// \t with the length of the prepended String
+					if (d == (int) d) {
+						tabsToAdd = numTabs - ((int) d - 1);
+						break;
+					}
 				}
 			}
-		}
 
-		// Add tabs to s 
-		for (int i = 1; i <= tabsToAdd; i++) {
-			sb.append("\t");
-		}
+			// Add tabs to s 
+			for (int i = 1; i <= tabsToAdd; i++) {
+				sb.append("\t");
+			}
 
-		return sb.toString();
+			return sb.toString();
+		}
+		// See https://stackoverflow.com/questions/36747661/java-how-to-align-text-in-jtextarea-regardless-of-length-of-characters
+		else {
+			return String.format("%-" + totalLen + "s", s);	
+		}
 	}
 
 
@@ -1984,6 +1999,37 @@ public class ToolBox {
 	}
 
 
+	/**
+	 * Gets the the range of numbers from the given start int (inclusive) to the given end
+	 * int (exclusive).
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	// TESTED
+	public static List<Integer> getRange(int start, int end) {
+		return IntStream.rangeClosed(start, end-1)
+			.boxed()
+			.collect(Collectors.toList());
+	}
+
+
+	/**
+	 * Returns a list of all duplicates in the given data. If there are no duplicates, 
+	 * an empty list is returned.
+	 * 
+	 * @param data
+	 * @return
+	 */
+	// TESTED
+	public static <T> List<T> getDuplicates(List<T> data) {
+		Set<T> elements = new HashSet<T>();
+	    return data.stream()
+	      .filter(n -> !elements.add(n))
+	      .collect(Collectors.toList());
+	}
+
+
 //	/**
 //	 * Retuns the column at the given index in the given matrix.
 //	 * 
@@ -2104,6 +2150,56 @@ public class ToolBox {
 		return toSort;
 	}
 
+	
+	/**
+	 * Sorts the given list by the given operation done on the list elements at the given indices.
+	 * @param toSort
+	 * @param index1
+	 * @param index2
+	 * @return
+	 */
+	public static List<Integer[]> sortBy(List<Integer[]> toSort, int index1, int index2, String type) {
+		List<String> allowed = Arrays.asList("addition", "subtraction", "multiplication", "division");
+		if (!allowed.contains(type)) {
+			throw new RuntimeException("Type " + type + " not allowed: must be one of " +
+				allowed	+ ".");
+		}
+
+		Collections.sort(toSort, new Comparator<Integer[]>() {
+			@Override
+			public int compare(Integer[] o1, Integer[] o2) {
+				int first1 = o1[index1];
+				int second1 = o1[index2];
+				int first2 = o2[index1];
+				int second2 = o2[index2];
+				if (type.equals("addition")) {
+					int i1 = first1 + second1;
+					int i2 = first2 + second2;
+					return Integer.compare(i1, i2);
+				}
+				else if (type.equals("subtraction")) {
+					int i1 = first1 - second1;
+					int i2 = first2 - second2;
+					return Integer.compare(i1, i2);
+				}
+				else if (type.equals("multiplication")) {
+					int i1 = first1 * second1;
+					int i2 = first2 * second2;
+					return Integer.compare(i1, i2);
+				}
+				else if (type.equals("division")) {
+					Rational r1 = new Rational(first1, second1);
+					Rational r2 = new Rational(first2, second2);
+					return r1.compareTo(r2);
+				}
+				else {
+					return -1;
+				}
+			}
+    	});
+		return toSort;
+	}
+
 
 	/**
 	 * Sorts the given list by the given index of each list element.
@@ -2131,10 +2227,12 @@ public class ToolBox {
 	 * @param toSort
 	 * @param index
 	 * @param type
+	 * @param sep
+	 * @param pos
 	 * @return
 	 */
 	// TESTED
-	public static List<String[]> sortByString(List<String[]> toSort, int index, String type) {
+	public static List<String[]> sortByString(List<String[]> toSort, int index, String type, String sep, String pos) {
 		// See https://stackoverflow.com/questions/20480723/how-to-sort-2d-arrayliststring-by-only-the-first-element
 		
 		List<String> allowed = Arrays.asList(new String[]{"int", "Rational"});
@@ -2147,7 +2245,19 @@ public class ToolBox {
 			Collections.sort(toSort, new Comparator<String[]>() {    
 				@Override
 				public int compare(String[] o1, String[] o2) {
-					return String.valueOf(o1[index]).compareTo(String.valueOf(o2[index]));
+					String s1 = o1[index];
+					String s2 = o2[index];
+					if (sep != null && pos != null) {
+						if (pos.equals("first")) {
+							s1 = s1.substring(0, s1.indexOf(sep));
+							s2 = s2.substring(0, s2.indexOf(sep));
+						}
+						else if (pos.equals("last")) {
+							s1 = s1.substring(s1.lastIndexOf(sep) + 1);
+							s2 = s2.substring(s2.lastIndexOf(sep) + 1);
+						}
+					}					 
+					return String.valueOf(s1).compareTo(String.valueOf(s2));
 				}
 			});
 		}
@@ -2155,12 +2265,26 @@ public class ToolBox {
 			Collections.sort(toSort, new Comparator<String[]>() {    
 				@Override
 				public int compare(String[] o1, String[] o2) {
-					String[] o1spl = o1[index].split("/");
-					Rational r1 = 
-						new Rational(Integer.parseInt(o1spl[0]), Integer.parseInt(o1spl[1]));
-					String[] o2spl = o2[index].split("/");
-					Rational r2 = 
-						new Rational(Integer.parseInt(o2spl[0]), Integer.parseInt(o2spl[1]));
+					String s1 = o1[index];
+					String s2 = o2[index];
+					if (sep != null && pos != null) {
+						if (pos.equals("first")) {
+							s1 = s1.substring(0, s1.indexOf(sep));
+							s2 = s2.substring(0, s2.indexOf(sep));
+						}
+						else if (pos.equals("last")) {
+							s1 = s1.substring(s1.lastIndexOf(sep) + 1);
+							s2 = s2.substring(s2.lastIndexOf(sep) + 1);
+						}
+					}
+					String[] s1spl = s1.split("/");
+//					String[] o1spl = o1[index].split("/");
+					Rational r1 = new Rational(Integer.parseInt(s1spl[0]), Integer.parseInt(s1spl[1]));
+//					Rational r1 = new Rational(Integer.parseInt(o1spl[0]), Integer.parseInt(o1spl[1]));
+					String[] s2spl = s2.split("/");
+//					String[] o2spl = o2[index].split("/");
+					Rational r2 = new Rational(Integer.parseInt(s2spl[0]), Integer.parseInt(s2spl[1]));
+//					Rational r2 = new Rational(Integer.parseInt(o2spl[0]), Integer.parseInt(o2spl[1]));
 					return r1.compareTo(r2);
 				}
 			});

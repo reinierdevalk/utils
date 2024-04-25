@@ -7,13 +7,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 
 
 public class PythonInterface {
 
 	// See https://norwied.wordpress.com/2012/03/28/call-python-script-from-java-app/ and
 	// https://norwied.wordpress.com/2012/07/23/pass-arguments-from-java-to-python-app/
-	private static final boolean VERBOSE = false;
+	private static final boolean VERBOSE = true;
 	private static final boolean VERBOSE_APP = false;
 
 
@@ -39,8 +40,11 @@ public class PythonInterface {
 			String line = null;
 			while((line = bfr.readLine()) != null) {
 				scriptOutput += line + "\r\n";
-				if (VERBOSE) System.out.println(line);
+//				if (VERBOSE) System.out.println(line);
 			}
+//			System.out.println(scriptOutput);
+//			System.out.println(Arrays.asList(cmd));
+//			System.out.println("Fuuuuuuuuuuuuuuuuuuu");
 
 			// bfrErr reads Process) errors (i.e., reads any errors given by the commands passed to Process). 
 			// See Listing 4.3 at http://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html
