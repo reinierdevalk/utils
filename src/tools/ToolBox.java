@@ -1751,23 +1751,23 @@ public class ToolBox {
 	 * Lists all possible combinations of all elements in two lists of the same length. Each list
 	 * element can only occur once in a combination.
 	 * 
-	 * Example for lists [0, 1, 2] and [a, b, c] with the following Cartesian product
+	 * Example for lists [0, 1, 2] and [a, b, c] with the following Cartesian product<br><br>
 	 * 
-	 *   0  1  2
-	 * a a0 a1 a2
-	 * b b0 b1 b2
-	 * c c0 c1 c2
+	 * <code>  0  1  2 </code><br>
+	 * <code>a a0 a1 a2</code><br>
+	 * <code>b b0 b1 b2</code><br>
+	 * <code>c c0 c1 c2</code><br><br>
 	 * 
-	 * Combinations are obtained by iterating the elements of the first row of the Cartesian product 
-	 * start at a0 (a and 0 unavailable for indices 1 and 2) 
-	 *   [a0, b1, c2]  
-	 *   [a0, b2, c1]
-	 * start at a1 (a and 1 unavailable for indices 1 and 2)
-	 *   [a1, b0, c2] 
-	 *   [a1, b2, c0]
-	 * start at a2 (a and 2 unavailable for indices 1 and 2)
-	 * [a2, b0, c1]
-	 * [a2, b1, c0]   
+	 * Combinations are obtained by iterating the elements of the first row of the Cartesian product<br> 
+	 * start at a0 (a and 0 unavailable for indices 1 and 2)<br> 
+	 *   <code>[a0, b1, c2]</code><br>  
+	 *   <code>[a0, b2, c1]</code><br>
+	 * start at a1 (a and 1 unavailable for indices 1 and 2)<br>
+	 *   <code>[a1, b0, c2]</code><br>
+	 *   <code>[a1, b2, c0]</code><br>
+	 * start at a2 (a and 2 unavailable for indices 1 and 2)<br>
+	 *   <code>[a2, b0, c1]</code><br>
+	 *   <code>[a2, b1, c0]</code><br>   
 	 * 
 	 * @return The indices of the combinations. 
 	 */

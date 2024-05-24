@@ -4,8 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import tools.labels.LabelTools;
+import tools.path.PathTools;
 import de.uos.fmt.musitech.utility.math.Rational;
 import junit.framework.TestCase;
 import path.Path;
@@ -32,12 +34,20 @@ public class LabelToolsTest  extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		String root = Path.ROOT_PATH_DEPLOYMENT_DEV;
+		
+		Map<String, String> paths = PathTools.getPaths();
+		String dp = paths.get("DATA_PATH");
+		String ep = paths.get("ENCODINGS_PATH");
+		String mp = paths.get("MIDI_PATH");
+		String td = paths.get("TEST_DIR");
+
 		encodingTestpiece = new File(
-			root + Path.ENCODINGS_REL_PATH + Path.TEST_DIR + "testpiece.tbp"
+			PathTools.getPathString(Arrays.asList(dp, ep, td)) + "testpiece.tbp"
+//			rp + Path.ENCODINGS_PATH + Path.TEST_DIR + "testpiece.tbp"
 		);
 		midiTestpiece = new File(
-			root + Path.MIDI_REL_PATH + Path.TEST_DIR + "testpiece.mid"
+			PathTools.getPathString(Arrays.asList(dp, mp, td)) + "testpiece.mid"
+//			rp + Path.MIDI_PATH + Path.TEST_DIR + "testpiece.mid"
 		);
 	}
 

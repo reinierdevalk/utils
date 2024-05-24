@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -12,12 +13,13 @@ import java.util.stream.IntStream;
 ///import org.junit.Test;
 
 import de.uos.fmt.musitech.utility.math.Rational;
-import exports.MEIExport;
 import junit.framework.TestCase;
 import path.Path;
 import representations.Tablature;
+import representations.Transcription;
 import structure.TimelineTest;
 import tbp.Encoding;
+import tools.path.PathTools;
 
 public class TimeMeterToolsTest extends TestCase {
 
@@ -41,12 +43,19 @@ public class TimeMeterToolsTest extends TestCase {
 
 
 	public void setUp() throws Exception {
-		String root = Path.ROOT_PATH_DEPLOYMENT_DEV; 
+		Map<String, String> paths = PathTools.getPaths();
+		String dp = paths.get("DATA_PATH");
+		String ep = paths.get("ENCODINGS_PATH");
+		String td = paths.get("TEST_DIR");
+		
+//		String rp = Path.ROOT_PATH_DEPLOYMENT_DEV; 
 		encodingTestpiece = new File(
-			root + Path.ENCODINGS_REL_PATH + Path.TEST_DIR + "testpiece.tbp"
+			PathTools.getPathString(Arrays.asList(dp, ep, td)) + "testpiece.tbp"
+//			rp + Path.ENCODINGS_PATH + Path.TEST_DIR + "testpiece.tbp"
 		);
 		encodingTestGetMeterInfo = new File(
-			root + Path.ENCODINGS_REL_PATH + Path.TEST_DIR + "test_get_meter_info.tbp"
+			PathTools.getPathString(Arrays.asList(dp, ep, td)) + "test_get_meter_info.tbp"
+//			rp + Path.ENCODINGS_PATH + Path.TEST_DIR + "test_get_meter_info.tbp"
 		);
 //		midiTestpiece = new File(
 //			root + Path.getMIDIPath() + Path.getTestDir() + "testpiece.mid"
@@ -802,6 +811,36 @@ public class TimeMeterToolsTest extends TestCase {
 				new Tablature(new Encoding(encodingTestGetMeterInfo), false).getMeterInfo()
 			)
 		);
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i), actual.get(i));
+		} 
+		assertEquals(expected, actual);
+	}
+
+
+	public void testGetDurationAsString() {
+		List<Rational> durs = Arrays.asList(
+			new Rational(2, 1),
+			new Rational(3, 2),
+			new Rational(1, 2),
+			new Rational(7, 16),
+			new Rational(7, 32),
+			new Rational(1, 16),
+			new Rational(3, 64) // NB: too small for tablature case
+		);
+
+		List<String> expected = Arrays.asList(
+			"B", "W.", "H", "Q..", "E..", "S", "T."
+		);
+
+		List<String> actual = new ArrayList<>();
+		for (Rational r : durs) {
+			actual.add(
+				TimeMeterTools.getDurationAsString(r, Transcription.SMALLEST_RHYTHMIC_VALUE)
+			);
+		}
 
 		assertEquals(expected.size(), actual.size());
 		for (int i = 0; i < expected.size(); i++) {

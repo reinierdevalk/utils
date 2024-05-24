@@ -3,7 +3,9 @@ package tools.music;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.uos.fmt.musitech.utility.math.Rational;
 import representations.Tablature;
@@ -11,7 +13,21 @@ import representations.Transcription;
 import tools.ToolBox;
 
 public class TimeMeterTools {
-	
+
+	public static final Map<Rational, String> DUR_STRS;
+	static {
+		DUR_STRS = new LinkedHashMap<Rational, String>();
+		DUR_STRS.put(new Rational(4, 1), "L");
+		DUR_STRS.put(new Rational(2, 1), "B");
+		DUR_STRS.put(new Rational(1, 1), "W");
+		DUR_STRS.put(new Rational(1, 2), "H");
+		DUR_STRS.put(new Rational(1, 4), "Q");
+		DUR_STRS.put(new Rational(1, 8), "E");
+		DUR_STRS.put(new Rational(1, 16), "S");
+		DUR_STRS.put(new Rational(1, 32), "T");
+	}
+
+
 	////////////////////////////////
 	//
 	//  C L A S S  M E T H O D S
@@ -328,7 +344,8 @@ public class TimeMeterTools {
 
 	/**
 	 * Splits the given fraction into its unit fractions (from large to small). The fraction must
-	 * be a multiple of 1/96 (tablature case) or 1/128 (non-tablature case).
+	 * be a multiple of <code>Tablature.SMALLEST_RHYTHMIC_VALUE</code> (i.e., 1/96; tablature case) 
+	 * or <code>Transcription.SMALLEST_RHYTHMIC_VALUE</code> (i.e., 1/128; non-tablature case).
 	 *  
 	 * @param r
 	 * @param mul
@@ -573,8 +590,8 @@ public class TimeMeterTools {
 		}
 		else {
 			// Each dot d adds 1/(2^d) * the undotted length to the undotted note
-			// One dot adds 1/(2^1), e.g., H.  = 1 * H + (1/2 * H)             = 3/2 * H
-			// Two dots add 1/(2^2), e.g., H.. = 1 * H + (1/2 * H) + (1/4 * H) = 7/4 * H
+			// One dot adds 1/(2^1), e.g.,           H.  = 1 * H + (1/2 * H)             = 3/2 * H
+			// Two dots add 1/(2^1) + 1/(2^2), e.g., H.. = 1 * H + (1/2 * H) + (1/4 * H) = 7/4 * H
 			// The undotted length is the dotted length divided by this factor  
 			double factor = 1;
 			for (int i = 1; i <= dots; i++) {
@@ -680,6 +697,21 @@ public class TimeMeterTools {
 			finalOffset = finalOffset.add(currMeter.mul(barsInCurrMeter));
 		}
 		return finalOffset;
+	}
+
+
+	/**
+	 * Returns the <code>String</code> representation of the duration given as <code>Rational</code>.
+	 * 
+	 * @param r 
+	 * @return
+	 */
+	// TESTED
+	public static String getDurationAsString(Rational r, Rational srv) {
+		List<Rational> uf = getUnitFractions(r, srv);
+		Rational base = uf.get(0);
+		int numDots = TimeMeterTools.getNumDots(uf);
+		return DUR_STRS.get(base) + ".".repeat(numDots);
 	}
 
 }

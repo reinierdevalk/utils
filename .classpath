@@ -14,5 +14,8 @@
 	<classpathentry kind="lib" path="/voice_separation/lib/commons-lang3-3.8.1-javadoc.jar"/>
 	<classpathentry kind="lib" path="/voice_separation/lib/commons-lang3-3.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/musitech.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-annotations-2.17.1.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-core-2.17.1.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-databind-2.17.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
