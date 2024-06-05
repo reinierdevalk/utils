@@ -13,12 +13,11 @@ import java.util.stream.IntStream;
 ///import org.junit.Test;
 
 import de.uos.fmt.musitech.utility.math.Rational;
+import external.Tablature;
+import external.Transcription;
+import internal.core.Encoding;
+import internal.structure.TimelineTest;
 import junit.framework.TestCase;
-import path.Path;
-import representations.Tablature;
-import representations.Transcription;
-import structure.TimelineTest;
-import tbp.Encoding;
 import tools.path.PathTools;
 
 public class TimeMeterToolsTest extends TestCase {
@@ -44,18 +43,14 @@ public class TimeMeterToolsTest extends TestCase {
 
 	public void setUp() throws Exception {
 		Map<String, String> paths = PathTools.getPaths();
-		String dp = paths.get("DATA_PATH");
 		String ep = paths.get("ENCODINGS_PATH");
-		String td = paths.get("TEST_DIR");
-		
-//		String rp = Path.ROOT_PATH_DEPLOYMENT_DEV; 
-		encodingTestpiece = new File(
-			PathTools.getPathString(Arrays.asList(dp, ep, td)) + "testpiece.tbp"
-//			rp + Path.ENCODINGS_PATH + Path.TEST_DIR + "testpiece.tbp"
+		String td = "test";
+
+		encodingTestpiece = new File(PathTools.getPathString(
+			Arrays.asList(ep, td)) + "testpiece.tbp"
 		);
-		encodingTestGetMeterInfo = new File(
-			PathTools.getPathString(Arrays.asList(dp, ep, td)) + "test_get_meter_info.tbp"
-//			rp + Path.ENCODINGS_PATH + Path.TEST_DIR + "test_get_meter_info.tbp"
+		encodingTestGetMeterInfo = new File(PathTools.getPathString(
+			Arrays.asList(ep, td)) + "test_get_meter_info.tbp"
 		);
 //		midiTestpiece = new File(
 //			root + Path.getMIDIPath() + Path.getTestDir() + "testpiece.mid"

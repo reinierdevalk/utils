@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import tbp.Symbol;
+import tbp.symbols.Symbol;
 
 public class StringTools {
 

@@ -15,26 +15,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PathTools {
-	
+
 	private static final String JSON_FILE = "paths.json";
 	private static final String CONFIG_FILE = "config.cfg";
-	
-	public static void main(String[] args) {
-		Map<String, String> m = getPaths();
-		String otherPath = m.get("TEMPLATES_PATH");
-
-		System.out.println("OTHER path: " + otherPath);
-	}
-	
-//	MEIExportTest
-//	MIDIExportTest
-//	TablatureTest
-//	TranscriptionTest
-//	ScoreMetricalTimelineTest
-//	ScorePieceTest
-//	TimelineTest
-//	EncodingTest
-//	TabMapperTest
 
 
 	/**
@@ -54,57 +37,57 @@ public class PathTools {
 			TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>(){};
 
 			// Read JSON file and convert to a Map with specific type
-			Map<String, String> userPaths = getUserDefinedPaths();
-//			Map<String, String> fullPathToCode = getUserDefinedPaths();
-//			Path fullPathToCode = getPathToParent();
-			String rootPath = userPaths.get("ROOT_PATH");
-			String codePath = userPaths.get("CODE_PATH");
-			String s = getPathString(Arrays.asList(
-				rootPath, codePath) 
-			) + JSON_FILE;
-			m = objectMapper.readValue(new File(s), typeRef);
-//			m = objectMapper.readValue(new File(fullPathToCode.resolve(JSON_FILE).toString()), typeRef);
+			Map<String, String> userDefinedPaths = getUserDefinedPaths();
+			String rootPath = userDefinedPaths.get("ROOT_PATH");
+			String codePath = userDefinedPaths.get("CODE_PATH");
+			m = objectMapper.readValue(
+				new File(getPathString(Arrays.asList(rootPath, codePath)) + JSON_FILE), typeRef
+			);
 
 			// 1. Set ROOT_PATH
 			m.put("ROOT_PATH", rootPath);
-//			m.put("CODE_PATH", codePath);
-			
-			// Complete the relative paths in the json file
-//			// 1. Determine rootPath. CODE_PATH and DATA_PATH must be on the same rootPath
-//			String fullPathToCodeStr = getPathString(Arrays.asList(fullPathToCode.toString()));
-//			// Replace file separators by forward slashes (needed on Windows, where 
-//			// File.separator is a backward slash)
-//			fullPathToCodeStr = fullPathToCodeStr.replace(File.separator, "/");
-//			String rootPath = fullPathToCodeStr.substring(
-//				0, fullPathToCodeStr.indexOf(m.get("CODE_PATH"))
-//			);
-//			System.out.println("rootPath: " + rootPath);
-//			System.exit(0);
 
-			// 2. Complete paths on rootPath by prepending rootPath
-			m.put("CODE_PATH", getPathString(Arrays.asList(rootPath, codePath)));
-//			m.put("CODE_PATH", rootPath + m.get("CODE_PATH"));
-			m.put("DEPLOYMENT_DEV_PATH", getPathString(Arrays.asList(rootPath, m.get("DEPLOYMENT_DEV_PATH"))));
-//			m.put("DEPLOYMENT_DEV_PATH", rootPath + m.get("DEPLOYMENT_DEV_PATH"));
-			m.put("DATA_PATH", getPathString(Arrays.asList(rootPath, m.get("DATA_PATH"))));
-//			m.put("DATA_PATH", rootPath + m.get("DATA_PATH"));
-			m.put("EXPERIMENTS_PATH", getPathString(Arrays.asList(rootPath, m.get("EXPERIMENTS_PATH"))));
-			m.put("TEMPLATES_PATH", getPathString(Arrays.asList(rootPath, m.get("TEMPLATES_PATH"))));
+			// 2. Complete paths on ROOT_PATH by prepending ROOT_PATH
+			m.put("CODE_PATH", getPathString(
+				Arrays.asList(rootPath, codePath)
+			));
+			m.put("DEPLOYMENT_DEV_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("DEPLOYMENT_DEV_PATH"))
+			));
+			m.put("DATA_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("DATA_PATH"))
+			));
+			m.put("EXPERIMENTS_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("EXPERIMENTS_PATH"))
+			));
+			m.put("TEMPLATES_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("TEMPLATES_PATH"))
+			));
+			m.put("MODELS_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("MODELS_PATH"))
+			));
 
-			// 3. Complete ENCODINGS and MIDI paths by prepending completed dataPath
+			// 3. Complete ENCODINGS and MIDI paths by prepending completed DATA_PATH
 			String dataPath = m.get("DATA_PATH");
-			m.put("ENCODINGS_PATH", getPathString(Arrays.asList(dataPath, m.get("ENCODINGS_PATH"))));
-//			m.put("ENCODINGS_PATH", dataPath + m.get("ENCODINGS_PATH"));
-			m.put("MIDI_PATH", getPathString(Arrays.asList(dataPath, m.get("MIDI_PATH"))));
-//			m.put("MIDI_PATH", dataPath + m.get("MIDI_PATH"));
-			m.put("ENCODINGS_PATH_JOSQUINTAB", getPathString(Arrays.asList(dataPath, m.get("ENCODINGS_PATH_JOSQUINTAB"))));
-//			m.put("ENCODINGS_PATH_JOSQUINTAB", dataPath + m.get("ENCODINGS_PATH_JOSQUINTAB"));
-			m.put("MIDI_PATH_JOSQUINTAB", getPathString(Arrays.asList(dataPath, m.get("MIDI_PATH_JOSQUINTAB"))));
-//			m.put("MIDI_PATH_JOSQUINTAB", dataPath + m.get("MIDI_PATH_JOSQUINTAB"));
-			for (Map.Entry<String, String> entry : m.entrySet()) {
-				System.out.println(entry.getKey() + " -- " + entry.getValue());
-			}
-			System.exit(0);
+			m.put("ENCODINGS_PATH", getPathString(
+				Arrays.asList(dataPath, m.get("ENCODINGS_PATH"))
+			));
+			m.put("MIDI_PATH", getPathString(
+				Arrays.asList(dataPath, m.get("MIDI_PATH"))
+			));
+			m.put("ENCODINGS_PATH_JOSQUINTAB", getPathString(
+				Arrays.asList(dataPath, m.get("ENCODINGS_PATH_JOSQUINTAB"))
+			));
+			m.put("MIDI_PATH_JOSQUINTAB", getPathString(
+				Arrays.asList(dataPath, m.get("MIDI_PATH_JOSQUINTAB"))
+			));
+			m.put("DATASETS_PATH", getPathString(
+				Arrays.asList(dataPath, m.get("DATASETS_PATH"))
+			));
+//			for (Map.Entry<String, String> entry : m.entrySet()) {
+//				System.out.println(entry.getKey() + " -- " + entry.getValue());
+//			}
+//			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

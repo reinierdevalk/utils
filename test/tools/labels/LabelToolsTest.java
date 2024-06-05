@@ -9,11 +9,10 @@ import java.util.Map;
 import tools.labels.LabelTools;
 import tools.path.PathTools;
 import de.uos.fmt.musitech.utility.math.Rational;
+import external.Tablature;
+import external.Transcription;
 import junit.framework.TestCase;
-import path.Path;
-import representations.Tablature;
-import representations.Transcription;
-import tbp.TabSymbol;
+import tbp.symbols.TabSymbol;
 
 public class LabelToolsTest  extends TestCase {
 
@@ -36,18 +35,15 @@ public class LabelToolsTest  extends TestCase {
 		super.setUp();
 		
 		Map<String, String> paths = PathTools.getPaths();
-		String dp = paths.get("DATA_PATH");
 		String ep = paths.get("ENCODINGS_PATH");
 		String mp = paths.get("MIDI_PATH");
-		String td = paths.get("TEST_DIR");
+		String td = "test";
 
-		encodingTestpiece = new File(
-			PathTools.getPathString(Arrays.asList(dp, ep, td)) + "testpiece.tbp"
-//			rp + Path.ENCODINGS_PATH + Path.TEST_DIR + "testpiece.tbp"
+		encodingTestpiece = new File(PathTools.getPathString(
+			Arrays.asList(ep, td)) + "testpiece.tbp"
 		);
-		midiTestpiece = new File(
-			PathTools.getPathString(Arrays.asList(dp, mp, td)) + "testpiece.mid"
-//			rp + Path.MIDI_PATH + Path.TEST_DIR + "testpiece.mid"
+		midiTestpiece = new File(PathTools.getPathString(
+			Arrays.asList(mp, td)) + "testpiece.mid"
 		);
 	}
 

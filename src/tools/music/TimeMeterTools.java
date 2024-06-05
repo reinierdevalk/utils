@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.uos.fmt.musitech.utility.math.Rational;
-import representations.Tablature;
-import representations.Transcription;
+import external.Tablature;
+import external.Transcription;
 import tools.ToolBox;
 
 public class TimeMeterTools {

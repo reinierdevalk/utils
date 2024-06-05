@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import de.uos.fmt.musitech.utility.math.Rational;
-import representations.Tablature;
-import representations.Transcription;
+import external.Tablature;
+import external.Transcription;
 
 public class LabelTools {
 	
