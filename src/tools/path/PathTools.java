@@ -19,6 +19,10 @@ public class PathTools {
 	private static final String JSON_FILE = "paths.json";
 	private static final String CONFIG_FILE = "config.cfg";
 
+	
+	public static void main(String[] args) {
+		getUserDefinedPaths();
+	}
 
 	/**
 	 * Reads <code>paths.json</code> (located on the <code>CODE_PATH</code>).
@@ -39,17 +43,36 @@ public class PathTools {
 			// Read JSON file and convert to a Map with specific type
 			Map<String, String> userDefinedPaths = getUserDefinedPaths();
 			String rootPath = userDefinedPaths.get("ROOT_PATH");
-			String codePath = userDefinedPaths.get("CODE_PATH");
+			String libPath = userDefinedPaths.get("LIB_PATH");
+			String exePath = userDefinedPaths.get("EXE_PATH");
+////			codePath = getPathString(Arrays.asList(codePath));
+////			// If there is no custom code path specified, codePath defaults to libPath
+////			codePath =
+////				customCodePath.equals("") ? getPathString(Arrays.asList(libPath)) :
+////				getPathString(Arrays.asList(rootPath, customCodePath));
+			
+			// 22.06 was dit
+//			String codePath = 
+//				libPath.equals("") ? getPathString(Arrays.asList(rootPath, libPath)) : // dev case 	
+//				getPathString(Arrays.asList(libPath));
+			String codePath = 
+				exePath.equals("") ? getPathString(Arrays.asList(rootPath, libPath)) : // dev case 	
+				getPathString(Arrays.asList(libPath));
+
+//			System.out.println(codePath + JSON_FILE);
 			m = objectMapper.readValue(
-				new File(getPathString(Arrays.asList(rootPath, codePath)) + JSON_FILE), typeRef
+				new File(getPathString(Arrays.asList(codePath)) + JSON_FILE), typeRef
 			);
+//			m = objectMapper.readValue(
+//				new File(getPathString(Arrays.asList(rootPath, codePath)) + JSON_FILE), typeRef
+//			);
 
 			// 1. Set ROOT_PATH
 			m.put("ROOT_PATH", rootPath);
 
 			// 2. Complete paths on ROOT_PATH by prepending ROOT_PATH
 			m.put("CODE_PATH", getPathString(
-				Arrays.asList(rootPath, codePath)
+				Arrays.asList(codePath)
 			));
 			m.put("DEPLOYMENT_DEV_PATH", getPathString(
 				Arrays.asList(rootPath, m.get("DEPLOYMENT_DEV_PATH"))
@@ -60,11 +83,20 @@ public class PathTools {
 			m.put("EXPERIMENTS_PATH", getPathString(
 				Arrays.asList(rootPath, m.get("EXPERIMENTS_PATH"))
 			));
+			m.put("MODELS_PATH", getPathString(
+					Arrays.asList(rootPath, m.get("MODELS_PATH"))
+				));
 			m.put("TEMPLATES_PATH", getPathString(
 				Arrays.asList(rootPath, m.get("TEMPLATES_PATH"))
 			));
-			m.put("MODELS_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("MODELS_PATH"))
+			m.put("TABMAPPER_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("TABMAPPER_PATH"))
+			));
+			m.put("DIPLOMAT_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("DIPLOMAT_PATH"))
+			));
+			m.put("POLYPHONIST_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("POLYPHONIST_PATH"))
 			));
 
 			// 3. Complete ENCODINGS and MIDI paths by prepending completed DATA_PATH
@@ -87,7 +119,6 @@ public class PathTools {
 //			for (Map.Entry<String, String> entry : m.entrySet()) {
 //				System.out.println(entry.getKey() + " -- " + entry.getValue());
 //			}
-//			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -130,10 +161,9 @@ public class PathTools {
 		try {
 			Map<String, String> userPaths = new HashMap<>();
 
-			// Get the path to the current class
-			// (F:/research/computation/software/code/eclipse/utils/bin/ contains
-			//  tools.path.PathTools.class -- note that the packages tools and path
-			//  are not considered dirs here)
+			// Get the path to tools.path.PathTools.class (i.e., the current class)
+			// NB Java counts the packages 'tools' and 'path' not as dirs, but as part of the class
+			// (= F:/research/computation/software/code/eclipse/utils/bin/)
 			String classPath = PathTools.class
 				.getProtectionDomain()
 				.getCodeSource()
@@ -141,8 +171,8 @@ public class PathTools {
 				.toURI()
 				.getPath();
 
-			// Get the path to utils/ (i.e., CODE_PATH)
-			// (F:/research/computation/software/code/eclipse/ contains utils/)
+			// Get the path to utils/ 
+			// (= F:/research/computation/software/code/eclipse/)
 			String codePath = new File(classPath)
 				.toPath()
 				.getParent()
@@ -189,7 +219,9 @@ public class PathTools {
 		// Replace any backward slashes (Windows)
 		pathStr = pathStr.replace("\\", "/");
 		// Add final file separator
-		pathStr += "/";
+		if (!pathStr.equals("")) {
+			pathStr += "/";
+		}
 
 		return pathStr;
 	}

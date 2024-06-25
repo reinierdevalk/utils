@@ -9,6 +9,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 import de.uos.fmt.musitech.utility.math.Rational;
+import internal.core.Encoding;
 
 
 public class ToolBoxTest extends TestCase {
@@ -29,7 +30,7 @@ public class ToolBoxTest extends TestCase {
 
 		List<String> expected = Arrays.asList(new String[]{"testpiece", "testpiece.tbp"});
 		List<String> actual = new ArrayList<>();
-		actual.add(ToolBox.getFilename(f, ".tbp"));
+		actual.add(ToolBox.getFilename(f, Encoding.EXTENSION));
 		actual.add(ToolBox.getFilename(f, null));
 
 		assertEquals(expected, actual);
@@ -298,22 +299,48 @@ public class ToolBoxTest extends TestCase {
 	}
 
 
+	public void testSplitExt() {
+		List<String> filenames = Arrays.asList(
+			"file1.tc", 
+			"file.no.2.txt" 
+		);
+
+		List<String[]> expected = Arrays.asList(
+			new String[]{"file1", ".tc"},
+			new String[]{"file.no.2", ".txt"}
+		);
+
+		List<String[]> actual = new ArrayList<>();
+		for (String s : filenames) {
+			actual.add(ToolBox.splitExt(s));
+		}
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).length, actual.get(i).length);
+			for (int j = 0; j < expected.get(i).length; j++) {
+				assertEquals(expected.get(i)[j], actual.get(i)[j]);
+			}
+		}
+	}
+
+
 	public void testInsertIntoString() {
 		List<Integer> indices = Arrays.asList(new Integer[]{0, 10, 6});
-		
-		List<String> strings = Arrays.asList(new String[]{
+
+		List<String> strings = Arrays.asList(
 			"string one", "string two", "string three"		
-		});
-		
-		List<String> expected = Arrays.asList(new String[]{
+		);
+
+		List<String> expected = Arrays.asList(
 			"HEREstring one", "string twoHERE", "stringHERE three"		
-		});
-		
+		);
+
 		List<String> actual = new ArrayList<>();
 		for (int i = 0; i < strings.size(); i++) {
 			actual.add(ToolBox.insertIntoString(strings.get(i), "HERE", indices.get(i)));
 		}
-		
+
 		assertEquals(expected, actual);	
 	}
 

@@ -36,6 +36,7 @@ import java.util.stream.IntStream;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
 
+import conversion.imports.TabImport;
 import de.uos.fmt.musitech.utility.math.Rational;
 
 
@@ -750,6 +751,25 @@ public class ToolBox {
 		}		
 		return table;
 	}
+	
+	
+	public static List<Object> getListsToAvg(int numCols, List<Integer> doubleIndices, List<Integer> colsToSkip) {
+		Integer[] intsToAvg = new Integer[numCols];
+		Arrays.fill(intsToAvg, 0);
+		Double[] doublesToAvg = new Double[numCols];
+		Arrays.fill(doublesToAvg, 0.0);
+		// Set to null values for the first element (name) and all double indices (intsToAvg) or 
+		// al int indices (doublesToAvg)
+		for (int i = 0; i < intsToAvg.length; i++) {
+			if (colsToSkip.contains(i) || doubleIndices.contains(i)) {
+				intsToAvg[i] = null;
+			}
+			if (colsToSkip.contains(i) || !doubleIndices.contains(i)) {
+				doublesToAvg[i] = null;
+			}
+		}
+		return Arrays.asList(new Object[]{intsToAvg, doublesToAvg});
+	}
 
 
 	/**
@@ -887,6 +907,24 @@ public class ToolBox {
 			}
 		}
 		return fileNames;
+	}
+
+
+	/**
+	 * Split the given filename into its name and extension. 
+	 * @param filename
+	 * @return
+	 */
+	// TESTED
+	public static String[] splitExt(String filename) {
+		if (!filename.contains(".")) {
+			throw new RuntimeException("ERROR: The file does not have an extension.");
+		}
+
+		int lastDotInd = filename.lastIndexOf(".");
+		return new String[]{
+			filename.substring(0, lastDotInd), filename.substring(lastDotInd)
+		};
 	}
 
 
