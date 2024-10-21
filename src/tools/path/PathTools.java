@@ -42,8 +42,19 @@ public class PathTools {
 
 			// Read JSON file and convert to a Map with specific type
 			Map<String, String> userDefinedPaths = getUserDefinedPaths();
+			
+//			for (Map.Entry<String, String> entry : userDefinedPaths.entrySet()) {
+//			    String key = entry.getKey();
+//			    String value = entry.getValue();
+//			    System.out.println("Key: " + key + ", Value: " + value);
+//			}
+//			System.out.println("* * * * * * * * *");
+			
+			// ROOT_PATH leads to all things not code (data, models, templates, ...) 
 			String rootPath = userDefinedPaths.get("ROOT_PATH");
+			// In the dev case, LIB_PATH is on (i.e., a continuation of) ROOT_PATH 
 			String libPath = userDefinedPaths.get("LIB_PATH");
+			// In the dev case, EXE_PATH is empty (the executable is called from LIB_PATH)
 			String exePath = userDefinedPaths.get("EXE_PATH");
 ////			codePath = getPathString(Arrays.asList(codePath));
 ////			// If there is no custom code path specified, codePath defaults to libPath
@@ -55,9 +66,12 @@ public class PathTools {
 //			String codePath = 
 //				libPath.equals("") ? getPathString(Arrays.asList(rootPath, libPath)) : // dev case 	
 //				getPathString(Arrays.asList(libPath));
-			String codePath = 
-				exePath.equals("") ? getPathString(Arrays.asList(rootPath, libPath)) : // dev case 	
-				getPathString(Arrays.asList(libPath));
+			
+//			String codePath = 
+//				exePath.equals("") ? getPathString(Arrays.asList(rootPath, libPath)) : // dev case 	
+//				getPathString(Arrays.asList(libPath)); // real-world case
+			
+			String codePath = libPath;
 
 //			System.out.println(codePath + JSON_FILE);
 			m = objectMapper.readValue(
@@ -98,6 +112,9 @@ public class PathTools {
 			m.put("POLYPHONIST_PATH", getPathString(
 				Arrays.asList(rootPath, m.get("POLYPHONIST_PATH"))
 			));
+			m.put("ANALYSER_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("ANALYSER_PATH"))
+			));
 
 			// 3. Complete ENCODINGS and MIDI paths by prepending completed DATA_PATH
 			String dataPath = m.get("DATA_PATH");
@@ -122,6 +139,13 @@ public class PathTools {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+//		for (Map.Entry<String, String> entry : m.entrySet()) {
+//		    String key = entry.getKey();
+//		    String value = entry.getValue();
+//		    System.out.println("Key: " + key + ", Value: " + value);
+//		}
+//		System.exit(0);
 
 		return m;
 	}

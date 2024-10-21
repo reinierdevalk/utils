@@ -7,14 +7,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Arrays;
 
 
 public class PythonInterface {
+	
+	public static void main(String[] args) {
+		
+	}
 
 	// See https://norwied.wordpress.com/2012/03/28/call-python-script-from-java-app/ and
 	// https://norwied.wordpress.com/2012/07/23/pass-arguments-from-java-to-python-app/
-	private static final boolean VERBOSE = true;
+	private static final boolean VERBOSE = false;
 	private static final boolean VERBOSE_APP = false;
 
 

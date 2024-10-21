@@ -6,8 +6,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import tbp.symbols.Symbol;
+import tools.ToolBox;
 
 public class StringTools {
+
+	public static void main(String[] args) {
+	}
+
 
 	/**
 	 * Parses a String representation of a List<Integer> or List<List<Integer>>.
@@ -55,5 +60,34 @@ public class StringTools {
 
 	public static int frequencyOfChar(String s, char c) {
 		return (int) s.chars().filter(ch -> ch == c).count();
+	}
+
+
+	public static String createLaTeXTable(String[][] dataStr, Integer[] intsToAvg, 
+		Double[] doublesToAvg, List<Integer> intInds, int maxLenDouble, int totalNumChars, 
+		boolean includeAvgs) {
+		String table = "";
+		String lineBr = " \\" + "\\" + "\r\n";
+		int numRows = dataStr.length;
+
+		// Set any averages
+		if (includeAvgs) {
+			dataStr[numRows-1] = ToolBox.getAveragesForMixedList(
+				intsToAvg, doublesToAvg, intInds, numRows-1, maxLenDouble, totalNumChars
+			);
+		}
+
+		// Create table
+		for (int i = 0; i < numRows; i++) {
+			String[] row = dataStr[i];
+			for (int j = 0; j < row.length; j++) {
+				table += row[j] + ( (j != row.length-1) ? " & " : lineBr );
+			}
+			// In case of any averages: add \hline below penultimate line
+			if (i == numRows-2 && includeAvgs) {
+				table += "\\hline" + "\r\n";
+			}
+		}		
+		return table;
 	}
 }

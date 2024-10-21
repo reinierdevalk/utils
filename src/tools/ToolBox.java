@@ -36,13 +36,16 @@ import java.util.stream.IntStream;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
 
-import conversion.imports.TabImport;
 import de.uos.fmt.musitech.utility.math.Rational;
 
 
 public class ToolBox {
-	
+
 	public static final int TAB_LEN = 8;
+
+	public static void main(String[] args) {
+	}
+
 
 	/**
 	 * Stores the given object in the given file.
@@ -696,70 +699,32 @@ public class ToolBox {
 
 
 	public static String[] getAveragesForMixedList(Integer[] intsToAvg, Double[] doublesToAvg, 
-		int divisor, int maxLenDouble, int totalNumChars) {
+		List<Integer> intInds, int divisor, int maxLenDouble, int totalNumChars) {
 		String[] res = new String[intsToAvg.length];
 		res[0] = "avg";
-		for (int i = 0; i < intsToAvg.length; i++) {
-			if (intsToAvg[i] != null) {
+		for (int i = 1; i < intsToAvg.length; i++) {
+			if (intInds.contains(i)) {
+//			if (intsToAvg[i] != null) {
 				res[i] = String.valueOf(Math.round(intsToAvg[i] / (double) divisor));
 			}
-			if (doublesToAvg[i] != null) {
-				res[i] = ToolBox.formatDouble((doublesToAvg[i] / divisor), 
-					maxLenDouble, totalNumChars);
+			else {
+//			if (doublesToAvg[i] != null) {
+				res[i] = ToolBox.formatDouble(
+					(doublesToAvg[i] / divisor), maxLenDouble, totalNumChars
+				);
 			}
 		}
 		return res;
 	}
 
 
-	public static String createLaTeXTable(String[][] dataStr, Integer[] intsToAvg, 
-		Double[] doublesToAvg, int maxLenDouble, int totalNumChars, boolean includeAvgs) {
-		String table = "";
-		String lineBr = " \\" + "\\" + "\r\n";
-		
-		int numRows = dataStr.length;
-		
-		// Set any averages
-		if (includeAvgs) {
-			dataStr[numRows-1] = 
-				getAveragesForMixedList(intsToAvg, doublesToAvg, numRows-1, maxLenDouble, 
-				totalNumChars);
-//			dataStr[numRows-1][0] = "avg";
-//			for (int i = 0; i < intsToAvg.length; i++) {
-//				if (intsToAvg[i] != null) {
-//					dataStr[numRows-1][i] = 
-//						String.valueOf(Math.round(intsToAvg[i] / (double) (numRows-1)));
-//				}
-//				if (doublesToAvg[i] != null) {
-//					dataStr[numRows-1][i] = 
-//						ToolBox.formatDouble((doublesToAvg[i] / (double) (numRows-1)), 
-//							maxLenDouble, totalNumChars);
-//				}
-//			}
-		}
-
-		// Create table
-		for (int i = 0; i < numRows; i++) {
-			String[] row = dataStr[i];
-			for (int j = 0; j < row.length; j++) {
-				table += row[j] + ( (j != row.length-1) ? " & " : lineBr );
-			}
-			// In case of any averages: add \hline below penultimate line
-			if (i == numRows-2 && includeAvgs) {
-				table += "\\hline" + "\r\n";
-			}
-		}		
-		return table;
-	}
-	
-	
 	public static List<Object> getListsToAvg(int numCols, List<Integer> doubleIndices, List<Integer> colsToSkip) {
 		Integer[] intsToAvg = new Integer[numCols];
 		Arrays.fill(intsToAvg, 0);
 		Double[] doublesToAvg = new Double[numCols];
 		Arrays.fill(doublesToAvg, 0.0);
 		// Set to null values for the first element (name) and all double indices (intsToAvg) or 
-		// al int indices (doublesToAvg)
+		// all int indices (doublesToAvg)
 		for (int i = 0; i < intsToAvg.length; i++) {
 			if (colsToSkip.contains(i) || doubleIndices.contains(i)) {
 				intsToAvg[i] = null;
