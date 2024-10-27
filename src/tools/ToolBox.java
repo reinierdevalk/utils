@@ -2445,7 +2445,7 @@ public class ToolBox {
 	 * @return
 	 */
 	// TESTED
-	public static List<Integer> getTwoBiggestValues(List<Integer> aList) {
+	public static List<Integer> getTwoLargestValues(List<Integer> aList) {
 //		int biggestValue = Integer.MIN_VALUE;
 //		int secondBiggestValue = Integer.MIN_VALUE;
 //		for (int i : aList) {

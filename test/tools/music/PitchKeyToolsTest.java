@@ -1,23 +1,28 @@
 package tools.music;
 
+import static org.junit.Assert.*;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.uos.fmt.musitech.utility.math.Rational;
-import junit.framework.TestCase;
 
-public class PitchKeyToolsTest extends TestCase {
+public class PitchKeyToolsTest {
 
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 	}
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@After
+	public void tearDown() throws Exception {
 	}
 
 
+	@Test
 	public void testGetScientificNotation() {
 		List<Integer> testVals = Arrays.asList(new Integer[]{
 			12, // C0
@@ -48,6 +53,7 @@ public class PitchKeyToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetOctave() {	
 		List<Integer> pitches = Arrays.asList(new Integer[]{47, 48, 61, 75, 85});
 		List<Integer> expected = Arrays.asList(new Integer[]{2, 3, 4, 5, 6});
@@ -65,6 +71,7 @@ public class PitchKeyToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetMIDIPitchClassKeySigs() {		
 		List<List<Integer>> expected = new ArrayList<List<Integer>>();
 		expected.add(Arrays.asList(new Integer[]{10, 3, 8, 1, 6, 11, 4}));
@@ -101,6 +108,7 @@ public class PitchKeyToolsTest extends TestCase {
 	};
 
 
+	@Test
 	public void testMakeMIDIPitchClassGrid() {
 		Integer[][] expected = new Integer[30][7];
 		expected[0] = new Integer[]{11, 1, 3, 4, 6, 8, 10}; // Cb
@@ -155,6 +163,7 @@ public class PitchKeyToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testMakeAlterationGrid() {
 		String[][] expected = new String[30][7];
 		expected[0] = new String[]{"f", "f", "f", "f", "f", "f", "f"}; // Cb
@@ -207,8 +216,9 @@ public class PitchKeyToolsTest extends TestCase {
 			}
 	    }
 	}
-	
-	
+
+
+	@Test
 	public void testMakePitchClassGrid() {
 		String[][] expected = new String[30][7];
 		expected[0] = new String[]{"c", "d", "e", "f", "g", "a", "b"}; // Cb
@@ -263,6 +273,7 @@ public class PitchKeyToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testSpellPitch() {
 		Integer[][] mpcGridMaj = PitchKeyTools.makeMIDIPitchClassGrid(0);
 		String[][] altGridMaj = PitchKeyTools.makeAlterationGrid(mpcGridMaj);

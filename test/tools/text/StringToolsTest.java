@@ -1,21 +1,27 @@
 package tools.text;
 
+import static org.junit.Assert.*;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
+public class StringToolsTest {
 
-public class StringToolsTest extends TestCase {
-
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 	}
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@After
+	public void tearDown() throws Exception {
 	}
-	
+
+
+	@Test
 	public void testParseStringifiedListOfIntegers() {
 		List<String> str = Arrays.asList(
 			"[1, 2, 3]", 

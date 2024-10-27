@@ -16,22 +16,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PathTools {
 
-	private static final String JSON_FILE = "paths.json";
+	private static final String PATHS_FILE = "paths.json";
+	private static final String PATHS_FILE_DEV = "paths-dev.json";
 	private static final String CONFIG_FILE = "config.cfg";
+	private static final String CONFIG_FILE_DEV = "config-dev.cfg";
 
 	
 	public static void main(String[] args) {
-		getUserDefinedPaths();
+		getUserDefinedPaths(true);
 	}
 
+
 	/**
-	 * Reads <code>paths.json</code> (located on the <code>CODE_PATH</code>).
+	 * Reads <code>paths.json</code> (located on the <code>CODE_PATH</code>). It is preferred
+	 * if this method is called from a <code>main()</code>, and its value then passed on.
+	 * 
+	 * @param dev <code>true</code> if called in development mode.
 	 * 
 	 * @return A {@code Map<String, String>}, containing for each key in
 	 *         <code>paths.json</code> the value (relative path) extended 
 	 *         to its full path.
 	 */
-	public static final Map<String, String> getPaths() {
+	public static final Map<String, String> getPaths(boolean dev) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
 
@@ -41,14 +47,14 @@ public class PathTools {
 			TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>(){};
 
 			// Read JSON file and convert to a Map with specific type
-			Map<String, String> userDefinedPaths = getUserDefinedPaths();
+			Map<String, String> userDefinedPaths = getUserDefinedPaths(dev);
 			
-//			for (Map.Entry<String, String> entry : userDefinedPaths.entrySet()) {
-//			    String key = entry.getKey();
-//			    String value = entry.getValue();
-//			    System.out.println("Key: " + key + ", Value: " + value);
-//			}
-//			System.out.println("* * * * * * * * *");
+			for (Map.Entry<String, String> entry : userDefinedPaths.entrySet()) {
+			    String key = entry.getKey();
+			    String value = entry.getValue();
+			    System.out.println("Key: " + key + ", Value: " + value);
+			}
+			System.out.println("* * * * * * * * *");
 			
 			// ROOT_PATH leads to all things not code (data, models, templates, ...) 
 			String rootPath = userDefinedPaths.get("ROOT_PATH");
@@ -75,7 +81,8 @@ public class PathTools {
 
 //			System.out.println(codePath + JSON_FILE);
 			m = objectMapper.readValue(
-				new File(getPathString(Arrays.asList(codePath)) + JSON_FILE), typeRef
+				new File(getPathString(Arrays.asList(codePath)) + 
+				(dev ? PATHS_FILE_DEV : PATHS_FILE)), typeRef
 			);
 //			m = objectMapper.readValue(
 //				new File(getPathString(Arrays.asList(rootPath, codePath)) + JSON_FILE), typeRef
@@ -88,9 +95,9 @@ public class PathTools {
 			m.put("CODE_PATH", getPathString(
 				Arrays.asList(codePath)
 			));
-			m.put("DEPLOYMENT_DEV_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("DEPLOYMENT_DEV_PATH"))
-			));
+//			m.put("DEPLOYMENT_DEV_PATH", getPathString(
+//				Arrays.asList(rootPath, m.get("DEPLOYMENT_DEV_PATH"))
+//			));
 			m.put("DATA_PATH", getPathString(
 				Arrays.asList(rootPath, m.get("DATA_PATH"))
 			));
@@ -179,9 +186,11 @@ public class PathTools {
 	 * Gets the <code>ROOT_PATH</code>, <code>CODE_PATH</code>, and <code>PATH_PATH</code>, 
 	 * as defined by the user in <code>config.cfg</code> (located on the <code>CODE_PATH</code>.
 	 * 
+	 * @param dev <code>true</code> if called in development mode.
+	 * 
 	 * @return
 	 */
-	public static Map<String, String> getUserDefinedPaths() {
+	public static Map<String, String> getUserDefinedPaths(boolean dev) {
 		try {
 			Map<String, String> userPaths = new HashMap<>();
 
@@ -205,7 +214,7 @@ public class PathTools {
 
 			// Read config.cfg
 			try (BufferedReader br = new BufferedReader(
-				new FileReader(getPathString(Arrays.asList(codePath)) + CONFIG_FILE))) {
+				new FileReader(getPathString(Arrays.asList(codePath)) + (dev ? CONFIG_FILE_DEV : CONFIG_FILE)))) {
 				String line;
 				while ((line = br.readLine()) != null) {
 					String[] parts = line.split("=");

@@ -1,5 +1,11 @@
 package tools.music;
 
+import static org.junit.Assert.*;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,19 +14,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-///import org.junit.After;
-///import org.junit.Before;
-///import org.junit.Test;
-
 import de.uos.fmt.musitech.utility.math.Rational;
 import external.Tablature;
 import external.Transcription;
 import internal.core.Encoding;
 import internal.structure.TimelineTest;
-import junit.framework.TestCase;
 import tools.path.PathTools;
 
-public class TimeMeterToolsTest extends TestCase {
+public class TimeMeterToolsTest {
 
 	private File encodingTestpiece;
 	private File encodingTestGetMeterInfo;
@@ -41,8 +42,9 @@ public class TimeMeterToolsTest extends TestCase {
 	private final Rational r1 = new Rational(1, 1);
 
 
+	@Before
 	public void setUp() throws Exception {
-		Map<String, String> paths = PathTools.getPaths();
+		Map<String, String> paths = PathTools.getPaths(true);
 		String ep = paths.get("ENCODINGS_PATH");
 		String td = "test";
 
@@ -61,6 +63,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@After
 	public void tearDown() throws Exception {
 	}
 
@@ -122,6 +125,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testDiminuteMeter() {
 		Rational twoTwo = new Rational(2, 2);
 		Rational fourFour = new Rational(4, 4);
@@ -152,6 +156,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testUndiminuteMeter() {
 		List<Rational> expected = new ArrayList<>();
 		expected.add(new Rational(2, 1)); // 2/2, dim = 2
@@ -180,6 +185,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testDiminute() {
 		List<Rational> expected = Arrays.asList(new Rational[]{
 			new Rational(3, 2),
@@ -210,6 +216,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testDiminuteAlt() {
 		List<Double> expected = Arrays.asList(new Double[]{1.5, 1.0, 1.0, 1.5, 0.375});
 
@@ -228,6 +235,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testCalculateTime() {
 		// Tablature/non-tablature case
 		List<Rational> durs = Arrays.asList(new Rational[]{
@@ -264,6 +272,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetMetricPosition() {
 		// For a piece with meter changes
 		Tablature t1 = new Tablature(encodingTestGetMeterInfo);
@@ -303,6 +312,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetDiminution() {
 		List<List<Rational>> allMetricTimes = new ArrayList<>();
 		// For testGetMeterInfo
@@ -349,6 +359,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetUnitFractions() {
 		List<List<Rational>> expected = new ArrayList<List<Rational>>(getTestFractions());
 		List<List<Rational>> actual = new ArrayList<List<Rational>>();
@@ -370,6 +381,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetUnitFractionSequences() {
 		List<List<Rational>> all = new ArrayList<List<Rational>>();
 		
@@ -420,6 +432,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetDotLengtheningFactor() {
 		List<Rational> expected = Arrays.asList(
 			Rational.ZERO,
@@ -442,6 +455,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetNumDots() {
 		List<List<Rational>> all = getTestFractions();
 		
@@ -467,6 +481,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testRound() {
 		List<Rational> all = Arrays.asList(new Rational[]{
 			new Rational(1, 32),
@@ -495,6 +510,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testRoundAlt() {
 		Rational two = new Rational(2, 1);
 		List<Rational> all = Arrays.asList(new Rational[]{
@@ -570,6 +586,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetDottedNoteLength() {
 		List<Rational> expected = Arrays.asList(new Rational[]{
 			// 1/1
@@ -609,6 +626,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetDottedNoteLengthAlt() {
 		List<Integer> expected = Arrays.asList(new Integer[]{
 			// 1/1
@@ -636,6 +654,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetUndottedNoteLength() {
 		List<Integer> expected = Arrays.asList(new Integer[]{
 			96, 96, 96, 96, // 1/1 
@@ -662,6 +681,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testIsTripletOnset() {
 		// Example from 4465_33-34_memor_esto-2.tbp, bars 64-65
 		// Rhythm = H Q | Q Q Q |
@@ -711,6 +731,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetExtendedTripletOnsetPair() {
 		// Example from 4465_33-34_memor_esto-2.tbp, bars 64-65
 		// Rhythm = H Q | Q Q Q |
@@ -780,7 +801,9 @@ public class TimeMeterToolsTest extends TestCase {
 //				System.out.println(actual.get(i));
 //			}
 			if (expected.get(i) == null) {
-				assertEquals(expected.get(i), actual.get(i));
+				assertNull(expected.get(i));
+				assertNull(actual.get(i));
+//				assertEquals(expected.get(i), actual.get(i));
 			}
 			else {
 				assertEquals(expected.get(i).length, actual.get(i).length);
@@ -792,6 +815,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetFinalOffset() {
 		List<Rational> expected = Arrays.asList(
 			new Rational(6, 2),
@@ -815,6 +839,7 @@ public class TimeMeterToolsTest extends TestCase {
 	}
 
 
+	@Test
 	public void testGetDurationAsString() {
 		List<Rational> durs = Arrays.asList(
 			new Rational(2, 1),

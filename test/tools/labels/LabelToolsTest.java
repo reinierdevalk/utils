@@ -1,5 +1,11 @@
 package tools.labels;
 
+import static org.junit.Assert.*;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,10 +17,9 @@ import tools.path.PathTools;
 import de.uos.fmt.musitech.utility.math.Rational;
 import external.Tablature;
 import external.Transcription;
-import junit.framework.TestCase;
 import tbp.symbols.TabSymbol;
 
-public class LabelToolsTest  extends TestCase {
+public class LabelToolsTest {
 
 	private File midiTestpiece;
 	private File encodingTestpiece; 
@@ -30,11 +35,9 @@ public class LabelToolsTest  extends TestCase {
 	private static final List<Double> SIXTEENTH_EIGHTH = Transcription.createDurationLabel(new Integer[]{2*3, 4*3});
 	
 	
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		Map<String, String> paths = PathTools.getPaths();
+	@Before
+	public void setUp() throws Exception {
+		Map<String, String> paths = PathTools.getPaths(true);
 		String ep = paths.get("ENCODINGS_PATH");
 		String mp = paths.get("MIDI_PATH");
 		String td = "test";
@@ -47,9 +50,8 @@ public class LabelToolsTest  extends TestCase {
 		);
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@After
+	public void tearDown() throws Exception {
 	}
 
 
@@ -60,6 +62,7 @@ public class LabelToolsTest  extends TestCase {
 	}
 
 
+	@Test
 	public void testConvertIntoListOfVoices() {		    
 		List<List<Integer>> expected = new ArrayList<List<Integer>>();
 		expected.add(Arrays.asList(new Integer[]{0, 1}));
@@ -81,6 +84,7 @@ public class LabelToolsTest  extends TestCase {
 	}
 
 
+	@Test
 	public void testConvertIntoVoiceLabel() {		
 		List<Integer> predictedVoices1 = Arrays.asList(new Integer[]{0, 1});
 		List<Integer> predictedVoices2 = Arrays.asList(new Integer[]{2});
@@ -106,6 +110,7 @@ public class LabelToolsTest  extends TestCase {
 	}
 
 
+	@Test
 	public void testConvertIntoDurationLabel() {		
 		List<Integer> predictedDurations1 = Arrays.asList(new Integer[]{8});
 		List<Integer> predictedDurations2 = Arrays.asList(new Integer[]{12});
@@ -131,6 +136,7 @@ public class LabelToolsTest  extends TestCase {
 	}
 
 
+	@Test
 	public void testGetVoiceAssignment() {
 		Tablature tablature = new Tablature(encodingTestpiece);
 		Transcription transcription = new Transcription(midiTestpiece, encodingTestpiece);
@@ -190,6 +196,7 @@ public class LabelToolsTest  extends TestCase {
 	}
 
 
+	@Test
 	public void testGetVoiceAssignmentFromListOfVoices() {
 		Transcription transcription = new Transcription(midiTestpiece, encodingTestpiece);
 
@@ -237,6 +244,7 @@ public class LabelToolsTest  extends TestCase {
 	}
 
 
+	@Test
 	public void testGetChordVoiceLabels() {
 		Transcription transcription = new Transcription(midiTestpiece, encodingTestpiece);
 
@@ -321,6 +329,7 @@ public class LabelToolsTest  extends TestCase {
 	}
 
 
+	@Test
 	public void testGetVoicesInChord() {
 		Tablature tablature = new Tablature(encodingTestpiece);
 		Transcription transcription = new Transcription(midiTestpiece, encodingTestpiece);
@@ -408,6 +417,7 @@ public class LabelToolsTest  extends TestCase {
 	}
 
 
+	@Test
 	public void testConvertIntoDuration() {
 		Transcription transcription = new Transcription(midiTestpiece, encodingTestpiece);
 
@@ -460,8 +470,9 @@ public class LabelToolsTest  extends TestCase {
 			}
 		}
 	}
-	
-	
+
+
+	@Test
 	public void testGetIntegerEncoding() {
 		List<Rational> durs = Arrays.asList(new Rational[]{
 			new Rational(1, 16),
