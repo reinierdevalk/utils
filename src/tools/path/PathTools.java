@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +24,8 @@ public class PathTools {
 
 	
 	public static void main(String[] args) {
-		getUserDefinedPaths(true);
+//		getUserDefinedPaths(true);
+		getPaths(true);
 	}
 
 
@@ -43,121 +45,92 @@ public class PathTools {
 
 		Map<String, String> m = null;
 		try {
-			// Define the type reference for the Map
-			TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>(){};
-
-			// Read JSON file and convert to a Map with specific type
+			// 1. Read user-defined paths from .cfg file 
+			// ROOT_PATH leads to all things not code (data, datasets, models, templates, ...) 
+			// CODE_PATH leads to the code 
+			// EXE_PATH leads to the executable (and is only needed in install.sh)
 			Map<String, String> userDefinedPaths = getUserDefinedPaths(dev);
-			
-			for (Map.Entry<String, String> entry : userDefinedPaths.entrySet()) {
-			    String key = entry.getKey();
-			    String value = entry.getValue();
-			    System.out.println("Key: " + key + ", Value: " + value);
-			}
-			System.out.println("* * * * * * * * *");
-			
-			// ROOT_PATH leads to all things not code (data, models, templates, ...) 
-			String rootPath = userDefinedPaths.get("ROOT_PATH");
-			// In the dev case, LIB_PATH is on (i.e., a continuation of) ROOT_PATH 
-			String codePath = userDefinedPaths.get("LIB_PATH");
-			// In the dev case, EXE_PATH is empty (the executable is called from LIB_PATH)
-			String exePath = userDefinedPaths.get("EXE_PATH");
-////			codePath = getPathString(Arrays.asList(codePath));
-////			// If there is no custom code path specified, codePath defaults to libPath
-////			codePath =
-////				customCodePath.equals("") ? getPathString(Arrays.asList(libPath)) :
-////				getPathString(Arrays.asList(rootPath, customCodePath));
-			
-			// 22.06 was dit
-//			String codePath = 
-//				libPath.equals("") ? getPathString(Arrays.asList(rootPath, libPath)) : // dev case 	
-//				getPathString(Arrays.asList(libPath));
-			
-//			String codePath = 
-//				exePath.equals("") ? getPathString(Arrays.asList(rootPath, libPath)) : // dev case 	
-//				getPathString(Arrays.asList(libPath)); // real-world case
-			
-//			String codePath = libPath;
+			String rp = userDefinedPaths.get("ROOT_PATH");
+			String cp = userDefinedPaths.get("LIB_PATH");
 
-//			System.out.println(codePath + JSON_FILE);
-			m = objectMapper.readValue(
-				new File(getPathString(Arrays.asList(codePath)) + 
-				(dev ? PATHS_FILE_DEV : PATHS_FILE)), typeRef
+			// 2. Read the Map from the JSON file
+			// Define the type reference for the Map
+			TypeReference<Map<String, Map<String, String>>> typeRef = new TypeReference<Map<String, Map<String, String>>>(){};
+			Map<String, Map<String, String>> config = objectMapper.readValue(
+				new File(getPathString(Arrays.asList(cp)) + (dev ? PATHS_FILE_DEV : PATHS_FILE)), typeRef
 			);
-//			m = objectMapper.readValue(
-//				new File(getPathString(Arrays.asList(rootPath, codePath)) + JSON_FILE), typeRef
-//			);
+			Map<String, String> paths = config.get("paths");
+			Map<String, String> scripts = config.get("scripts");
 
-			// 1. Set ROOT_PATH and CODE_PATH
-			m.put("ROOT_PATH", getPathString(Arrays.asList(rootPath)));
-			m.put("CODE_PATH", getPathString(Arrays.asList(codePath)));
-
-			// 2. Complete paths on ROOT_PATH by prepending ROOT_PATH
+			// 3. Set paths in m
+			m = new LinkedHashMap<String, String>();
+			// a. Set ROOT_PATH and CODE_PATH
+			m.put("ROOT_PATH", getPathString(Arrays.asList(rp)));
+			m.put("CODE_PATH", getPathString(Arrays.asList(cp)));
+			// b. Complete paths on ROOT_PATH by prepending ROOT_PATH
 			m.put("ENCODINGS_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("ENCODINGS_PATH"))
+				Arrays.asList(rp, paths.get("ENCODINGS_PATH"))
 			));
 			m.put("MIDI_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("MIDI_PATH"))
+				Arrays.asList(rp, paths.get("MIDI_PATH"))
 			));
 			m.put("ENCODINGS_PATH_JOSQUINTAB", getPathString(
-				Arrays.asList(rootPath, m.get("ENCODINGS_PATH_JOSQUINTAB"))
+				Arrays.asList(rp, paths.get("ENCODINGS_PATH_JOSQUINTAB"))
 			));
 			m.put("MIDI_PATH_JOSQUINTAB", getPathString(
-				Arrays.asList(rootPath, m.get("MIDI_PATH_JOSQUINTAB"))
+				Arrays.asList(rp, paths.get("MIDI_PATH_JOSQUINTAB"))
 			));
 			m.put("DATASETS_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("DATASETS_PATH"))
+				Arrays.asList(rp, paths.get("DATASETS_PATH"))
 			));
 			m.put("EXPERIMENTS_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("EXPERIMENTS_PATH"))
+				Arrays.asList(rp, paths.get("EXPERIMENTS_PATH"))
 			));
 			m.put("MODELS_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("MODELS_PATH"))
+				Arrays.asList(rp, paths.get("MODELS_PATH"))
 			));
 			m.put("TEMPLATES_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("TEMPLATES_PATH"))
+				Arrays.asList(rp, paths.get("TEMPLATES_PATH"))
 			));
 			m.put("ANALYSER_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("ANALYSER_PATH"))
+				Arrays.asList(rp, paths.get("ANALYSER_PATH"))
 			));
 			m.put("CONVERTER_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("CONVERTER_PATH"))
+				Arrays.asList(rp, paths.get("CONVERTER_PATH"))
 			));
 			m.put("TABMAPPER_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("TABMAPPER_PATH"))
+				Arrays.asList(rp, paths.get("TABMAPPER_PATH"))
 			));
 			m.put("DIPLOMAT_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("DIPLOMAT_PATH"))
+				Arrays.asList(rp, paths.get("DIPLOMAT_PATH"))
 			));
 			m.put("POLYPHONIST_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("POLYPHONIST_PATH"))
+				Arrays.asList(rp, paths.get("POLYPHONIST_PATH"))
 			));
-
-			// 3. Complete paths on CODE_PATH by prepending CODE_PATH
+			// c. Complete paths on CODE_PATH by prepending CODE_PATH
 			m.put("UTILS_PYTHON_PATH", getPathString(
-				Arrays.asList(codePath, m.get("UTILS_PYTHON_PATH"))
+				Arrays.asList(cp, paths.get("UTILS_PYTHON_PATH"))
 			));
 			m.put("VOICE_SEP_PYTHON_PATH", getPathString(
-				Arrays.asList(codePath, m.get("VOICE_SEP_PYTHON_PATH"))
+				Arrays.asList(cp, paths.get("VOICE_SEP_PYTHON_PATH"))
 			));
 			m.put("VOICE_SEP_MATLAB_PATH", getPathString(
-				Arrays.asList(codePath, m.get("VOICE_SEP_MATLAB_PATH"))
+				Arrays.asList(cp, paths.get("VOICE_SEP_MATLAB_PATH"))
 			));
 			m.put("ANALYSIS_PYTHON_PATH", getPathString(
-				Arrays.asList(codePath, m.get("ANALYSIS_PYTHON_PATH"))
+				Arrays.asList(cp, paths.get("ANALYSIS_PYTHON_PATH"))
 			));
 
-//			for (Map.Entry<String, String> entry : m.entrySet()) {
-//				System.out.println(entry.getKey() + " -- " + entry.getValue());
-//			}
+			// 4. Set scripts in m
+			m.put("BEAM", scripts.get("BEAM"));
+			m.put("SCIKIT", scripts.get("SCIKIT"));
+			m.put("TENSORFLOW", scripts.get("TENSORFLOW"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+//		System.out.println("completed paths:");
 //		for (Map.Entry<String, String> entry : m.entrySet()) {
-//		    String key = entry.getKey();
-//		    String value = entry.getValue();
-//		    System.out.println("Key: " + key + ", Value: " + value);
+//			System.out.println(entry.getKey() + " -- " + entry.getValue());
 //		}
 //		System.exit(0);
 
@@ -219,7 +192,7 @@ public class PathTools {
 				.getParent()
 				.toString();
 
-			// Read config.cfg
+			// Read config file
 			try (BufferedReader br = new BufferedReader(
 				new FileReader(getPathString(Arrays.asList(codePath)) + (dev ? CONFIG_FILE_DEV : CONFIG_FILE)))) {
 				String line;
