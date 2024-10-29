@@ -59,7 +59,7 @@ public class PathTools {
 			// ROOT_PATH leads to all things not code (data, models, templates, ...) 
 			String rootPath = userDefinedPaths.get("ROOT_PATH");
 			// In the dev case, LIB_PATH is on (i.e., a continuation of) ROOT_PATH 
-			String libPath = userDefinedPaths.get("LIB_PATH");
+			String codePath = userDefinedPaths.get("LIB_PATH");
 			// In the dev case, EXE_PATH is empty (the executable is called from LIB_PATH)
 			String exePath = userDefinedPaths.get("EXE_PATH");
 ////			codePath = getPathString(Arrays.asList(codePath));
@@ -77,7 +77,7 @@ public class PathTools {
 //				exePath.equals("") ? getPathString(Arrays.asList(rootPath, libPath)) : // dev case 	
 //				getPathString(Arrays.asList(libPath)); // real-world case
 			
-			String codePath = libPath;
+//			String codePath = libPath;
 
 //			System.out.println(codePath + JSON_FILE);
 			m = objectMapper.readValue(
@@ -88,27 +88,40 @@ public class PathTools {
 //				new File(getPathString(Arrays.asList(rootPath, codePath)) + JSON_FILE), typeRef
 //			);
 
-			// 1. Set ROOT_PATH
-			m.put("ROOT_PATH", rootPath);
+			// 1. Set ROOT_PATH and CODE_PATH
+			m.put("ROOT_PATH", getPathString(Arrays.asList(rootPath)));
+			m.put("CODE_PATH", getPathString(Arrays.asList(codePath)));
 
 			// 2. Complete paths on ROOT_PATH by prepending ROOT_PATH
-			m.put("CODE_PATH", getPathString(
-				Arrays.asList(codePath)
+			m.put("ENCODINGS_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("ENCODINGS_PATH"))
 			));
-//			m.put("DEPLOYMENT_DEV_PATH", getPathString(
-//				Arrays.asList(rootPath, m.get("DEPLOYMENT_DEV_PATH"))
-//			));
-			m.put("DATA_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("DATA_PATH"))
+			m.put("MIDI_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("MIDI_PATH"))
+			));
+			m.put("ENCODINGS_PATH_JOSQUINTAB", getPathString(
+				Arrays.asList(rootPath, m.get("ENCODINGS_PATH_JOSQUINTAB"))
+			));
+			m.put("MIDI_PATH_JOSQUINTAB", getPathString(
+				Arrays.asList(rootPath, m.get("MIDI_PATH_JOSQUINTAB"))
+			));
+			m.put("DATASETS_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("DATASETS_PATH"))
 			));
 			m.put("EXPERIMENTS_PATH", getPathString(
 				Arrays.asList(rootPath, m.get("EXPERIMENTS_PATH"))
 			));
 			m.put("MODELS_PATH", getPathString(
-					Arrays.asList(rootPath, m.get("MODELS_PATH"))
-				));
+				Arrays.asList(rootPath, m.get("MODELS_PATH"))
+			));
 			m.put("TEMPLATES_PATH", getPathString(
 				Arrays.asList(rootPath, m.get("TEMPLATES_PATH"))
+			));
+			m.put("ANALYSER_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("ANALYSER_PATH"))
+			));
+			m.put("CONVERTER_PATH", getPathString(
+				Arrays.asList(rootPath, m.get("CONVERTER_PATH"))
 			));
 			m.put("TABMAPPER_PATH", getPathString(
 				Arrays.asList(rootPath, m.get("TABMAPPER_PATH"))
@@ -119,27 +132,21 @@ public class PathTools {
 			m.put("POLYPHONIST_PATH", getPathString(
 				Arrays.asList(rootPath, m.get("POLYPHONIST_PATH"))
 			));
-			m.put("ANALYSER_PATH", getPathString(
-				Arrays.asList(rootPath, m.get("ANALYSER_PATH"))
+
+			// 3. Complete paths on CODE_PATH by prepending CODE_PATH
+			m.put("UTILS_PYTHON_PATH", getPathString(
+				Arrays.asList(codePath, m.get("UTILS_PYTHON_PATH"))
+			));
+			m.put("VOICE_SEP_PYTHON_PATH", getPathString(
+				Arrays.asList(codePath, m.get("VOICE_SEP_PYTHON_PATH"))
+			));
+			m.put("VOICE_SEP_MATLAB_PATH", getPathString(
+				Arrays.asList(codePath, m.get("VOICE_SEP_MATLAB_PATH"))
+			));
+			m.put("ANALYSIS_PYTHON_PATH", getPathString(
+				Arrays.asList(codePath, m.get("ANALYSIS_PYTHON_PATH"))
 			));
 
-			// 3. Complete ENCODINGS and MIDI paths by prepending completed DATA_PATH
-			String dataPath = m.get("DATA_PATH");
-			m.put("ENCODINGS_PATH", getPathString(
-				Arrays.asList(dataPath, m.get("ENCODINGS_PATH"))
-			));
-			m.put("MIDI_PATH", getPathString(
-				Arrays.asList(dataPath, m.get("MIDI_PATH"))
-			));
-			m.put("ENCODINGS_PATH_JOSQUINTAB", getPathString(
-				Arrays.asList(dataPath, m.get("ENCODINGS_PATH_JOSQUINTAB"))
-			));
-			m.put("MIDI_PATH_JOSQUINTAB", getPathString(
-				Arrays.asList(dataPath, m.get("MIDI_PATH_JOSQUINTAB"))
-			));
-			m.put("DATASETS_PATH", getPathString(
-				Arrays.asList(dataPath, m.get("DATASETS_PATH"))
-			));
 //			for (Map.Entry<String, String> entry : m.entrySet()) {
 //				System.out.println(entry.getKey() + " -- " + entry.getValue());
 //			}
@@ -183,7 +190,7 @@ public class PathTools {
 
 
 	/**
-	 * Gets the <code>ROOT_PATH</code>, <code>CODE_PATH</code>, and <code>PATH_PATH</code>, 
+	 * Gets the <code>ROOT_PATH</code>, <code>CODE_PATH</code>, and <code>EXE_PATH</code>, 
 	 * as defined by the user in <code>config.cfg</code> (located on the <code>CODE_PATH</code>.
 	 * 
 	 * @param dev <code>true</code> if called in development mode.
