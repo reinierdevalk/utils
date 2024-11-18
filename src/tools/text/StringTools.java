@@ -1,9 +1,16 @@
 package tools.text;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import tbp.symbols.Symbol;
 import tools.ToolBox;
@@ -89,5 +96,28 @@ public class StringTools {
 			}
 		}		
 		return table;
+	}
+
+
+	/**
+	 * Reads a JSON file into a <code>Map</code>.
+	 * 
+	 * @param fileName The path to the JSON file.
+	 * @return
+	 */
+	public static Map<String, Map<String, String>> readJSONFile(String fileName) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+
+		Map<String, Map<String, String>> m = null;
+		try {
+			// Define the type reference for the Map
+			TypeReference<Map<String, Map<String, String>>> typeRef = 
+				new TypeReference<Map<String, Map<String, String>>>(){};
+			m = objectMapper.readValue(new File(fileName), typeRef);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return m;
 	}
 }
