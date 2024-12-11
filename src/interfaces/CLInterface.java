@@ -1,35 +1,57 @@
-package tools.path;
+package interfaces;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import conversion.exports.MEIExport;
+import conversion.imports.MIDIImport;
+import conversion.imports.TabImport;
+import internal.core.Encoding;
+import tools.ToolBox;
 import tools.text.StringTools;
 
-public class PathTools {
-
+public class CLInterface {
 	private static final String PATHS_FILE = "paths.json";
 	private static final String PATHS_FILE_DEV = "paths-dev.json";
 	private static final String CONFIG_FILE = "config.cfg";
 	private static final String CONFIG_FILE_DEV = "config-dev.cfg";
-
 	
+	public static final String FILE = "-f";
+	public static final String FORMAT = "-r";
+	
+	// CLI args (as in abtab script)
+	// Transcriber
+	public final static String KEY = "-k";
+	public final static String MODE = "-m";
+	public final static String TABLATURE = "-t";
+	public final static String TYPE = "-y";
+	public final static String MODEL = "-o";
+	public final static String VERBOSE = "-v";
+	
+	// TabMapper
+	public final static String ORNAMENTATION = "-o";
+	public final static String SCORE = "-s";
+	public final static String TABLATURE_TM = "-t";
+	public final static String DURATION = "-d";
+
 	public static void main(String[] args) {
-//		getUserDefinedPaths(true);
-		getPaths(true);
 	}
 
 
 	/**
 	 * Reads <code>paths.json</code> (located on the <code>CODE_PATH</code>). It is preferred
-	 * if this method is called from a <code>main()</code>, and its value then passed on.
+	 * that this method is called from a <code>main()</code>, and its value then passed on.
 	 * 
 	 * @param dev <code>true</code> if called in development mode.
 	 * 
@@ -37,7 +59,7 @@ public class PathTools {
 	 *         <code>paths.json</code> the value (relative path) extended 
 	 *         to its full path.
 	 */
-	public static final Map<String, String> getPaths(boolean dev) {
+	public static Map<String, String> getPaths(boolean dev) {
 		Map<String, String> m = null;
 
 		// 1. Read user-defined paths from .cfg file 
@@ -167,10 +189,14 @@ public class PathTools {
 		try {
 			Map<String, String> userPaths = new HashMap<>();
 
-			// Get the path to tools.path.PathTools.class (i.e., the current class)
-			// NB Java counts the packages 'tools' and 'path' not as dirs, but as part of the class
+			// Get the path to interfaces.CLInterface.class (i.e., the current class)
+			// NB Java counts the package 'interfaces' not as dir, but as part of the class
 			// (= F:/research/computation/software/code/eclipse/utils/bin/)
-			String classPath = PathTools.class
+//			// Get the path to tools.path.PathTools.class (i.e., the current class)
+//			// NB Java counts the packages 'tools' and 'path' not as dirs, but as part of the class
+//			// (= F:/research/computation/software/code/eclipse/utils/bin/)
+			String classPath = CLInterface.class
+//			String classPath = PathTools.class
 				.getProtectionDomain()
 				.getCodeSource()
 				.getLocation()
@@ -216,6 +242,7 @@ public class PathTools {
 	 * @param l
 	 * @return
 	 */
+	// TODO move to more general class (ToolBox? StringTools?)
 	public static String getPathString(List<String> l) {
 		Path path = Path.of(l.get(0));
 		for (int i = 1; i < l.size(); i++) {
@@ -230,6 +257,72 @@ public class PathTools {
 		}
 
 		return pathStr;
+	}
+
+
+	public static List<Object> parseCLIArgs(String[] opts, String[] defaults, 
+		String[] userOptsVals, String path) {
+		
+		// Populate cliOptsVals with default values
+		Map<String, String> cliOptsVals = new LinkedHashMap<String, String>();
+		for (int i = 0; i < opts.length; i++) {
+			cliOptsVals.put(opts[i], defaults[i]);
+		}
+
+		// Parse userOptsVals and overwrite any default values in cliOptsVals
+		for (String s : userOptsVals) {
+			String[] optVal = s.trim().split(" ");
+			cliOptsVals.put(optVal[0], optVal[1]);
+		}
+
+		// Set piecenames
+		List<String> piecenames = new ArrayList<>();
+		// Single piece
+		if (!cliOptsVals.get(FILE).equals("n/a")) {
+			piecenames.add(ToolBox.splitExt(cliOptsVals.get(FILE))[0]);
+		}
+		// All pieces in path
+		else {
+			piecenames.addAll(ToolBox.getFilesInFolder(
+				path, cliOptsVals.get(FORMAT).equals("y") ? TabImport.ALLOWED_FILE_FORMATS : 
+				Arrays.asList(MIDIImport.EXTENSION), false
+			));
+		}
+		// Convert any non-.tbp in piecenames to .tbp
+		convertToTbp(path, piecenames);
+
+		return Arrays.asList(new Object[]{cliOptsVals, piecenames});
+	}
+
+
+	/**
+	 * Converts, for each piece in piecenames, <inPath/piece> into the .tbp format (if it does 
+	 * not exist yet).
+	 * 
+	 * @param inPath
+	 * @param piecenames
+	 */
+	public static void convertToTbp(String inPath, List<String> piecenames) {
+		for (String p : piecenames) {
+			String ip = inPath + p;
+			if (!Files.exists(Paths.get(ip + Encoding.EXTENSION))) {
+				// .tc file
+				if (Files.exists(Paths.get(ip + TabImport.TC_EXT))) {
+					String s = TabImport.tc2tbp(
+						ToolBox.readTextFile(new File(ip + TabImport.TC_EXT))
+					);
+					ToolBox.storeTextFile(s, new File(ip + Encoding.EXTENSION));
+				}
+				// .xml file
+				else if (Files.exists(Paths.get(ip + MEIExport.MEI_EXT))) {
+					// TODO luteconv .xml -> .tc; TabImport.tc2tbp()
+				}
+				// .mei file 
+				else if (Files.exists(Paths.get(ip + MEIExport.MEI_EXT_ALT))) {
+					// TODO luteconv .mei -> .tc; TabImport.tc2tbp()
+				}
+			}
+		}
 	}
 
 }

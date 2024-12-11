@@ -313,101 +313,101 @@ public class PitchKeyToolsTest {
 		List<String[]> expected = new ArrayList<>();
 		// pitch is in key
 		// Flats
-		expected.add(new String[]{"b", "n"}); // 71 in Am
-		expected.add(new String[]{"b", "f"}); // 70 in Dm
-		expected.add(new String[]{"e", "f"}); // 63 in Gm
-		expected.add(new String[]{"a", "f"}); // 68 in Cm
-		expected.add(new String[]{"d", "f"}); // 61 in Fm
-		expected.add(new String[]{"g", "f"}); // 66 in Bbm
+		expected.add(new String[]{"b", "n", ""}); // 71 in Am
+		expected.add(new String[]{"b", "f", ""}); // 70 in Dm
+		expected.add(new String[]{"e", "f", ""}); // 63 in Gm
+		expected.add(new String[]{"a", "f", ""}); // 68 in Cm
+		expected.add(new String[]{"d", "f", ""}); // 61 in Fm
+		expected.add(new String[]{"g", "f", ""}); // 66 in Bbm
 		// Sharps
-		expected.add(new String[]{"f", "s"}); // 66 in Em
-		expected.add(new String[]{"c", "s"}); // 61 in Bm
-		expected.add(new String[]{"g", "s"}); // 68 in F#m
-		expected.add(new String[]{"d", "s"}); // 63 in C#m
-		expected.add(new String[]{"a", "s"}); // 70 in G#m
+		expected.add(new String[]{"f", "s", ""}); // 66 in Em
+		expected.add(new String[]{"c", "s", ""}); // 61 in Bm
+		expected.add(new String[]{"g", "s", ""}); // 68 in F#m
+		expected.add(new String[]{"d", "s", ""}); // 63 in C#m
+		expected.add(new String[]{"a", "s", ""}); // 70 in G#m
 		// pitch is not in key
 		// 1. next or second-next KA
 		// Flats
-		expected.add(new String[]{"b", "f"}); // 70 in Am
-		expected.add(new String[]{"a", "f"}); // 68 in Dm
-		expected.add(new String[]{"a", "f"}); // 68 in Gm
-		expected.add(new String[]{"g", "f"}); // 66 in Cm
-		expected.add(new String[]{"g", "f"}); // 66 in Fm
-		expected.add(new String[]{"f", "f"}); // 64 in Bbm
+		expected.add(new String[]{"b", "f", ""}); // 70 in Am
+		expected.add(new String[]{"a", "f", ""}); // 68 in Dm
+		expected.add(new String[]{"a", "f", ""}); // 68 in Gm
+		expected.add(new String[]{"g", "f", ""}); // 66 in Cm
+		expected.add(new String[]{"g", "f", ""}); // 66 in Fm
+		expected.add(new String[]{"f", "f", ""}); // 64 in Bbm
 		// Sharps
-		expected.add(new String[]{"g", "s"}); // 68 in Em
-		expected.add(new String[]{"g", "s"}); // 68 in Bm
-		expected.add(new String[]{"a", "s"}); // 70 in F#m
-		expected.add(new String[]{"a", "s"}); // 70 in C#m
-		expected.add(new String[]{"b", "s"}); // 60 in G#m
+		expected.add(new String[]{"g", "s", ""}); // 68 in Em
+		expected.add(new String[]{"g", "s", ""}); // 68 in Bm
+		expected.add(new String[]{"a", "s", ""}); // 70 in F#m
+		expected.add(new String[]{"a", "s", ""}); // 70 in C#m
+		expected.add(new String[]{"b", "s", ""}); // 60 in G#m
 		// 2. naturalised KA
 		// Flats
-		expected.add(new String[]{"b", "n"}); // 71 in Dm
-		expected.add(new String[]{"e", "n"}); // 64 in Gm
-		expected.add(new String[]{"a", "n"}); // 69 in Cm
-		expected.add(new String[]{"d", "n"}); // 62 in Fm
-		expected.add(new String[]{"g", "n"}); // 67 in Bbm
+		expected.add(new String[]{"b", "n", ""}); // 71 in Dm
+		expected.add(new String[]{"e", "n", ""}); // 64 in Gm
+		expected.add(new String[]{"a", "n", ""}); // 69 in Cm
+		expected.add(new String[]{"d", "n", ""}); // 62 in Fm
+		expected.add(new String[]{"g", "n", ""}); // 67 in Bbm
 		// Sharps
-		expected.add(new String[]{"f", "n"}); // 65 in Em
-		expected.add(new String[]{"c", "n"}); // 60 in Bm
-		expected.add(new String[]{"g", "n"}); // 67 in F#m
-		expected.add(new String[]{"d", "n"}); // 62 in C#m
-		expected.add(new String[]{"a", "n"}); // 69 in G#m		
+		expected.add(new String[]{"f", "n", ""}); // 65 in Em
+		expected.add(new String[]{"c", "n", ""}); // 60 in Bm
+		expected.add(new String[]{"g", "n", ""}); // 67 in F#m
+		expected.add(new String[]{"d", "n", ""}); // 62 in C#m
+		expected.add(new String[]{"a", "n", ""}); // 69 in G#m		
 		// 3. ULT/LLT for minor (or minor parallel)
 		// ULT, flats
-		expected.add(new String[]{"b", "f"}); // 70 in Am
-		expected.add(new String[]{"e", "f"}); // 63 in Dm
-		expected.add(new String[]{"a", "f"}); // 68 in Gm
-		expected.add(new String[]{"d", "f"}); // 61 in Cm
-		expected.add(new String[]{"g", "f"}); // 66 in Fm
-		expected.add(new String[]{"c", "f"}); // 71 in Bbm
+		expected.add(new String[]{"b", "f", ""}); // 70 in Am
+		expected.add(new String[]{"e", "f", ""}); // 63 in Dm
+		expected.add(new String[]{"a", "f", ""}); // 68 in Gm
+		expected.add(new String[]{"d", "f", ""}); // 61 in Cm
+		expected.add(new String[]{"g", "f", ""}); // 66 in Fm
+		expected.add(new String[]{"c", "f", ""}); // 71 in Bbm
 		// ULT, sharps
-		expected.add(new String[]{"f", "n"}); // 65 in Em
-		expected.add(new String[]{"c", "n"}); // 60 in Bm
-		expected.add(new String[]{"g", "n"}); // 67 in F#m
-		expected.add(new String[]{"d", "n"}); // 62 in C#m
-		expected.add(new String[]{"a", "n"}); // 69 in G#m
+		expected.add(new String[]{"f", "n", ""}); // 65 in Em
+		expected.add(new String[]{"c", "n", ""}); // 60 in Bm
+		expected.add(new String[]{"g", "n", ""}); // 67 in F#m
+		expected.add(new String[]{"d", "n", ""}); // 62 in C#m
+		expected.add(new String[]{"a", "n", ""}); // 69 in G#m
 		// LLT, flats
-		expected.add(new String[]{"g", "s"}); // 68 in Am
-		expected.add(new String[]{"c", "s"}); // 61 in Dm
-		expected.add(new String[]{"f", "s"}); // 66 in Gm
-		expected.add(new String[]{"b", "n"}); // 71 in Cm
-		expected.add(new String[]{"e", "n"}); // 64 in Fm
-		expected.add(new String[]{"a", "n"}); // 69 in Bbm
+		expected.add(new String[]{"g", "s", ""}); // 68 in Am
+		expected.add(new String[]{"c", "s", ""}); // 61 in Dm
+		expected.add(new String[]{"f", "s", ""}); // 66 in Gm
+		expected.add(new String[]{"b", "n", ""}); // 71 in Cm
+		expected.add(new String[]{"e", "n", ""}); // 64 in Fm
+		expected.add(new String[]{"a", "n", ""}); // 69 in Bbm
 		// LLT, sharps
-		expected.add(new String[]{"d", "s"}); // 63 in Em
-		expected.add(new String[]{"a", "s"}); // 70 in Bm
-		expected.add(new String[]{"e", "s"}); // 65 in F#m
-		expected.add(new String[]{"b", "s"}); // 60 in C#m
-		expected.add(new String[]{"f", "x"}); // 67 in G#m
+		expected.add(new String[]{"d", "s", ""}); // 63 in Em
+		expected.add(new String[]{"a", "s", ""}); // 70 in Bm
+		expected.add(new String[]{"e", "s", ""}); // 65 in F#m
+		expected.add(new String[]{"b", "s", ""}); // 60 in C#m
+		expected.add(new String[]{"f", "x", ""}); // 67 in G#m
 		// 4. R3 for minor (or minor parallel)
 		// Flats
-		expected.add(new String[]{"c", "s"}); // 61 in Am
-		expected.add(new String[]{"f", "s"}); // 66 in Dm
-		expected.add(new String[]{"b", "n"}); // 71 in Gm
-		expected.add(new String[]{"e", "n"}); // 64 in Cm
-		expected.add(new String[]{"a", "n"}); // 69 in Fm
-		expected.add(new String[]{"d", "n"}); // 62 in Bbm
+		expected.add(new String[]{"c", "s", ""}); // 61 in Am
+		expected.add(new String[]{"f", "s", ""}); // 66 in Dm
+		expected.add(new String[]{"b", "n", ""}); // 71 in Gm
+		expected.add(new String[]{"e", "n", ""}); // 64 in Cm
+		expected.add(new String[]{"a", "n", ""}); // 69 in Fm
+		expected.add(new String[]{"d", "n", ""}); // 62 in Bbm
 		// Sharps
-		expected.add(new String[]{"g", "s"}); // 68 in Em
-		expected.add(new String[]{"d", "s"}); // 63 in Bm
-		expected.add(new String[]{"a", "s"}); // 70 in F#m
-		expected.add(new String[]{"e", "s"}); // 65 in C#m
-		expected.add(new String[]{"b", "s"}); // 60 in G#m
+		expected.add(new String[]{"g", "s", ""}); // 68 in Em
+		expected.add(new String[]{"d", "s", ""}); // 63 in Bm
+		expected.add(new String[]{"a", "s", ""}); // 70 in F#m
+		expected.add(new String[]{"e", "s", ""}); // 65 in C#m
+		expected.add(new String[]{"b", "s", ""}); // 60 in G#m
 		// 5. R6 for minor (or minor parallel)
 		// Flats
-		expected.add(new String[]{"f", "s"}); // 66 in Am
-		expected.add(new String[]{"b", "n"}); // 71 in Dm
-		expected.add(new String[]{"e", "n"}); // 64 in Gm
-		expected.add(new String[]{"a", "n"}); // 69 in Cm
-		expected.add(new String[]{"d", "n"}); // 62 in Fm
-		expected.add(new String[]{"g", "n"}); // 67 in Bbm
+		expected.add(new String[]{"f", "s", ""}); // 66 in Am
+		expected.add(new String[]{"b", "n", ""}); // 71 in Dm
+		expected.add(new String[]{"e", "n", ""}); // 64 in Gm
+		expected.add(new String[]{"a", "n", ""}); // 69 in Cm
+		expected.add(new String[]{"d", "n", ""}); // 62 in Fm
+		expected.add(new String[]{"g", "n", ""}); // 67 in Bbm
 		// Sharps
-		expected.add(new String[]{"c", "s"}); // 61 in Em
-		expected.add(new String[]{"g", "s"}); // 68 in Bm
-		expected.add(new String[]{"d", "s"}); // 63 in F#m
-		expected.add(new String[]{"a", "s"}); // 70 in C#m
-		expected.add(new String[]{"e", "s"}); // 65 in G#m
+		expected.add(new String[]{"c", "s", ""}); // 61 in Em
+		expected.add(new String[]{"g", "s", ""}); // 68 in Bm
+		expected.add(new String[]{"d", "s", ""}); // 63 in F#m
+		expected.add(new String[]{"a", "s", ""}); // 70 in C#m
+		expected.add(new String[]{"e", "s", ""}); // 65 in G#m
 
 		List<String[]> actual = new ArrayList<>();
 //		Rational o = new Rational(1, 2);

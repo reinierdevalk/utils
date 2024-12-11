@@ -9,14 +9,16 @@ import org.junit.Test;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import tools.labels.LabelTools;
-import tools.path.PathTools;
 import de.uos.fmt.musitech.utility.math.Rational;
 import external.Tablature;
 import external.Transcription;
+import interfaces.CLInterface;
+import tbp.symbols.Symbol;
 import tbp.symbols.TabSymbol;
 
 public class LabelToolsTest {
@@ -24,28 +26,47 @@ public class LabelToolsTest {
 	private File midiTestpiece;
 	private File encodingTestpiece; 
 	
-	private static final List<Double> V_0 = Transcription.createVoiceLabel(new Integer[]{0});
-	private static final List<Double> V_1 = Transcription.createVoiceLabel(new Integer[]{1});
-	private static final List<Double> V_2 = Transcription.createVoiceLabel(new Integer[]{2});
-	private static final List<Double> V_3 = Transcription.createVoiceLabel(new Integer[]{3});
-	private static final List<Double> V_4 = Transcription.createVoiceLabel(new Integer[]{4});
-	private static final List<Double> V_01 = Transcription.createVoiceLabel(new Integer[]{0, 1});
-	private static final List<Double> QUARTER = Transcription.createDurationLabel(new Integer[]{8*3});
-	private static final List<Double> DOTTED_QUARTER = Transcription.createDurationLabel(new Integer[]{12*3});
-	private static final List<Double> SIXTEENTH_EIGHTH = Transcription.createDurationLabel(new Integer[]{2*3, 4*3});
-	
+	private List<Double> vo;
+	private List<Double> v1;
+	private List<Double> v2;
+	private List<Double> v3;
+	private List<Double> v4;
+	private List<Double> v01;
+
+	private List<Double> quarter;
+	private List<Double> dottedQuarter;
+	private List<Double> sixteenthEighth;
+
+	private int mnv;
+	private int mtsd;
+	private int dlm;
 	
 	@Before
 	public void setUp() throws Exception {
-		Map<String, String> paths = PathTools.getPaths(true);
+		mnv = Transcription.MAX_NUM_VOICES;
+		mtsd = Transcription.MAX_TABSYMBOL_DUR;
+		dlm = Transcription.DUR_LABEL_MULTIPLIER;
+		
+		vo = LabelTools.createVoiceLabel(new Integer[]{0}, mnv);
+		v1 = LabelTools.createVoiceLabel(new Integer[]{1}, mnv);
+		v2 = LabelTools.createVoiceLabel(new Integer[]{2}, mnv);
+		v3 = LabelTools.createVoiceLabel(new Integer[]{3}, mnv);
+		v4 = LabelTools.createVoiceLabel(new Integer[]{4}, mnv);
+		v01 = LabelTools.createVoiceLabel(new Integer[]{0, 1}, mnv);
+
+		quarter = LabelTools.createDurationLabel(new Integer[]{8*3}, mtsd);
+		dottedQuarter = LabelTools.createDurationLabel(new Integer[]{12*3}, mtsd);
+		sixteenthEighth = LabelTools.createDurationLabel(new Integer[]{2*3, 4*3}, mtsd);
+
+		Map<String, String> paths = CLInterface.getPaths(true);
 		String ep = paths.get("ENCODINGS_PATH");
 		String mp = paths.get("MIDI_PATH");
-		String td = "test";
+		String td = "test/5vv/";
 
-		encodingTestpiece = new File(PathTools.getPathString(
+		encodingTestpiece = new File(CLInterface.getPathString(
 			Arrays.asList(ep, td)) + "testpiece.tbp"
 		);
-		midiTestpiece = new File(PathTools.getPathString(
+		midiTestpiece = new File(CLInterface.getPathString(
 			Arrays.asList(mp, td)) + "testpiece.mid"
 		);
 	}
@@ -70,9 +91,9 @@ public class LabelToolsTest {
 		expected.add(Arrays.asList(new Integer[]{3, 4}));
 
 		List<List<Integer>> actual = new ArrayList<List<Integer>>();
-		actual.add(LabelTools.convertIntoListOfVoices(combineLabels(V_0, V_1)));
-		actual.add(LabelTools.convertIntoListOfVoices(V_2));
-		actual.add(LabelTools.convertIntoListOfVoices(combineLabels(V_3, V_4)));
+		actual.add(LabelTools.convertIntoListOfVoices(combineLabels(vo, v1)));
+		actual.add(LabelTools.convertIntoListOfVoices(v2));
+		actual.add(LabelTools.convertIntoListOfVoices(combineLabels(v3, v4)));
 
 		assertEquals(expected.size(), actual.size());
 		for (int i = 0; i < expected.size(); i++) {
@@ -91,14 +112,14 @@ public class LabelToolsTest {
 		List<Integer> predictedVoices3 = Arrays.asList(new Integer[]{3, 4});
 
 		List<List<Double>> expected = new ArrayList<List<Double>>();
-		expected.add(combineLabels(V_0, V_1));
-		expected.add(V_2); 
-		expected.add(combineLabels(V_3, V_4)); 
+		expected.add(combineLabels(vo, v1));
+		expected.add(v2); 
+		expected.add(combineLabels(v3, v4)); 
 
 		List<List<Double>> actual = new ArrayList<List<Double>>();
-		actual.add(LabelTools.convertIntoVoiceLabel(predictedVoices1));
-		actual.add(LabelTools.convertIntoVoiceLabel(predictedVoices2));
-		actual.add(LabelTools.convertIntoVoiceLabel(predictedVoices3));
+		actual.add(LabelTools.convertIntoVoiceLabel(predictedVoices1, mnv));
+		actual.add(LabelTools.convertIntoVoiceLabel(predictedVoices2, mnv));
+		actual.add(LabelTools.convertIntoVoiceLabel(predictedVoices3, mnv));
 
 		assertEquals(expected.size(), actual.size());
 		for (int i = 0; i < expected.size(); i++) {
@@ -117,14 +138,14 @@ public class LabelToolsTest {
 		List<Integer> predictedDurations3 = Arrays.asList(new Integer[]{2, 4});
 
 		List<List<Double>> expected = new ArrayList<List<Double>>();
-		expected.add(QUARTER);
-		expected.add(DOTTED_QUARTER); 
-		expected.add(SIXTEENTH_EIGHTH);
+		expected.add(quarter);
+		expected.add(dottedQuarter); 
+		expected.add(sixteenthEighth);
 
 		List<List<Double>> actual = new ArrayList<List<Double>>();
-		actual.add(LabelTools.convertIntoDurationLabel(predictedDurations1));
-		actual.add(LabelTools.convertIntoDurationLabel(predictedDurations2));
-		actual.add(LabelTools.convertIntoDurationLabel(predictedDurations3));
+		actual.add(LabelTools.convertIntoDurationLabel(predictedDurations1, mtsd));
+		actual.add(LabelTools.convertIntoDurationLabel(predictedDurations2, mtsd));
+		actual.add(LabelTools.convertIntoDurationLabel(predictedDurations3, mtsd));
 
 		assertEquals(expected.size(), actual.size());
 		for (int i = 0; i < expected.size(); i++) {
@@ -251,55 +272,55 @@ public class LabelToolsTest {
 		List<List<List<Double>>> expected = new ArrayList<List<List<Double>>>();
 		// Chord 0
 		List<List<Double>> expected0 = new ArrayList<List<Double>>();
-		expected0.add(V_3); expected0.add(V_2); 
-		expected0.add(V_1); expected0.add(V_0);
+		expected0.add(v3); expected0.add(v2); 
+		expected0.add(v1); expected0.add(vo);
 		// Chord 1
 		List<List<Double>> expected1 = new ArrayList<List<Double>>();
-		expected1.add(V_3); expected1.add(V_2); 
-		expected1.add(V_0); expected1.add(V_1);
+		expected1.add(v3); expected1.add(v2); 
+		expected1.add(vo); expected1.add(v1);
 		// Chord 2
 		List<List<Double>> expected2 = new ArrayList<List<Double>>();
-		expected2.add(V_3); 
+		expected2.add(v3); 
 		// Chord 3
 		List<List<Double>> expected3 = new ArrayList<List<Double>>();
-		expected3.add(V_4); expected3.add(V_3); 
-		expected3.add(V_2); expected3.add(combineLabels(V_0, V_1)); 
+		expected3.add(v4); expected3.add(v3); 
+		expected3.add(v2); expected3.add(combineLabels(vo, v1)); 
 		// Chord 4
 		List<List<Double>> expected4 = new ArrayList<List<Double>>();
-		expected4.add(V_4);  
+		expected4.add(v4);  
 		// Chord 5
 		List<List<Double>> expected5 = new ArrayList<List<Double>>();
-		expected5.add(V_4); expected5.add(V_3); 
-		expected5.add(V_2); expected5.add(V_1); 
-		expected5.add(V_0); 
+		expected5.add(v4); expected5.add(v3); 
+		expected5.add(v2); expected5.add(v1); 
+		expected5.add(vo); 
 		// Chord 6
 		List<List<Double>> expected6 = new ArrayList<List<Double>>();
-		expected6.add(V_4); expected6.add(V_2); 
-		expected6.add(V_0); expected6.add(V_1);
+		expected6.add(v4); expected6.add(v2); 
+		expected6.add(vo); expected6.add(v1);
 		// Chord 7
 		List<List<Double>> expected7 = new ArrayList<List<Double>>();
-		expected7.add(V_2); expected7.add(V_0); 
+		expected7.add(v2); expected7.add(vo); 
 		// Chord 8
 		List<List<Double>> expected8 = new ArrayList<List<Double>>();
-		expected8.add(V_3); expected8.add(V_2); 
-		expected8.add(V_1); expected8.add(V_0); 
+		expected8.add(v3); expected8.add(v2); 
+		expected8.add(v1); expected8.add(vo); 
 		// Chords 9-14
 		List<List<Double>> expected9 = new ArrayList<List<Double>>();
-		expected9.add(V_0);
+		expected9.add(vo);
 		List<List<Double>> expected10 = new ArrayList<List<Double>>();
-		expected10.add(V_0);
+		expected10.add(vo);
 		List<List<Double>> expected11 = new ArrayList<List<Double>>();
-		expected11.add(V_0);
+		expected11.add(vo);
 		List<List<Double>> expected12 = new ArrayList<List<Double>>();
-		expected12.add(V_0);
+		expected12.add(vo);
 		List<List<Double>> expected13 = new ArrayList<List<Double>>();
-		expected13.add(V_0);
+		expected13.add(vo);
 		List<List<Double>> expected14 = new ArrayList<List<Double>>();
-		expected14.add(V_0);
+		expected14.add(vo);
 		// Chord 15
 		List<List<Double>> expected15 = new ArrayList<List<Double>>();
-		expected15.add(V_3); expected15.add(V_2); 
-		expected15.add(V_1); expected15.add(V_0);
+		expected15.add(v3); expected15.add(v2); 
+		expected15.add(v1); expected15.add(vo);
 
 		expected.add(expected0); expected.add(expected1); expected.add(expected2); expected.add(expected3); 
 		expected.add(expected4); expected.add(expected5); expected.add(expected6); expected.add(expected7);
@@ -312,7 +333,7 @@ public class LabelToolsTest {
 		int highestNumberOfVoices = transcription.getNumberOfVoices();
 		List<List<Integer>> voiceAssignments = transcription.getVoiceAssignments(/*tablature,*/ highestNumberOfVoices);
 		for (int i = 0; i < transcription.getChords().size(); i++) {
-			actual.add(LabelTools.getChordVoiceLabels(voiceAssignments.get(i)));
+			actual.add(LabelTools.getChordVoiceLabels(voiceAssignments.get(i), mnv));
 		}
 
 		assertEquals(expected.size(), actual.size());
@@ -481,19 +502,126 @@ public class LabelToolsTest {
 			new Rational(13, 16)
 		});
 
-		int dlm = Transcription.DUR_LABEL_MULTIPLIER;
 		List<Integer> expected = Arrays.asList(
 			2*dlm, 4*dlm, 20*dlm, 26*dlm
 		);
 
 		List<Integer> actual = new ArrayList<Integer>();
 		for (Rational r : durs) {
-			actual.add(LabelTools.getIntegerEncoding(r));	
+			actual.add(LabelTools.getIntegerEncoding(r, mtsd));
 		}
 
 		assertEquals(expected.size(), actual.size());
 		for (int i = 0; i < expected.size(); i++) {
 			assertEquals(expected.get(i), actual.get(i));
 		}
+	}
+
+
+	@Test
+	public void testCreateVoiceLabel() {
+		List<List<Double>> expected = Arrays.asList(
+			Arrays.asList(new Double[]{1.0, 0.0, 0.0, 0.0, 0.0}),
+			Arrays.asList(new Double[]{0.0, 1.0, 0.0, 0.0, 0.0}),
+			Arrays.asList(new Double[]{0.0, 0.0, 1.0, 0.0, 0.0}),
+			Arrays.asList(new Double[]{1.0, 0.0, 0.0, 1.0, 0.0}),
+			Arrays.asList(new Double[]{1.0, 0.0, 0.0, 0.0, 1.0})
+		);
+				
+		List<List<Double>> actual = new ArrayList<List<Double>>();
+		List<Integer[]> voices = Arrays.asList(
+			new Integer[]{0},
+			new Integer[]{1},
+			new Integer[]{2},
+			new Integer[]{3, 0},
+			new Integer[]{4, 0}
+		);
+		for (Integer[] in : voices) {
+			actual.add(LabelTools.createVoiceLabel(in, mnv));
+		}
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).size(), actual.get(i).size());
+			for (int j = 0; j < expected.get(i).size(); j++) {
+				assertEquals(expected.get(i).get(j), actual.get(i).get(j));
+			}
+		}
+		assertEquals(expected, actual);
+	}
+
+
+	@Test
+	public void testCreateDurationLabel() {
+		List<Double> empty = Collections.nCopies(mtsd, 0.0);
+		List<List<Double>> expected = new ArrayList<List<Double>>(); 		
+		// Thirty-second
+		List<Double> t = new ArrayList<Double>(empty);
+		t.set(0, 1.0);
+		expected.add(t);
+		// Sixteenth
+		List<Double> s = new ArrayList<Double>(empty);
+		s.set(1, 1.0);
+		expected.add(s);
+		// Eighth
+		List<Double> e = new ArrayList<Double>(empty);
+		e.set(3, 1.0);
+		expected.add(e);
+		// Dotted eighth
+		List<Double> de = new ArrayList<Double>(empty);
+		de.set(5, 1.0);
+		expected.add(de);
+		// Quarter
+		List<Double> q = new ArrayList<Double>(empty);
+		q.set(7, 1.0);
+		expected.add(q);
+		// Half
+		List<Double> h = new ArrayList<Double>(empty);
+		h.set(15, 1.0);
+		expected.add(h);
+		// Dotted half
+		List<Double> dh = new ArrayList<Double>(empty);
+		dh.set(23, 1.0);
+		expected.add(dh);
+		// Whole
+		List<Double> w = new ArrayList<Double>(empty);
+		w.set(31, 1.0);
+		expected.add(w);
+		// Sixteenth and dotted half
+		List<Double> sAndDh = new ArrayList<Double>(empty);
+		sAndDh.set(1, 1.0); sAndDh.set(23, 1.0);
+		expected.add(sAndDh);
+		// Quarter and half
+		List<Double> qAndH = new ArrayList<Double>(empty);
+		qAndH.set(7, 1.0); qAndH.set(15, 1.0);
+		expected.add(qAndH);
+
+		List<List<Double>> actual = new ArrayList<List<Double>>();
+		List<Integer[]> durations = Arrays.asList(
+			new Integer[]{Symbol.SEMIFUSA.getDuration()}, // 3
+			new Integer[]{Symbol.FUSA.getDuration()}, // 6
+			new Integer[]{Symbol.SEMIMINIM.getDuration()}, // 12
+			new Integer[]{Symbol.SEMIMINIM.makeVariant(1, false, false).get(0).getDuration()}, // 18
+			new Integer[]{Symbol.MINIM.getDuration()}, // 24
+			new Integer[]{Symbol.SEMIBREVIS.getDuration()}, // 48
+			new Integer[]{Symbol.SEMIBREVIS.makeVariant(1, false, false).get(0).getDuration()}, // 72
+			new Integer[]{Symbol.BREVIS.getDuration()}, // 96
+			new Integer[]{Symbol.FUSA.getDuration(), 
+				Symbol.SEMIBREVIS.makeVariant(1, false, false).get(0).getDuration()}, // 6 and 72
+			new Integer[]{Symbol.MINIM.getDuration(), Symbol.SEMIBREVIS.getDuration()} // 24 and 48
+		);
+//		durations = durations.stream().map(p -> p * 3).collect(Collectors.toList());
+		for (Integer[] in : durations) {
+			actual.add(LabelTools.createDurationLabel(in, mtsd));
+		}
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).size(), actual.get(i).size());
+			for (int j = 0; j < expected.get(i).size(); j++) {
+				assertEquals(expected.get(i).get(j), actual.get(i).get(j));
+			}
+		}
+		assertEquals(expected, actual);
 	}
 }

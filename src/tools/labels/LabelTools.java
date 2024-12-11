@@ -1,14 +1,18 @@
 package tools.labels;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import de.uos.fmt.musitech.utility.math.Rational;
 import external.Tablature;
-import external.Transcription;
 
 public class LabelTools {
+
+	public static void main(String[] args) {
+	}
 	
 	/**
 	 * Converts the given voice label into a list of voices. In the case of a SNU, the 
@@ -36,10 +40,12 @@ public class LabelTools {
 	 * @return
 	 */
 	// TESTED
-	public static List<Double> convertIntoVoiceLabel(List<Integer> listOfVoices) {
+	public static List<Double> convertIntoVoiceLabel(List<Integer> listOfVoices, int argMaxNumVoices) {
 		// Create a voice label and initialise it with only 0.0s
 		List<Double> voiceLabel = new ArrayList<Double>();
-		for (int i = 0; i < Transcription.MAX_NUM_VOICES; i++) {
+		
+		for (int i = 0; i < argMaxNumVoices; i++) { // Schmier
+//		for (int i = 0; i < Transcription.MAX_NUM_VOICES; i++) { // Schmier
 			voiceLabel.add(0.0);
 		}
 
@@ -61,10 +67,11 @@ public class LabelTools {
 	 * @return
 	 */
 	// TESTED
-	public static List<Double> convertIntoDurationLabel(List<Integer> listOfDurations) {
+	public static List<Double> convertIntoDurationLabel(List<Integer> listOfDurations, int maxTabSymDur) {
 		// Create a duration label and initialise it with only 0.0s
 		List<Double> durationLabel = new ArrayList<Double>();
-		for (int i = 0; i < Transcription.MAX_TABSYMBOL_DUR; i++) {
+		for (int i = 0; i < maxTabSymDur; i++) {
+//		for (int i = 0; i < Transcription.MAX_TABSYMBOL_DUR; i++) {
 			durationLabel.add(0.0);
 		}
 
@@ -161,13 +168,14 @@ public class LabelTools {
 	 * @return
 	 */
 	// TESTED
-	public static List<List<Double>> getChordVoiceLabels(List<Integer> voiceAssignment) {
+	public static List<List<Double>> getChordVoiceLabels(List<Integer> voiceAssignment, int maxNumVoices) {
 		List<List<Double>> voiceLabels = new ArrayList<List<Double>>();
 
 		// Initialise an empty voice label
 		List<Double> emptyVoiceLabel = new ArrayList<Double>();
 
-		for (int i = 0; i < Transcription.MAX_NUM_VOICES; i++) {
+		for (int i = 0; i < maxNumVoices; i++) { // Schmier
+//		for (int i = 0; i < Transcription.MAX_NUM_VOICES; i++) { // Schmier
 			emptyVoiceLabel.add(0.0);
 		}
 		// Create voice labels for each onset in the chord. The number of onsets is the highest number contained by
@@ -261,9 +269,53 @@ public class LabelTools {
 	 * @return
 	 */
 	// TESTED
-	public static int getIntegerEncoding(Rational dur) {
+	public static int getIntegerEncoding(Rational dur, int maxTabSymDur) {
 		dur.reduce();
-		int multiplier = Transcription.MAX_TABSYMBOL_DUR / dur.getDenom();
+		int multiplier = maxTabSymDur / dur.getDenom();
+//		int multiplier = Transcription.MAX_TABSYMBOL_DUR / dur.getDenom();
 		return dur.getNumer() * multiplier;
 	}
+
+
+	/**
+	 * Creates a voice label encoding the given voice(s).
+	 *   
+	 * @param voice The voices, integers ranging from 0 (the highest voice) to 
+	 *              maxNumVoices - 1 (the lowest voice).
+	 * @param maxNumVoices
+	 * @return
+	 */
+	// TESTED
+	public static List<Double> createVoiceLabel(Integer[] voices, int maxNumVoices) {
+		Double[] voiceLabel = new Double[maxNumVoices];
+//		Double[] voiceLabel = new Double[MAX_NUM_VOICES];
+		Arrays.setAll(voiceLabel, ind -> Arrays.asList(voices).contains(ind) ? 1.0 : 0.0);
+		return Arrays.asList(voiceLabel);
+	}
+
+
+	/**
+	 * Creates a duration label encoding the given duration(s).
+	 * 
+	 * NB: Tablature case only.
+	 *  
+	 * @param durations The durations as TabSymbol durations (brevis = whole note = 96, 
+	 * 				    semibrevis = half note = 48, etc.), integers ranging from 0 (the 
+	 *                  shortest duration) to argMaxTabSymDur - 1 (the longest duration). 
+	 *                  TabSymbol durations are always divisible by 3.
+	 * @param maxTabSymDur 
+	 * @return
+	 */
+	// TESTED
+	public static List<Double> createDurationLabel(Integer[] durations, int maxTabSymDur) {
+		List<Integer> durs = Arrays.asList(durations).stream()
+			.map(d -> ((d/3) - 1))
+			.collect(Collectors.toList());
+		Double[] durLabel = new Double[maxTabSymDur];
+//		Double[] durLabel = new Double[MAX_TABSYMBOL_DUR];
+		Arrays.setAll(durLabel, ind -> durs.contains(ind) ? 1.0 : 0.0);
+
+		return Arrays.asList(durLabel);
+	}
+
 }

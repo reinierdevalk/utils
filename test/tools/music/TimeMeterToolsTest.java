@@ -17,9 +17,10 @@ import java.util.stream.IntStream;
 import de.uos.fmt.musitech.utility.math.Rational;
 import external.Tablature;
 import external.Transcription;
+import interfaces.CLInterface;
 import internal.core.Encoding;
 import internal.structure.TimelineTest;
-import tools.path.PathTools;
+
 
 public class TimeMeterToolsTest {
 
@@ -44,14 +45,14 @@ public class TimeMeterToolsTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Map<String, String> paths = PathTools.getPaths(true);
+		Map<String, String> paths = CLInterface.getPaths(true);
 		String ep = paths.get("ENCODINGS_PATH");
-		String td = "test";
+		String td = "test/5vv/";
 
-		encodingTestpiece = new File(PathTools.getPathString(
+		encodingTestpiece = new File(CLInterface.getPathString(
 			Arrays.asList(ep, td)) + "testpiece.tbp"
 		);
-		encodingTestGetMeterInfo = new File(PathTools.getPathString(
+		encodingTestGetMeterInfo = new File(CLInterface.getPathString(
 			Arrays.asList(ep, td)) + "test_get_meter_info.tbp"
 		);
 //		midiTestpiece = new File(

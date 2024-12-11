@@ -76,7 +76,7 @@ public class PitchKeyTools {
 			}
 			// 2. To spell pitch
 			else {
-				verbose = false;
+				verbose = true;
 				int pitch = Integer.parseInt(args[0]);
 				int numAlt = Integer.parseInt(args[1]);
 				// Convert grids back from String. NB: The String representations of altGrid and
@@ -116,6 +116,7 @@ public class PitchKeyTools {
 				String dict = 
 					"{\"pname\": " + "\"" + pa[0] + "\"" + ", " + // pa[<n>] needs to be placed in double quotes for json.loads()
 					"\"accid\": " + "\"" + pa[1] + "\"" + ", " +
+					"\"accid.ges\": " + "\"" + pa[2] + "\"" + ", " +
 					"\"accidsInEffect\": " + accidsInEffect.toString() + "}";
 				System.out.println(dict);
 			}
@@ -146,9 +147,10 @@ public class PitchKeyTools {
 					i, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), aie
 				);
 				String[] pa = (String[]) ps.get(0);
-				System.out.println("MIDI : " + i);
-				System.out.println("pname: " + pa[0]);
-				System.out.println("accid: " + pa[1]);
+				System.out.println("MIDI :     " + i);
+				System.out.println("pname:     " + pa[0]);
+				System.out.println("accid:     " + pa[1]);
+				System.out.println("accid.ges: " + pa[2]);
 				aie = (List<List<Integer>>) ps.get(1);
 				System.out.println(aie);
 			}
@@ -439,7 +441,7 @@ public class PitchKeyTools {
 	 * @param accidsInEffect
 	 * @return A list containing
 	 *         <ul>
-	 *         <li>As element 0: a String[] containing pname and accid, in MEI terminology.</li>
+	 *         <li>As element 0: a String[] containing pname, accid, and accid.ges (in MEI terminology).</li>
 	 *         <li>As element 1: the updated <code>accidsInEffect</code> (if it is not <code>null</code>).</li>
 	 *         </ul>
 	 */
@@ -447,10 +449,20 @@ public class PitchKeyTools {
 	public static List<Object> spellPitch(int pitch, int numAlt, List<Object> grids, List<List<Integer>> accidsInEffect) {
 		String pname = "";
 		String accid = "";
-		
+		String accidGes = "";
+
 		Integer[] mpcGrid = (Integer[]) grids.get(0); 
 		String[] altGrid = (String[]) grids.get(1);  
 		String[] pcGrid = (String[]) grids.get(2);
+
+		String keySigAccidType = numAlt <= 0 ? "f" : "s";
+		// Key sig accidentals as MIDI pitch classes (e.g. 10, 3 for Bb, Eb)
+		List<Integer> keySigAccidMpc = new ArrayList<>();
+		for (int i = 0; i < altGrid.length; i++) {
+			if (altGrid[i].equals(keySigAccidType)) {
+				keySigAccidMpc.add(mpcGrid[i]);
+			}
+		}
 
 		List<Integer> doubleFlatsInEffect = null;
 		List<Integer> flatsInEffect = null; 
@@ -491,7 +503,7 @@ public class PitchKeyTools {
 
 		// a. pitch is in key
 		if (mpcGridList.contains(mpc)) {
-			if (verbose) System.out.println("pitch is in key");
+			if (verbose) System.err.println("pitch is in key");
 			int pcInd = mpcGridList.indexOf(mpc);
 			pname = pcGrid[pcInd];
 			if (!considerContext) {
@@ -500,61 +512,40 @@ public class PitchKeyTools {
 			else {
 				// Previously double flat (but must be flat)
 				if (doubleFlatsInEffect.contains(pitch-1)) {
-//					if (pitch == 61) System.out.println("EEN");
 					accid = "f";
 					doubleFlatsInEffect.remove(doubleFlatsInEffect.indexOf(pitch-1));
 				}
 				// Previously flat (but must be natural)
 				else if (flatsInEffect.contains(pitch-1)) {
-//					if (pitch == 61) System.out.println("TWEE");
 					accid = "n";
 					flatsInEffect.remove(flatsInEffect.indexOf(pitch-1));
 				}
 				// Previously natural (but must be flat)
 				else if (naturalsInEffect.contains(pitch+1) && altGrid[pcInd].equals("f")) {
-//					if (pitch == 61) System.out.println("DRIE");
 					accid = "f";
 					naturalsInEffect.remove(naturalsInEffect.indexOf(pitch+1));
 				}
 				// Previously natural (but must be sharp)
 				else if (naturalsInEffect.contains(pitch-1) && altGrid[pcInd].equals("s")) {
-//					if (pitch == 61) {
-//						System.out.println("VIER");
-//						System.out.println(naturalsInEffect);
-//						System.out.println(Arrays.asList(altGrid));
-//						System.out.println(altGrid[pcInd]);
-//						System.out.println(pcInd);
-//						System.out.println(mpc);
-//						System.out.println(pitch);
-//					}
 					accid = "s";
 					naturalsInEffect.remove(naturalsInEffect.indexOf(pitch-1));
 				}
 				// Previously sharp (but must be natural)
 				else if (sharpsInEffect.contains(pitch+1)) {
-//					if (pitch == 61) System.out.println("VIJF");
 					accid = "n";
 					sharpsInEffect.remove(sharpsInEffect.indexOf(pitch+1));
 				}
 				// Previously double sharp (but must be sharp)
 				else if (doubleSharpsInEffect.contains(pitch+1)) {
-//					if (pitch == 61) System.out.println("ZES");
 					accid = "f";
 					doubleSharpsInEffect.remove(doubleSharpsInEffect.indexOf(pitch+1));
 				}
 				// No accidental
 				else {
-//					if (pitch == 61) {
-//						System.out.println("ZEVEN");
-//						System.out.println(naturalsInEffect);
-//						System.out.println(naturalsInEffect.contains(pitch-1));
-//						System.out.println(Arrays.asList(altGrid));
-//						System.out.println(altGrid[pcInd]);
-//						System.out.println(pcInd);
-//						System.out.println(pitch);
-//						System.out.println(mpc);
-//					}
 					accid = "";
+					if (keySigAccidMpc.contains(mpc)) {
+						accidGes = keySigAccidType;
+					}
 				}
 			}
 		}
@@ -574,7 +565,7 @@ public class PitchKeyTools {
 					(numAlt == 0) ? -1 : KEY_ACCID_MPC_FLAT.indexOf(mpcKeySigs.get(mpcKeySigs.size()-1));
 				for (int incr : new Integer[]{1, 2}) {
 					if (KEY_ACCID_MPC_FLAT.get(indLastKeyAccid + incr) == mpc) {
-						if (verbose) System.out.println("pitch is next or second-next KA (flats)");
+						if (verbose) System.err.println("pitch is next or second-next KA (flats)");
 						pname = KEY_ACCID_PC_FLAT.get(indLastKeyAccid + incr);
 						accid = accids.get(accids.indexOf(alt) - 1);
 						if (considerContext) {
@@ -584,6 +575,7 @@ public class PitchKeyTools {
 							}
 							else {
 								accid = "";
+								accidGes = "f";
 							}
 						}
 						isNextOrSecondNextKA = true;
@@ -598,7 +590,7 @@ public class PitchKeyTools {
 					/*(numAlt == 0) ? -1 : */ KEY_ACCID_MPC_SHARP.indexOf(mpcKeySigs.get(mpcKeySigs.size()-1));
 				for (int incr : new Integer[]{1, 2}) {
 					if (KEY_ACCID_MPC_SHARP.get(indLastKeyAccid + incr) == mpc) {
-						if (verbose) System.out.println("pitch is next or second-next KA (sharps)");
+						if (verbose) System.err.println("pitch is next or second-next KA (sharps)");
 						pname = KEY_ACCID_PC_SHARP.get(indLastKeyAccid + incr);
 						accid = accids.get(accids.indexOf(alt) + 1);
 						if (considerContext) {
@@ -608,6 +600,7 @@ public class PitchKeyTools {
 							}
 							else {
 								accid = "";
+								accidGes = "s";
 							}
 						}
 						isNextOrSecondNextKA = true;
@@ -621,10 +614,10 @@ public class PitchKeyTools {
 					numAlt > 0 && mpcKeySigs.contains((pitch+1) % 12)) {
 					// Exception for LLT; continue to 3. below  
 					if (numAlt == 3 && mpc == 5 || numAlt == 4 && mpc == 0 || numAlt == 5 && mpc == 7) {
-						if (verbose) System.out.println("pitch is LLT (sharps) (hardcoded)");
+						if (verbose) System.err.println("pitch is LLT (sharps) (hardcoded)");
 					}
 					else {
-						if (verbose) System.out.println("pitch is naturalised KA");
+						if (verbose) System.err.println("pitch is naturalised KA");
 						int pcInd = -1;
 						// Flats
 						if (numAlt < 0) {
@@ -645,8 +638,9 @@ public class PitchKeyTools {
 							if (!naturalsInEffect.contains(pitch)) {
 								naturalsInEffect.add(pitch);
 							}
-							else { 
+							else {
 								accid = "";
+								accidGes = "n";
 							}
 						}
 						isNaturalisedKA = true;
@@ -665,7 +659,7 @@ public class PitchKeyTools {
 					//      third-last KA, naturalised (E# = F; B# = C; Fx = G), and therefore 
 					//      caught at 2. above and hardcoded at 3.
 					if (mpc == mpcGridNomMajOfMin[mpcGridNomMajOfMin.length-1]) {
-						if (verbose) System.out.println("pitch is LLT for minor");
+						if (verbose) System.err.println("pitch is LLT for minor");
 						if (numAlt == 3 && mpc == 5 || numAlt == 4 && mpc == 0 || numAlt == 5 && mpc == 7) {
 							pname = numAlt == 3 ? "e" : (numAlt == 4 ? "b" : "f");
 							accid = numAlt == 3 ? "s" : (numAlt == 4 ? "s" : "x");
@@ -682,6 +676,7 @@ public class PitchKeyTools {
 									}
 									else { 
 										accid = "";
+										accidGes = "n";
 									}
 								}
 								else if (accid.equals("s")) {
@@ -690,6 +685,7 @@ public class PitchKeyTools {
 									}
 									else {
 										accid = "";
+										accidGes = "s";
 									}
 								}
 								else if (accid.equals("x")) {
@@ -698,6 +694,7 @@ public class PitchKeyTools {
 									}
 									else {
 										accid = "";
+										accidGes = "x";
 									}
 								}
 							}
@@ -711,7 +708,7 @@ public class PitchKeyTools {
 						//    - two flats or more: the R3 is the second-last KA, naturalised
 						//    - sharps: the R3 is the second-next KA
 						if (mpc == mpcGridNomMajOfMin[2]) {
-							if (verbose) System.out.println("pitch is R3 for minor");
+							if (verbose) System.err.println("pitch is R3 for minor");
 							pname = pcGridNomMajOfMin[2];
 							accid = altGridNomMajOfMin[2];
 							if (considerContext) {
@@ -723,6 +720,7 @@ public class PitchKeyTools {
 									}
 									else {
 										accid = "";
+										accidGes = "n";
 									}
 								}
 								else if (accid.equals("s")) {
@@ -731,6 +729,7 @@ public class PitchKeyTools {
 									}
 									else {
 										accid = "";
+										accidGes = "s";
 									}
 								}
 							}
@@ -743,7 +742,7 @@ public class PitchKeyTools {
 							//    - one flat or more: the R6 is the last KA, naturalised
 							//    - sharps: the R6 is the next KA
 							if (mpc == mpcGridNomMajOfMin[5]) {
-								if (verbose) System.out.println("pitch is R6 for minor");
+								if (verbose) System.err.println("pitch is R6 for minor");
 								pname = pcGridNomMajOfMin[5];
 								accid = altGridNomMajOfMin[5];
 								if (considerContext) {
@@ -755,6 +754,7 @@ public class PitchKeyTools {
 										}
 										else { 
 											accid = "";
+											accidGes = "n";
 										}
 									}
 									else if (accid.equals("s")) {
@@ -763,6 +763,7 @@ public class PitchKeyTools {
 										}
 										else { 
 											accid = "";
+											accidGes = "s";
 										}
 									}
 								}
@@ -772,7 +773,7 @@ public class PitchKeyTools {
 				}
 			}
 		}
-		String[] pa = new String[]{pname, accid};
+		String[] pa = new String[]{pname, accid, accidGes};
 		return Arrays.asList(new Object[]{pa, accidsInEffect});
 	}
 

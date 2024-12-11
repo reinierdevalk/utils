@@ -29,10 +29,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -40,21 +38,50 @@ import java.util.stream.IntStream;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
 
-import conversion.exports.MEIExport;
-import conversion.imports.MIDIImport;
-import conversion.imports.TabImport;
 import de.uos.fmt.musitech.utility.math.Rational;
-import internal.core.Encoding;
-import tools.path.PathTools;
 
 
 public class ToolBox {
 
 	public static final int TAB_LEN = 8;
-	public static final String FILE = "-f";
-	public static final String FORMAT = "-r";
 
 	public static void main(String[] args) {
+	}
+
+
+	/**
+	 * Gets, on the given path, the names of all pieces with an extension that is in 
+	 * the given list. If <code>includeExt</code> is <code>False</code>, only unique
+	 * piece names are returned. 
+	 * 
+	 * @param path
+	 * @param ext
+	 * @param includeExt
+	 * @return
+	 */
+	public static List<String> getFilesInFolder(String path, List<String> ext, boolean includeExt) {
+		List<String> pieces = new ArrayList<>();
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(path))) {
+			for (Path entry : stream) {
+				if (Files.isRegularFile(entry)) {
+					String filename = entry.getFileName().toString();
+					String[] nameAndExt = ToolBox.splitExt(filename);
+					if (ext.contains(nameAndExt[1])) {
+						if (includeExt) {
+							pieces.add(filename);
+						}
+						else {
+							if (!pieces.contains(nameAndExt[0])) {
+								pieces.add(nameAndExt[0]);
+							}
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return pieces;
 	}
 
 
@@ -883,117 +910,6 @@ public class ToolBox {
 			}
 		}
 		return fileNames;
-	}
-
-
-	public static List<Object> parseCLIArgs(String[] opts, String[] defaults, 
-		String[] userOptsVals, String path) {
-		
-		// Populate cliOptsVals with default values
-		Map<String, String> cliOptsVals = new LinkedHashMap<String, String>();
-		for (int i = 0; i < opts.length; i++) {
-			cliOptsVals.put(opts[i], defaults[i]);
-		}
-
-		// Parse userOptsVals and overwrite any default values in cliOptsVals
-		for (String s : userOptsVals) {
-			String[] optVal = s.trim().split(" ");
-			cliOptsVals.put(optVal[0], optVal[1]);
-		}
-
-		// Set pieces
-		List<String> pieces = new ArrayList<>();
-		// Single piece
-		if (!cliOptsVals.get(FILE).equals("n/a")) {
-			String filename = cliOptsVals.get(FILE);
-			pieces.add(filename.substring(0, filename.lastIndexOf(".")));
-		}
-		// All pieces in path
-		else {
-			pieces = ToolBox.readInputFolder(
-				path, 
-				cliOptsVals.get(FORMAT).equals("y") ? TabImport.ALLOWED_FILE_FORMATS : 
-					Arrays.asList(MIDIImport.EXTENSION), 
-				false);
-		}
-
-		return Arrays.asList(new Object[]{cliOptsVals, pieces});
-	}
-
-
-	/**
-	 * Gets, for the allowed formats given, the (unique) piece names. Any pieces not
-	 * in .tbp format are converted into it.
-	 * 
-	 * @param inPath
-	 * @param formats
-	 * @param inclExtension
-	 * 
-	 * @return The list of unique pieces.
-	 */
-	public static List<String> readInputFolder(String inPath, List<String> formats, boolean inclExtension) {
-		// Get unique piece names
-		List<String> piecenames = getFilenamesInFolder(inPath, formats, inclExtension);
-
-		// Ensure correct formatting of inPath
-		inPath = PathTools.getPathString(Arrays.asList(inPath));
-
-		// Convert any non-.tbp into .tbp
-		for (String p : piecenames) {
-			if (!Files.exists(Paths.get(inPath + p + Encoding.EXTENSION))) {
-				// .tc file
-				if (Files.exists(Paths.get(inPath + p + TabImport.TC_EXT))) {
-					String s = TabImport.tc2tbp(
-						readTextFile(new File(inPath + p + TabImport.TC_EXT))
-					);
-					storeTextFile(s, new File(inPath + p + Encoding.EXTENSION));
-				}
-				// .xml file
-				else if (Files.exists(Paths.get(inPath + p + MEIExport.MEI_EXT))) {
-					// TODO luteconv .xml -> .tc; TabImport.tc2tbp()
-				}
-				// .mei file 
-				else if (Files.exists(Paths.get(inPath + p + MEIExport.MEI_EXT_ALT))) {
-					// TODO luteconv .mei -> .tc; TabImport.tc2tbp()
-				}
-			}
-		}
-		return piecenames;
-	}
-
-
-	/**
-	 * Gets, on the given path, the names of all pieces with an extension that is in 
-	 * the given list.
-	 * 
-	 * @param path
-	 * @param ext
-	 * @param includeExt
-	 * @return
-	 */
-	public static List<String> getFilenamesInFolder(String path, List<String> ext, boolean includeExt) {
-		List<String> pieces = new ArrayList<>();
-		try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(path))) {
-			for (Path entry : stream) {
-				if (Files.isRegularFile(entry)) {
-					String filename = entry.getFileName().toString();
-					String[] ne = ToolBox.splitExt(filename);
-					if (ext.contains(ne[1])) {
-						if (includeExt) {
-							pieces.add(filename);
-						}
-						else {
-							if (!pieces.contains(ne[0])) {
-								pieces.add(ne[0]);
-							}
-						}
-					}
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return pieces;
 	}
 
 

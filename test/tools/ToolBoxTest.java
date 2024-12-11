@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.uos.fmt.musitech.utility.math.Rational;
+import interfaces.CLInterface;
 import internal.core.Encoding;
-import tools.path.PathTools;
 
 
 public class ToolBoxTest {
@@ -26,11 +26,11 @@ public class ToolBoxTest {
 		
 	@Before
 	public void setUp() throws Exception {
-		Map<String, String> paths = PathTools.getPaths(true);
+		Map<String, String> paths = CLInterface.getPaths(true);
 		String ep = paths.get("ENCODINGS_PATH");
-		String td = "test";
+		String td = "test/5vv/";
 
-		encodingTestpiece = new File(PathTools.getPathString(
+		encodingTestpiece = new File(CLInterface.getPathString(
 			Arrays.asList(ep, td)) + "testpiece.tbp"
 		);
 		delta = 1e-9;
