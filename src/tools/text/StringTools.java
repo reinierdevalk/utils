@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -67,6 +68,21 @@ public class StringTools {
 
 	public static int frequencyOfChar(String s, char c) {
 		return (int) s.chars().filter(ch -> ch == c).count();
+	}
+
+
+	public static String randomID(int length) {
+		String allowedChars = "abcdefghijklmnopqrstuvwxyz123456789";
+		Random random = new Random();
+		StringBuilder res = new StringBuilder(length);
+
+		for (int i = 0; i < length; i++) {
+			// Get a random index in allowedChars and at the character to res 
+			int index = random.nextInt(allowedChars.length());
+			res.append(allowedChars.charAt(index));
+		}
+
+		return res.toString();
 	}
 
 

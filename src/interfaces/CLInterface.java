@@ -313,13 +313,13 @@ public class CLInterface {
 					);
 					ToolBox.storeTextFile(s, new File(ip + Encoding.EXTENSION));
 				}
-				// .xml file
+				// .mei file
 				else if (Files.exists(Paths.get(ip + MEIExport.MEI_EXT))) {
-					// TODO luteconv .xml -> .tc; TabImport.tc2tbp()
-				}
-				// .mei file 
-				else if (Files.exists(Paths.get(ip + MEIExport.MEI_EXT_ALT))) {
 					// TODO luteconv .mei -> .tc; TabImport.tc2tbp()
+				}
+				// .xml file 
+				else if (Files.exists(Paths.get(ip + MEIExport.MEI_EXT_ALT))) {
+					// TODO luteconv .xml -> .tc; TabImport.tc2tbp()
 				}
 			}
 		}
