@@ -213,16 +213,19 @@ public class CLInterface {
 
 			// Read config file
 			try (BufferedReader br = new BufferedReader(
-				new FileReader(getPathString(Arrays.asList(codePath)) + (dev ? CONFIG_FILE_DEV : CONFIG_FILE)))) {
+				new FileReader(getPathString(Arrays.asList(codePath)) + CONFIG_FILE))) {
+//				new FileReader(getPathString(Arrays.asList(codePath)) + (dev ? CONFIG_FILE_DEV : CONFIG_FILE)))) {
 				String line;
 				while ((line = br.readLine()) != null) {
 					String[] parts = line.split("=");
-					userPaths.put(
-						// Key
-						parts[0].trim(), 
-						// Value: replace any backward slashes (Windows); remove quotes  
-						parts[1].trim().replace("\\", "/").replace("\"", "")
-					);
+					if (!line.equals("")) { // not if the line is empty
+						userPaths.put(
+							// Key
+							parts[0].trim(), 
+							// Value: replace any backward slashes (Windows); remove quotes  
+							parts[1].trim().replace("\\", "/").replace("\"", "")
+						);
+					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
