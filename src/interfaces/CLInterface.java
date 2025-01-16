@@ -221,8 +221,8 @@ public class CLInterface {
 					if (!line.equals("")) { // not if the line is empty
 						userPaths.put(
 							// Key
-							parts[0].trim(), 
-							// Value: replace any backward slashes (Windows); remove quotes  
+							parts[0].trim(),
+							// Value: replace any backward slashes (Windows); remove quotes
 							parts[1].trim().replace("\\", "/").replace("\"", "")
 						);
 					}
