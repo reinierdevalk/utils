@@ -32,6 +32,7 @@ public class CLInterface {
 	
 	// CLI args (as in abtab script)
 	// Transcriber
+	public final static String TUNING = "-u";
 	public final static String KEY = "-k";
 	public final static String MODE = "-m";
 	public final static String TABLATURE = "-t";
