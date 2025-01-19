@@ -52,7 +52,10 @@ public class ToolBox {
 	/**
 	 * Gets, on the given path, the names of all pieces with an extension that is in 
 	 * the given list. If <code>includeExt</code> is <code>False</code>, only unique
-	 * piece names are returned. 
+	 * piece names are returned.
+	 *
+	 * NB: It is not guaranteed that the pieces are listed in the same sequence as on
+	 *     the path.
 	 * 
 	 * @param path
 	 * @param ext
@@ -2259,6 +2262,93 @@ public class ToolBox {
 			}               
 		});
 		return toSort;
+	}
+
+
+	/**
+	 * Sorts the given list by the content after the given prefix.
+	 * <ul>
+	 * <li>If <code>type</code> is "number", the list is sorted (in numerical order) by the value of
+	 *     the number after the prefix.</li>
+	 * <li>If <code>type</code> is "string", the list is sorted (in alphabetical order) by the value of
+	 *     the string between the prefix and the suffix.</li></li>
+	 * </ul>
+	 *
+	 * @param unsorted
+	 * @param prefix
+	 * @param suffix
+	 * @param type One of "number" or "string".
+	 * @return
+	 */
+	// TESTED
+	public static List<String> sortBySubstring(List<String> unsorted, String prefix, String suffix, String type) {		
+		if (type.equals("number")) {
+			Collections.sort(unsorted, getComparator(prefix, null, type));
+		}
+		else if (type.equals("string")) {
+			Collections.sort(unsorted, getComparator(prefix, suffix, type));
+		}
+
+		return unsorted;
+	}
+
+
+	private static Comparator<String> getComparator(String prefix, String suffix, String type) {
+		if (type.equals("number")) {
+			return (s1, s2) -> {
+				int num1 = Integer.parseInt(extractFromString(s1, prefix, null, "number"));
+				int num2 = Integer.parseInt(extractFromString(s2, prefix, null, "number"));
+				return Integer.compare(num1, num2);
+			};
+		}
+		else {
+			return (s1, s2) -> {
+				String str1 = extractFromString(s1, prefix, suffix, "string");
+				String str2 = extractFromString(s2, prefix, suffix, "string");
+				return str1.compareTo(str2);
+			};
+		}
+	}
+
+
+	/**
+	 * Extracts the string between the given prefix and suffix. If <code>type</code> == "number",
+	 * the suffix is not needed, and its beginning is determined by the first non-numerical substring.
+	 *
+	 * @param s
+	 * @param prefix
+	 * @param suffix
+	 * @param type One of "number" or "string".
+	 * @return
+	 */
+	// TESTED
+	public static String extractFromString(String s, String prefix, String suffix, String type) {
+		if (!s.contains(prefix)) {
+			return null;
+		}
+		else {
+			if (type.equals("number")) {
+				int start = s.indexOf(prefix) + prefix.length();
+				int end = -1;
+				for (int i = start; i < s.length(); i++) {
+					if ("0123456789".contains(s.substring(i, i+1))) {
+						end = i+1;
+					}
+					else {
+						break;
+					}
+				}
+				return s.substring(start, end);
+			}
+			else {
+				int start = s.indexOf(prefix) + prefix.length();
+				int end = s.indexOf(suffix, start);
+				if (end == -1) {
+					end = s.length();
+				}
+				return s.substring(start, end);
+			}
+		}
 	}
 
 

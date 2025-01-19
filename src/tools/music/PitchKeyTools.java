@@ -2,6 +2,7 @@ package tools.music;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,11 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import de.uos.fmt.musitech.data.score.NotationChord;
+import de.uos.fmt.musitech.data.score.NotationStaff;
+import de.uos.fmt.musitech.data.score.NotationVoice;
+import de.uos.fmt.musitech.data.structure.Note;
+import internal.core.ScorePiece;
 import tools.text.StringTools;
 
 //import de.uos.fmt.musitech.data.score.NotationVoice;
@@ -777,6 +783,103 @@ public class PitchKeyTools {
 		}
 		String[] pa = new String[]{pname, accid, accidGes};
 		return Arrays.asList(new Object[]{pa, accidsInEffect});
+	}
+
+
+	/**
+	 * Counts the pitch class frequencies for the given <code>ScorePiece</code>, where C is pitch
+	 * class 0, C#/Db pitchclass 1, etc.
+	 *
+	 * @param sp
+	 * @return A list containing 12 elements, each representing a pitch class. The value of the element
+	 *         is the frequency of the represented pitch class.
+	 */
+	// TESTED
+	public static List<Integer> getPitchClassCount(ScorePiece sp) {
+		List<Integer> pitchClassCounts = new ArrayList<>(Collections.nCopies(12, 0));
+		for (NotationStaff nst : sp.getScore()) {
+			for (NotationVoice nv : nst) {
+				for (NotationChord nc : nv) {
+					for (Note n : nc) {
+						int pc = n.getMidiPitch() % 12;
+						pitchClassCounts.set(pc, pitchClassCounts.get(pc) +1);
+					}
+				}
+			}
+		}
+
+		return pitchClassCounts;
+	}
+
+
+	/**
+	 * Given the list of pitch class counts representing a piece, detects the key (as the number of
+	 * alterations) of the piece.
+	 *
+	 * @param pitchClassCounts
+	 * @return
+	 */
+	public static int detectKey(List<Integer> pitchClassCounts) {
+		List<String> flats = Arrays.asList("", "d", "", "e", "f", "", "g", "", "a", "", "b", "c");
+		List<String> sharps = Arrays.asList("b", "c", "", "d", "", "e", "f", "", "g", "", "a", "");
+
+//		pitchClassCounts.set(flats.indexOf("e"), pitchClassCounts.get(flats.indexOf("e")) + 100);
+//		pitchClassCounts.set(flats.indexOf("a"), pitchClassCounts.get(flats.indexOf("a")) + 100);
+//		pitchClassCounts.set(sharps.indexOf("f"), pitchClassCounts.get(sharps.indexOf("f")) + 100);
+//		pitchClassCounts.set(sharps.indexOf("c"), pitchClassCounts.get(sharps.indexOf("c")) + 100);
+
+		// Iterate through all flat/sharp accidentals. For each accidental, if there are more
+		// notes with the accidental than without it, the key contains the accidental. Break
+		// when the condition is no longer met
+		Integer[] numAlts = new Integer[2];
+		for (int i = 0; i < KEY_ACCID_PC_FLAT.size(); i++) {
+			// Get pitch class of the current accid and that of its natural counterpart
+			int pcAccid = flats.indexOf(KEY_ACCID_PC_FLAT.get(i));
+			// Modulo ensures that pcNatural is always <= 11, i.e., is always an index in
+			// pitchClassCounts (necessary when pcAccid == 11 (Cb))
+			int pcNatural = (pcAccid + 1) % 12;
+			// Update numAlt or break
+			if (pitchClassCounts.get(pcAccid) > pitchClassCounts.get(pcNatural)) {
+				numAlts[0] = -(i+1);
+			}
+			else {
+				break;
+			}
+		}
+
+		for (int i = 0; i < KEY_ACCID_PC_SHARP.size(); i++) {
+			// Get pitch class of the current accid  and that of its natural counterpart
+			int pcAccid = sharps.indexOf(KEY_ACCID_PC_SHARP.get(i));
+			// Modulo ensures that pcNatural is always >= 0, i.e., is always an index in
+			// pitchClassCounts (necessary when pcAccid is 0 (B#))
+			int pcNatural = (pcAccid - 1) % 12;
+			// Update numAlt or break
+			if (pitchClassCounts.get(pcAccid) > pitchClassCounts.get(pcNatural)) {
+				numAlts[1] = i+1;
+			}
+			else {
+				break;
+			}
+		}
+
+		System.out.println(Arrays.asList(numAlts));
+		// No key with flats or sharps found
+		if (numAlts[0] == null && numAlts[1] == null) {
+			return 0;
+		}
+		// Key with flats found
+		else if (numAlts[0] != null && numAlts[1] == null) {
+			return numAlts[0];
+		}
+		// Key with sharps found
+		else if (numAlts[0] == null && numAlts[1] != null) {
+			return numAlts[1];
+		}
+		// Key with flats and key with sharps found: return the one with
+		// fewer accidentals (e.g., Cb (7 flats) == B (5 sharps))
+		else {
+			return Math.abs(numAlts[0]) < numAlts[1] ? numAlts[0] : numAlts[1];
+		}
 	}
 
 

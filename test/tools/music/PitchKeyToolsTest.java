@@ -6,15 +6,36 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import conversion.imports.MIDIImport;
+import external.Transcription;
+import interfaces.CLInterface;
+import internal.core.ScorePiece;
+import tools.ToolBox;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 public class PitchKeyToolsTest {
 
+	private Map<String, String> paths;
+	private File midiTestpiece;
+	private String bachPath;
+
 	@Before
 	public void setUp() throws Exception {
+		paths = CLInterface.getPaths(true);
+		String mp = paths.get("MIDI_PATH");
+		String td = "test/5vv/";
+		String bd = "bach-WTC/thesis/4vv/";
+		bachPath = CLInterface.getPathString(Arrays.asList(mp, bd));
+
+		midiTestpiece = new File(CLInterface.getPathString(
+			Arrays.asList(mp, td)) + "testpiece.mid"
+		);		
 	}
 
 	@After
@@ -516,5 +537,52 @@ public class PitchKeyToolsTest {
 				assertEquals(expected.get(i)[j], actual.get(i)[j]);
 			}
 		}
+	}
+
+
+	@Test
+	public void testGetPitchClassCounts() {
+		Transcription t = new Transcription(midiTestpiece);
+
+		List<Integer> expected = Arrays.asList(4, 0, 2, 0, 3, 3, 1, 0, 4, 20, 0, 3);
+		List<Integer> actual = PitchKeyTools.getPitchClassCount(t.getScorePiece());
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i), actual.get(i));
+		}
+		assertEquals(expected, actual);
+	}
+
+
+	@Test
+	public void testDetectKey() {
+		List<String> pieces = ToolBox.getFilesInFolder(bachPath, Arrays.asList(MIDIImport.EXTENSION), true);
+		pieces = ToolBox.sortBySubstring(pieces, "BWV_", null, "number");
+
+		List<Integer> expected = Arrays.asList(
+			0, 2, /*-4,*/ /*3,*/ -2, -4, 5, 0, 5, 2, -3, 2, -3, /*6,*/ 4, -2, -4, -5, 5
+		);
+
+		List<Integer> actual = new ArrayList<>();
+		List<Integer> skip = Arrays.asList(2, 3, 13); // BWV 857, 859, 877
+		for (int i = 0; i < pieces.size(); i++) {
+			if (!skip.contains(i)) {
+				String p = pieces.get(i);
+				System.out.println(p);
+				File f = new File(CLInterface.getPathString(Arrays.asList(bachPath)) + p);
+				Transcription t = new Transcription(f);
+				List<Integer> pitchClassCounts = PitchKeyTools.getPitchClassCount(t.getScorePiece());
+				System.out.println(pitchClassCounts);
+				actual.add(PitchKeyTools.detectKey(pitchClassCounts));
+			}
+		}
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			System.out.println(i);
+			assertEquals(expected.get(i), actual.get(i));
+		}
+		assertEquals(expected, actual);				
 	}
 }

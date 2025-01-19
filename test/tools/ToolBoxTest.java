@@ -1969,6 +1969,67 @@ public class ToolBoxTest {
 
 
 	@Test
+	public void testSortBySubstring() {
+		List<String> num = Arrays.asList(
+			"bla-num_3-bla",
+			"bla-num_1-bla",
+			"bla-num_2-bla"
+		);
+		List<String> str = Arrays.asList(
+			"bla-num_C-bla",
+			"bla-num_A-bla",
+			"bla-num_B-bla"
+		);
+
+		List<String> expected = Arrays.asList(
+			"bla-num_1-bla",
+			"bla-num_2-bla",
+			"bla-num_3-bla",
+			"bla-num_A-bla",
+			"bla-num_B-bla",
+			"bla-num_C-bla"
+		);
+
+		List<String> actual = new ArrayList<>();
+		actual.addAll(ToolBox.sortBySubstring(num, "num_", null, "number"));
+		actual.addAll(ToolBox.sortBySubstring(str, "num_", "-bla", "string"));
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i), actual.get(i));
+		}
+	}
+
+
+	@Test
+	public void testExtractFromString() {
+		List<String> num = Arrays.asList(
+			"num_1-bla-bla",
+			"bla-num_2-bla",
+			"bla-bla-num_3",
+			"bla-bla-numm_3"
+		);
+		List<String> str = Arrays.asList(
+			"num_A-bla-bla",
+			"bla-num_B-bla",
+			"bla-bla-num_C",
+			"bla-bla-numm_C"
+		);
+
+		List<String> expected = Arrays.asList("1", "2", "3", null, "A", "B", "C", null);
+
+		List<String> actual = new ArrayList<>();
+		num.forEach(s -> actual.add(ToolBox.extractFromString(s, "num_", null, "number")));
+		str.forEach(s -> actual.add(ToolBox.extractFromString(s, "num_", "-bla", "string")));
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i), actual.get(i));
+		}
+	}
+
+
+	@Test
 	public void testSortByString() {
 		// int
 		String[] a = new String[]{"1", "50", "1.50"};
