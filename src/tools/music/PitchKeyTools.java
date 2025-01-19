@@ -41,10 +41,12 @@ public class PitchKeyTools {
 	
 	// F#, C#, G#, D#, A#, E#, B#
 	private static final List<Integer> KEY_ACCID_MPC_SHARP = Arrays.asList(6, 1, 8, 3, 10, 5, 0); 
-	private static final List<String> KEY_ACCID_PC_SHARP = Arrays.asList("f", "c", "g", "d", "a", "e", "b");
+	public static final List<String> KEY_ACCID_PC_SHARP = Arrays.asList("f", "c", "g", "d", "a", "e", "b");
 	// Bb, Eb, Ab, Db, Gb, Cb, Fb
 	private static final List<Integer> KEY_ACCID_MPC_FLAT = Arrays.asList(10, 3, 8, 1, 6, 11, 4);
-	private static final List<String> KEY_ACCID_PC_FLAT = Arrays.asList("b", "e", "a", "d", "g", "c", "f");
+	public static final List<String> KEY_ACCID_PC_FLAT = Arrays.asList("b", "e", "a", "d", "g", "c", "f");
+//	// ks at ind i has accids up to and including ind i in KEY_ACCID_PC_FLAT; e.g., Eb (ind=2) has Bb, Eb, Ab 
+//	public static final List<String> KEYS_PC_FLAT = Arrays.asList("f", "b", "e", "a", "d");
 	
 	private static boolean verbose = false;
 
