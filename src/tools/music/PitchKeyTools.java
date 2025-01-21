@@ -419,11 +419,12 @@ public class PitchKeyTools {
 	 * Spells the given pitch, considering the given key signature as number of alterations. 
 	 * numAlt <= 0 indicates flats; numAlt > 0 indicates sharps (NB: Am/C is considered a key 
 	 * signature with zero flats.)
-	 * 
-	 * The method works only for key signatures with no more than five key accidentals (KA), i.e., 
-	 * key signatures without double flats or double sharps. However, alterations may occasionally 
-	 * lead to double sharps or flats.<br><br>
-	 * 
+	 *
+	 * The method works only for key signatures with no more than five key accidentals (KA)
+	 * because of enharmonicity problems (the sixth flat/sharp is Cb/E#) and the occurrence
+	 * of double flats or double sharps. However, alterations may occasionally lead to double
+	 * sharps or flats.<br><br>
+	 *
 	 * Sequence of determination
 	 * <ul>
 	 * <li>1. pitch is the next or second next KA.</li>
@@ -816,9 +817,13 @@ public class PitchKeyTools {
 	 * Given the list of pitch class counts representing a piece, detects the key (as the number of
 	 * alterations) of the piece.
 	 *
+	 * The method works only for key signatures with no more than five key accidentals (KA)
+	 * because of enharmonicity problems (the sixth flat/sharp is Cb/E#).
+	 *
 	 * @param pitchClassCounts
 	 * @return
 	 */
+	// TESTED
 	public static int detectKey(List<Integer> pitchClassCounts) {
 		List<String> flats = Arrays.asList("", "d", "", "e", "f", "", "g", "", "a", "", "b", "c");
 		List<String> sharps = Arrays.asList("b", "c", "", "d", "", "e", "f", "", "g", "", "a", "");
@@ -835,8 +840,7 @@ public class PitchKeyTools {
 		for (int i = 0; i < KEY_ACCID_PC_FLAT.size(); i++) {
 			// Get pitch class of the current accid and that of its natural counterpart
 			int pcAccid = flats.indexOf(KEY_ACCID_PC_FLAT.get(i));
-			// Modulo ensures that pcNatural is always <= 11, i.e., is always an index in
-			// pitchClassCounts (necessary when pcAccid == 11 (Cb))
+			// pcNatural is ind+1, or, in the case of the last ind (for Cb), ind 0
 			int pcNatural = (pcAccid + 1) % 12;
 			// Update numAlt or break
 			if (pitchClassCounts.get(pcAccid) > pitchClassCounts.get(pcNatural)) {
@@ -850,9 +854,8 @@ public class PitchKeyTools {
 		for (int i = 0; i < KEY_ACCID_PC_SHARP.size(); i++) {
 			// Get pitch class of the current accid  and that of its natural counterpart
 			int pcAccid = sharps.indexOf(KEY_ACCID_PC_SHARP.get(i));
-			// Modulo ensures that pcNatural is always >= 0, i.e., is always an index in
-			// pitchClassCounts (necessary when pcAccid is 0 (B#))
-			int pcNatural = (pcAccid - 1) % 12;
+			// pcNatural ind-1, or, in the case of the first ind (for B#), ind 11
+			int pcNatural = (pcAccid + 11) % 12;
 			// Update numAlt or break
 			if (pitchClassCounts.get(pcAccid) > pitchClassCounts.get(pcNatural)) {
 				numAlts[1] = i+1;
@@ -862,7 +865,6 @@ public class PitchKeyTools {
 			}
 		}
 
-		System.out.println(Arrays.asList(numAlts));
 		// No key with flats or sharps found
 		if (numAlts[0] == null && numAlts[1] == null) {
 			return 0;

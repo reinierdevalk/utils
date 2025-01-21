@@ -30,7 +30,7 @@ public class PitchKeyToolsTest {
 		paths = CLInterface.getPaths(true);
 		String mp = paths.get("MIDI_PATH");
 		String td = "test/5vv/";
-		String bd = "bach-WTC/thesis/4vv/";
+		String bd = "bach-WTC/thesis/";
 		bachPath = CLInterface.getPathString(Arrays.asList(mp, bd));
 
 		midiTestpiece = new File(CLInterface.getPathString(
@@ -557,30 +557,88 @@ public class PitchKeyToolsTest {
 
 	@Test
 	public void testDetectKey() {
-		List<String> pieces = ToolBox.getFilesInFolder(bachPath, Arrays.asList(MIDIImport.EXTENSION), true);
-		pieces = ToolBox.sortBySubstring(pieces, "BWV_", null, "number");
+		// 3vv
+		int BWV_847 = -3;
+		int BWV_848 = -5; // ks in score is 7 (C# major) -- detection fails --> MORE THAN 5 KA
+		int BWV_851 = 0; // ks in score is -1 (d minor) -- detection fails because there are more B than Bb (47:48) --> FAIL
+		int BWV_852 = -3;
+		int BWV_853 = 6; // ks in score is 6 (d# minor) -- detection fails --> MORE THAN 5 KA --> LUCKY
+		int BWV_854 = 4;
+		int BWV_856 = -1;
+		int BWV_858 = 6; // ks in score is 6 (F# major) -- detection fails --> MORE THAN 5 KA --> LUCKY
+		int BWV_860 = 1;
+		int BWV_864 = 3;
+		int BWV_866 = -2;
+		int BWV_870 = 0;
+		int BWV_872 = -5; // ks in score is 7 (C# major) -- detection fails --> MORE THAN 5 KA
+		int BWV_873 = 4;
+		int BWV_875 = -1;
+		int BWV_879 = 1;
+		int BWV_880 = -1;
+		int BWV_881 = -4;
+		int BWV_882 = 6; // ks in score is 6 (F# major) -- detection fails --> MORE THAN 5 KA --> LUCKY
+		int BWV_883 = 3;
+		int BWV_884 = 1;
+		int BWV_887 = 5;
+		int BWV_888 = 3;
+		int BWV_889 = 0;
+		int BWV_890 = -2;
+		int BWV_893 = 2;
+		List<Integer> expected = new ArrayList<>();
+		expected.addAll(Arrays.asList(
+			BWV_847, BWV_848, BWV_851, BWV_852, BWV_853, BWV_854, BWV_856, BWV_858, BWV_860, 
+			BWV_864, BWV_866, BWV_870, BWV_872, BWV_873, BWV_875, BWV_879, BWV_880, BWV_881, 
+			BWV_882, BWV_883, BWV_884, BWV_887, BWV_888, BWV_889, BWV_890, BWV_893
+		));
 
-		List<Integer> expected = Arrays.asList(
-			0, 2, /*-4,*/ /*3,*/ -2, -4, 5, 0, 5, 2, -3, 2, -3, /*6,*/ 4, -2, -4, -5, 5
-		);
+		// 4vv
+		int BWV_846 = 0;
+		int BWV_850 = 2;
+		int BWV_857 = -3; // ks in score is -4 (f minor) -- detection fails because there are more D than Db (76:119) --> raised 6th
+		int BWV_859 = 4; // ks in score is 3 (f# minor) -- detection fails because there are more D# than D (46:54) --> raised 6th
+		int BWV_861 = -2;
+		int BWV_862 = -4;
+		int BWV_863 = 5;
+		int BWV_865 = 0;
+		int BWV_868 = 5;
+		int BWV_869 = 2;
+		int BWV_871 = -3;
+		int BWV_874 = 2;
+		int BWV_876 = -3;
+		int BWV_877 = -6; // ks in score is 6 (d# minor) -- detection fails --> MORE THAN 5 KA
+		int BWV_878 = 4;
+		int BWV_885 = -2;
+		int BWV_886 = -4;
+		int BWV_891 = -5;
+		int BWV_892 = 5;
+		expected.addAll(Arrays.asList(
+			BWV_846, BWV_850, BWV_857, BWV_859, BWV_861, BWV_862, BWV_863, BWV_865, BWV_868, BWV_869, 
+			BWV_871, BWV_874, BWV_876, BWV_877, BWV_878, BWV_885, BWV_886, BWV_891, BWV_892
+		));
+
+		List<Transcription> trans = new ArrayList<>();
+		List<String> three = ToolBox.getFilesInFolder(bachPath + "3vv/", Arrays.asList(MIDIImport.EXTENSION), true);
+		three = ToolBox.sortBySubstring(three, "BWV_", null, "number");
+		for (String p : three) {
+			File f = new File(CLInterface.getPathString(Arrays.asList(bachPath, "3vv/")) + p);
+			trans.add(new Transcription(f));
+		}
+		List<String> four = ToolBox.getFilesInFolder(bachPath + "4vv/", Arrays.asList(MIDIImport.EXTENSION), true);
+		four = ToolBox.sortBySubstring(four, "BWV_", null, "number");
+		for (String p : four) {
+			File f = new File(CLInterface.getPathString(Arrays.asList(bachPath, "4vv/")) + p);
+			trans.add(new Transcription(f));
+		}
 
 		List<Integer> actual = new ArrayList<>();
-		List<Integer> skip = Arrays.asList(2, 3, 13); // BWV 857, 859, 877
-		for (int i = 0; i < pieces.size(); i++) {
-			if (!skip.contains(i)) {
-				String p = pieces.get(i);
-				System.out.println(p);
-				File f = new File(CLInterface.getPathString(Arrays.asList(bachPath)) + p);
-				Transcription t = new Transcription(f);
-				List<Integer> pitchClassCounts = PitchKeyTools.getPitchClassCount(t.getScorePiece());
-				System.out.println(pitchClassCounts);
-				actual.add(PitchKeyTools.detectKey(pitchClassCounts));
-			}
+		for (int i = 0; i < trans.size(); i++) {
+			Transcription t = trans.get(i);
+			List<Integer> pitchClassCounts = PitchKeyTools.getPitchClassCount(t.getScorePiece());
+			actual.add(PitchKeyTools.detectKey(pitchClassCounts));
 		}
 
 		assertEquals(expected.size(), actual.size());
 		for (int i = 0; i < expected.size(); i++) {
-			System.out.println(i);
 			assertEquals(expected.get(i), actual.get(i));
 		}
 		assertEquals(expected, actual);				
