@@ -46,6 +46,8 @@ public class CLInterface {
 	public final static String TABLATURE_TM = "-t";
 	public final static String DURATION = "-d";
 
+	public final static String INPUT = "i";
+
 	public static void main(String[] args) {
 	}
 

@@ -56,8 +56,12 @@ public class PitchKeyTools {
 	
 	private static boolean verbose = false;
 
-
 	public static void main(String[] args) {
+		
+	}
+
+
+	public static void main2(String[] args) {
 		if (args.length != 0) {
 			// 1. To make grids
 			if (args.length == 2) {
@@ -424,22 +428,28 @@ public class PitchKeyTools {
 	 * because of enharmonicity problems (the sixth flat/sharp is Cb/E#) and the occurrence
 	 * of double flats or double sharps. However, alterations may occasionally lead to double
 	 * sharps or flats.<br><br>
+	 * 
+	 * Fb Cb Gb Db Ab Eb Bb X F# C# G# D# A# E# B#
+	 * -7 -6 -5 -4 -3 -2 -1 0 1  2  3  4  5  6  7
+	 * key = G
+	 * midi nr = 10: Bb or A#?
 	 *
 	 * Sequence of determination
 	 * <ul>
-	 * <li>1. pitch is the next or second next KA.</li>
+	 * <li>1. pitch is the next or second-next KA.</li>
 	 * <li>2. pitch is a naturalised KA.</li>
-	 * <li>3. pitch is the upper or lower leading tone (ULT/LLT) for minor (or the minor parallel).</li>
-	 * <li>4. pitch is the raised third (R3) for minor (or the minor parallel).</li>
-	 * <li>5. pitch is raised sixth (R6) for minor (or the minor parallel).</li>
+	 * <li>3. pitch is the upper or lower leading tone (ULT/LLT) for minor (or for the minor parallel).</li>
+	 * <li>4. pitch is the raised third (R3) for minor (or for the minor parallel).</li>
+	 * <li>5. pitch is raised sixth (R6) for minor (or for the minor parallel).</li>
 	 * </ul>
 	 * 
 	 * This covers all non-in-key pitches within the octave. Examples
 	 * <ul>
-	 * <li>Am  (0b): A, Bb (1), B, C, C# (4), D, Eb (1), E, F, F# (5), G, G# (3), A</li>
-	 * <li>Dm  (1b): D, Eb (1), E, F, F# (4), G, Ab (1), A, Bb, B (2), C, C# (3), D</li>
-	 * <li>Gm  (2b): G, Ab (1), A, Bb, B (2), C, Db (1), D, Eb, E (2), F, F# (3), G</li>
-	 * <li>F#m (3#): F#, G (2), G#, A, A# (4), B, C (2), C#, D, D# (1), E, E# (3), F#</li>
+	 * <li>Am  (0b): A,  Bb (1), B,  C,  C# (4), D, Eb (1), E,  F,  F# (5), G, G# (3), A</li>
+	 * <li>Dm  (1b): D,  Eb (1), E,  F,  F# (4), G, Ab (1), A,  Bb, B  (2), C, C# (3), D</li>
+	 * <li>Gm  (2b): G,  Ab (1), A,  Bb, B  (2), C, Db (1), D,  Eb, E  (2), F, F# (3), G</li>
+	 * <li>F#m (3#): F#, G  (2), G#, A,  A# (4), B, C  (2), C#, D,  D# (1), E, E# (3), F#</li>
+	 * <li>Em  (1#): E,  E# (2), F#, G,  G# (4), A, A# (x), B,  C,  C# (5), D, D# (3), E </li>
 	 * </ul>
 	 *  
 	 * @param pitch
@@ -656,7 +666,7 @@ public class PitchKeyTools {
 					}
 				}
 				if (!isNaturalisedKA) {
-					// 3. pitch is the upper or lower leading tone (ULT/LLT) for minor (or the minor parallel)
+					// 3. pitch is the upper or lower leading tone (ULT/LLT) for minor (or for the minor parallel)
 					// a. The ULT case is fully covered above
 					//    - flats: the ULT is the next KA
 					//    - sharps: the ULT is the last KA, naturalised
@@ -711,7 +721,7 @@ public class PitchKeyTools {
 						}
 					}
 					if (!isLLTForMinor) {
-						// 4. pitch is the raised third (R3) for minor (or the minor parallel)
+						// 4. pitch is the raised third (R3) for minor (or for the minor parallel)
 						//    This is partly covered above
 						//    - zero or one flats: the R3 still has to be calculated
 						//    - two flats or more: the R3 is the second-last KA, naturalised
@@ -745,7 +755,7 @@ public class PitchKeyTools {
 							isR3ForMinor = true;							
 						}
 						if (!isR3ForMinor) {
-							// 5. pitch is the raised sixth (R6) for minor (or the minor parallel)
+							// 5. pitch is the raised sixth (R6) for minor (or for the minor parallel)
 							//    This is partly covered above
 							//    - zero flats: the R6 still has to be calculated
 							//    - one flat or more: the R6 is the last KA, naturalised
@@ -776,6 +786,9 @@ public class PitchKeyTools {
 										}
 									}
 								}
+							}
+							else {
+
 							}
 						}
 					}
