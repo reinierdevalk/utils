@@ -16,6 +16,7 @@ import de.uos.fmt.musitech.data.score.NotationChord;
 import de.uos.fmt.musitech.data.score.NotationStaff;
 import de.uos.fmt.musitech.data.score.NotationVoice;
 import de.uos.fmt.musitech.data.structure.Note;
+import interfaces.CLInterface;
 import internal.core.ScorePiece;
 import tools.text.StringTools;
 
@@ -56,17 +57,58 @@ public class PitchKeyTools {
 	
 	private static boolean verbose = false;
 
+
 	public static void main(String[] args) {
-		
-	}
-
-
-	public static void main2(String[] args) {
-		if (args.length != 0) {
+		if (args.length == 0)  {
+			List<Integer> pitches = Arrays.asList(61);
+			int numAlt = 2;
+			List<Object> grids = createGrids(numAlt, 0);
+			Integer[] mpcGrid = (Integer[]) grids.get(0);
+			String[] altGrid = (String[]) grids.get(1);
+			String[] pcGrid = (String[]) grids.get(2);
+			System.out.println(Arrays.asList(mpcGrid));
+			System.out.println(Arrays.asList(altGrid));
+			System.out.println(Arrays.asList(pcGrid));
+			System.out.println("-----");
+			List<List<Integer>> aie = new ArrayList<>();
+			aie.add(new ArrayList<>());
+			aie.add(new ArrayList<>());
+			List<Integer> blbl = new ArrayList<>();
+			blbl.add(60);
+			aie.add(blbl);
+			aie.add(new ArrayList<>());
+			aie.add(new ArrayList<>());
+			System.out.println(aie);
+			
+			for (int i : pitches) {
+				List<Object> ps = spellPitch(
+					i, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), aie
+				);
+				String[] pa = (String[]) ps.get(0);
+				System.out.println("MIDI :     " + i);
+				System.out.println("pname:     " + pa[0]);
+				System.out.println("accid:     " + pa[1]);
+				System.out.println("accid.ges: " + pa[2]);
+				aie = (List<List<Integer>>) ps.get(1);
+				System.out.println(aie);
+			}
+		}
+		else {
+			// NB If this class is called from Python, the _call_java() function reads the stdout
+			// returned by this class, and passes it to json.loads(). Therefore, in this class
+			// - System.out.println() (the stdout) must be used to return a json-formatted string
+			// - System.err.println() (the stderr) must be used for any debugging -- if the stdout
+			//   is used for this, it makes the output returned non-valid json
 			// 1. To make grids
 			if (args.length == 2) {
 				verbose = false;
-				int numAlt = Integer.parseInt(args[0]);
+				int numAlt;
+				if (args[0].equals(CLInterface.INPUT)) {
+					numAlt = 0; // TODO calculate with method
+				}
+				else {
+					numAlt = Integer.parseInt(args[0]);
+				}
 				int mode = Integer.parseInt(args[1]) == 0 ? 0 : 1;
 				List<Object> grids = PitchKeyTools.createGrids(numAlt, mode);
 				Integer[] mpcGrid = (Integer[]) grids.get(0);
@@ -118,9 +160,9 @@ public class PitchKeyTools {
 					accidsInEffectStr.equals("null") ? null : 
 					StringTools.parseStringifiedListOfIntegers(accidsInEffectStr);
 
-//				System.out.println("FROM JAVA");
-//				System.out.println(pitch);
-//				System.out.println(accidsInEffectStr);
+//				System.err.println("FROM JAVA");
+//				System.err.println(pitch);
+//				System.err.println(accidsInEffectStr);
 				List<Object> pitchSpell = spellPitch(
 					pitch, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), accidsInEffect
 				);
@@ -131,40 +173,6 @@ public class PitchKeyTools {
 					"\"accid.ges\": " + "\"" + pa[2] + "\"" + ", " +
 					"\"accidsInEffect\": " + accidsInEffect.toString() + "}";
 				System.out.println(dict);
-			}
-		}
-		else {
-			List<Integer> pitches = Arrays.asList(61);
-			int numAlt = 2;
-			List<Object> grids = createGrids(numAlt, 0);
-			Integer[] mpcGrid = (Integer[]) grids.get(0);
-			String[] altGrid = (String[]) grids.get(1);
-			String[] pcGrid = (String[]) grids.get(2);
-			System.out.println(Arrays.asList(mpcGrid));
-			System.out.println(Arrays.asList(altGrid));
-			System.out.println(Arrays.asList(pcGrid));
-			System.out.println("-----");
-			List<List<Integer>> aie = new ArrayList<>();
-			aie.add(new ArrayList<>());
-			aie.add(new ArrayList<>());
-			List<Integer> blbl = new ArrayList<>();
-			blbl.add(60);
-			aie.add(blbl);
-			aie.add(new ArrayList<>());
-			aie.add(new ArrayList<>());
-			System.out.println(aie);
-			
-			for (int i : pitches) {
-				List<Object> ps = spellPitch(
-					i, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), aie
-				);
-				String[] pa = (String[]) ps.get(0);
-				System.out.println("MIDI :     " + i);
-				System.out.println("pname:     " + pa[0]);
-				System.out.println("accid:     " + pa[1]);
-				System.out.println("accid.ges: " + pa[2]);
-				aie = (List<List<Integer>>) ps.get(1);
-				System.out.println(aie);
 			}
 		}
 	}
