@@ -25,20 +25,19 @@ public class CLInterface {
 	private static final String PATHS_FILE = "paths.json";
 	private static final String PATHS_FILE_DEV = "paths-dev.json";
 	private static final String CONFIG_FILE = "config.cfg";
-	private static final String CONFIG_FILE_DEV = "config-dev.cfg";
 	
 	public static final String FILE = "-f";
 	public static final String FORMAT = "-r";
 	
 	// CLI args (as in abtab script)
 	// Transcriber
-	public final static String TUNING = "-u";
-	public final static String KEY = "-k";
-	public final static String MODE = "-m";
-	public final static String TABLATURE = "-t";
-	public final static String TYPE = "-y";
-	public final static String MODEL = "-o";
-	public final static String VERBOSE = "-v";
+	public final static String TUNING = "-u"; // only needed in MEIExport
+	public final static String KEY = "-k"; // only needed in TestManager
+	public final static String MODE = "-m"; // only needed in TestManager
+	public final static String TABLATURE = "-t"; // only needed in MEIExport
+	public final static String TYPE = "-y"; // only needed in MEIExport
+	public final static String MODEL = "-o"; // only needed in UI
+	public final static String VERBOSE = "-v"; // only needed in UI
 	
 	// TabMapper
 	public final static String ORNAMENTATION = "-o";
@@ -329,6 +328,16 @@ public class CLInterface {
 				}
 			}
 		}
+	}
+
+
+	public static Map<String, String> getTranscriptionParams(Map<String, String> cliOptsVals) {
+		Map<String, String> transParams = new LinkedHashMap<String, String>();
+		transParams.put(TUNING, cliOptsVals.get(TUNING));
+		transParams.put(TABLATURE, cliOptsVals.get(TABLATURE));
+		transParams.put(TYPE, cliOptsVals.get(TYPE));
+
+		return transParams;
 	}
 
 }
