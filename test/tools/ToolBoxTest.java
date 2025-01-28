@@ -47,7 +47,7 @@ public class ToolBoxTest {
 
 		List<String> expected = Arrays.asList(new String[]{"testpiece", "testpiece.tbp"});
 		List<String> actual = new ArrayList<>();
-		actual.add(ToolBox.getFilename(encodingTestpiece, Encoding.EXTENSION));
+		actual.add(ToolBox.getFilename(encodingTestpiece, Encoding.TBP_EXT));
 		actual.add(ToolBox.getFilename(encodingTestpiece, null));
 
 		assertEquals(expected, actual);

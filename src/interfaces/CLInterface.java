@@ -46,6 +46,15 @@ public class CLInterface {
 	public final static String DURATION = "-d";
 
 	public final static String INPUT = "i";
+	
+	public static final List<String> ALLOWED_FILE_FORMATS = Arrays.asList(
+		MEIExport.MEI_EXT, // .mei
+		TabImport.TAB_EXT, // .tab
+		Encoding.TBP_EXT, // .tbp
+		TabImport.TC_EXT, // .tc
+		MEIExport.XML_EXT // .xml
+	);
+
 
 	public static void main(String[] args) {
 	}
@@ -242,7 +251,8 @@ public class CLInterface {
 
 	/**
 	 * Constructs a path <code>String</code> from the given list of dir names.
-	 * The list elements are added in the order they appear in the list.
+	 * The list elements are added in the order they appear in the list; a file
+	 * separator (/) is added to the end of the path.
 	 * 
 	 * @param l
 	 * @return
@@ -289,8 +299,8 @@ public class CLInterface {
 		// All pieces in path
 		else {
 			piecenames.addAll(ToolBox.getFilesInFolder(
-				path, cliOptsVals.get(FORMAT).equals("y") ? TabImport.ALLOWED_FILE_FORMATS : 
-				Arrays.asList(MIDIImport.EXTENSION), false
+				path, cliOptsVals.get(FORMAT).equals("y") ? ALLOWED_FILE_FORMATS : 
+				Arrays.asList(MIDIImport.MID_EXT), false
 			));
 		}
 		// Convert any non-.tbp in piecenames to .tbp
@@ -310,20 +320,20 @@ public class CLInterface {
 	public static void convertToTbp(String inPath, List<String> piecenames) {
 		for (String p : piecenames) {
 			String ip = inPath + p;
-			if (!Files.exists(Paths.get(ip + Encoding.EXTENSION))) {
+			if (!Files.exists(Paths.get(ip + Encoding.TBP_EXT))) {
 				// .tc file
 				if (Files.exists(Paths.get(ip + TabImport.TC_EXT))) {
 					String s = TabImport.tc2tbp(
 						ToolBox.readTextFile(new File(ip + TabImport.TC_EXT))
 					);
-					ToolBox.storeTextFile(s, new File(ip + Encoding.EXTENSION));
+					ToolBox.storeTextFile(s, new File(ip + Encoding.TBP_EXT));
 				}
 				// .mei file
 				else if (Files.exists(Paths.get(ip + MEIExport.MEI_EXT))) {
 					// TODO luteconv .mei -> .tc; TabImport.tc2tbp()
 				}
 				// .xml file 
-				else if (Files.exists(Paths.get(ip + MEIExport.MEI_EXT_ALT))) {
+				else if (Files.exists(Paths.get(ip + MEIExport.XML_EXT))) {
 					// TODO luteconv .xml -> .tc; TabImport.tc2tbp()
 				}
 			}

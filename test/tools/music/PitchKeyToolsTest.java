@@ -617,13 +617,13 @@ public class PitchKeyToolsTest {
 		));
 
 		List<Transcription> trans = new ArrayList<>();
-		List<String> three = ToolBox.getFilesInFolder(bachPath + "3vv/", Arrays.asList(MIDIImport.EXTENSION), true);
+		List<String> three = ToolBox.getFilesInFolder(bachPath + "3vv/", Arrays.asList(MIDIImport.MID_EXT), true);
 		three = ToolBox.sortBySubstring(three, "BWV_", null, "number");
 		for (String p : three) {
 			File f = new File(CLInterface.getPathString(Arrays.asList(bachPath, "3vv/")) + p);
 			trans.add(new Transcription(f));
 		}
-		List<String> four = ToolBox.getFilesInFolder(bachPath + "4vv/", Arrays.asList(MIDIImport.EXTENSION), true);
+		List<String> four = ToolBox.getFilesInFolder(bachPath + "4vv/", Arrays.asList(MIDIImport.MID_EXT), true);
 		four = ToolBox.sortBySubstring(four, "BWV_", null, "number");
 		for (String p : four) {
 			File f = new File(CLInterface.getPathString(Arrays.asList(bachPath, "4vv/")) + p);
