@@ -275,13 +275,13 @@ public class CLInterface {
 	}
 
 
-	public static List<Object> parseCLIArgs(String[] opts, String[] defaults, 
+	public static List<Object> parseCLIArgs(String[] opts, String[] defaultVals, 
 		String[] userOptsVals, String path) {
-		
+
 		// Populate cliOptsVals with default values
 		Map<String, String> cliOptsVals = new LinkedHashMap<String, String>();
 		for (int i = 0; i < opts.length; i++) {
-			cliOptsVals.put(opts[i], defaults[i]);
+			cliOptsVals.put(opts[i], defaultVals[i]);
 		}
 
 		// Parse userOptsVals and overwrite any default values in cliOptsVals
@@ -292,20 +292,22 @@ public class CLInterface {
 
 		// Set piecenames
 		List<String> piecenames = new ArrayList<>();
-		// Single piece
-		if (!cliOptsVals.get(FILE).equals("n/a")) {
-			piecenames.add(ToolBox.splitExt(cliOptsVals.get(FILE))[0]);
+		if (path != null) {
+			// Single piece
+			if (!cliOptsVals.get(FILE).equals("n/a")) {
+				piecenames.add(ToolBox.splitExt(cliOptsVals.get(FILE))[0]);
+			}
+			// All pieces in path
+			else {
+				piecenames.addAll(ToolBox.getFilesInFolder(
+					path, cliOptsVals.get(FORMAT).equals("y") ? ALLOWED_FILE_FORMATS : 
+					Arrays.asList(MIDIImport.MID_EXT), false
+				));
+			}
+			// Convert any non-.tbp in piecenames to .tbp
+			convertToTbp(path, piecenames);
 		}
-		// All pieces in path
-		else {
-			piecenames.addAll(ToolBox.getFilesInFolder(
-				path, cliOptsVals.get(FORMAT).equals("y") ? ALLOWED_FILE_FORMATS : 
-				Arrays.asList(MIDIImport.MID_EXT), false
-			));
-		}
-		// Convert any non-.tbp in piecenames to .tbp
-		convertToTbp(path, piecenames);
-
+		
 		return Arrays.asList(new Object[]{cliOptsVals, piecenames});
 	}
 
