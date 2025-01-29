@@ -25,7 +25,11 @@ public class CLInterface {
 	private static final String PATHS_FILE = "paths.json";
 	private static final String PATHS_FILE_DEV = "paths-dev.json";
 	private static final String CONFIG_FILE = "config.cfg";
-	
+
+	private static final int OPTS_IND = 1;
+	private static final int DEFAULT_VALS_IND = 2;
+	private static final int USER_OPTS_VALS_IND = 3;
+
 	public static final String FILE = "-f";
 	public static final String FORMAT = "-r";
 	
@@ -275,8 +279,21 @@ public class CLInterface {
 	}
 
 
-	public static List<Object> parseCLIArgs(String[] opts, String[] defaultVals, 
-		String[] userOptsVals, String path) {
+	/**
+	 * Parses the given CLI arguments. 
+	 * @param args Has a fixed sequence -- see abtab script.
+	 * @param path
+	 * @return
+	 */
+	public static List<Object> parseCLIArgs(String[] args, String path) {
+		String[] opts = args[OPTS_IND].split(" ");
+		String[] defaultVals = args[DEFAULT_VALS_IND].split(" ");
+		String uov = args[USER_OPTS_VALS_IND];
+		String[] userOptsVals = !uov.equals("") ? uov.split(",") : new String[]{};
+		System.out.println("from CLIinterface.parseCLIArgs():");
+		System.out.println("opts :" + Arrays.asList(opts));
+		System.out.println("defs :" + Arrays.asList(defaultVals));
+		System.out.println("user :" + Arrays.asList(userOptsVals));
 
 		// Populate cliOptsVals with default values
 		Map<String, String> cliOptsVals = new LinkedHashMap<String, String>();
@@ -345,9 +362,14 @@ public class CLInterface {
 
 	public static Map<String, String> getTranscriptionParams(Map<String, String> cliOptsVals) {
 		Map<String, String> transParams = new LinkedHashMap<String, String>();
-		transParams.put(TUNING, cliOptsVals.get(TUNING));
+		// Tuning. If not provided, use input
+		String tun = cliOptsVals.get(TUNING);
+		transParams.put(TUNING, tun == null ? INPUT : tun);
+		// Tablature
 		transParams.put(TABLATURE, cliOptsVals.get(TABLATURE));
-		transParams.put(TYPE, cliOptsVals.get(TYPE));
+		// Type. If not provided, use input
+		String type = cliOptsVals.get(TYPE);
+		transParams.put(TYPE, type == null ? INPUT : type);
 
 		return transParams;
 	}
