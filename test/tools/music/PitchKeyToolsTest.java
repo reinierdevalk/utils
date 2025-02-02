@@ -641,6 +641,29 @@ public class PitchKeyToolsTest {
 		for (int i = 0; i < expected.size(); i++) {
 			assertEquals(expected.get(i), actual.get(i));
 		}
-		assertEquals(expected, actual);				
+		assertEquals(expected, actual);
+	}
+
+
+	@Test
+	public void testTransposeKeySig() {		
+		List<Integer> transIntervals = Arrays.asList(-1, -2, -3, -4, -5, 0, 1, 2, 3, 4, 5);
+
+		// Transpose Eb (-3) to D, Db, C, B, Bb and Eb, E, F, F#, G, Ab
+		List<Integer> expected1 = Arrays.asList(2, -5, 0, 5, -2, -3, 4, -1, 6, 1, -4);
+		// Transpose A (3) to Ab, G, F#, F, E and A, Bb, B, C, Db, D
+		List<Integer> expected2 = Arrays.asList(-4, 1, 6, -1, 4, 3, -2, 5, 0, -5, 2);
+		List<Integer> expected = new ArrayList<>(expected1);
+        expected.addAll(expected2);
+
+		List<Integer> actual = new ArrayList<>();
+		transIntervals.forEach(i -> actual.add(PitchKeyTools.transposeKeySig(-3, i)));
+		transIntervals.forEach(i -> actual.add(PitchKeyTools.transposeKeySig(3, i)));
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i), actual.get(i));
+		}
+		assertEquals(expected, actual);
 	}
 }

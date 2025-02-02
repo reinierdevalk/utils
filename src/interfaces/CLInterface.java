@@ -30,24 +30,30 @@ public class CLInterface {
 	private static final int DEFAULT_VALS_IND = 2;
 	private static final int USER_OPTS_VALS_IND = 3;
 
-	public static final String FILE = "-f";
-	public static final String FORMAT = "-r";
 	
 	// CLI args (as in abtab script)
 	// Transcriber
 	public final static String TUNING = "-u"; // only needed in MEIExport
 	public final static String KEY = "-k"; // only needed in TestManager
 	public final static String MODE = "-m"; // only needed in TestManager
-	public final static String TABLATURE = "-t"; // only needed in MEIExport
-	public final static String TYPE = "-y"; // only needed in MEIExport
 	public final static String MODEL = "-o"; // only needed in UI
 	public final static String VERBOSE = "-v"; // only needed in UI
-	
+
 	// TabMapper
 	public final static String ORNAMENTATION = "-o";
-	public final static String SCORE = "-s";
-	public final static String TABLATURE_TM = "-t";
 	public final static String DURATION = "-d";
+	
+	// Layout
+	public final static String STAFF = "-s";
+	public final static String TABLATURE = "-t"; // only needed in MEIExport
+	public final static String TYPE = "-y"; // only needed in MEIExport
+	public final static String PLACEMENT = "-p";
+
+	// Input
+	public static final String FILE = "-f";
+	public static final String FORMAT = "-r";
+	
+
 
 	public final static String INPUT = "i";
 	
@@ -362,14 +368,37 @@ public class CLInterface {
 
 	public static Map<String, String> getTranscriptionParams(Map<String, String> cliOptsVals) {
 		Map<String, String> transParams = new LinkedHashMap<String, String>();
-		// Tuning. If not provided, use input
-		String tun = cliOptsVals.get(TUNING);
-		transParams.put(TUNING, tun == null ? INPUT : tun);
-		// Tablature
-		transParams.put(TABLATURE, cliOptsVals.get(TABLATURE));
-		// Type. If not provided, use input
-		String type = cliOptsVals.get(TYPE);
-		transParams.put(TYPE, type == null ? INPUT : type);
+		
+		List<String> keys = Arrays.asList(TUNING, STAFF, TABLATURE, TYPE, PLACEMENT);
+		if (cliOptsVals != null) {
+			for (String key : keys) {
+				if (cliOptsVals.containsKey(key)) {
+					transParams.put(key, cliOptsVals.get(key));
+				}
+			}
+		}
+		else {
+			List<String> values = Arrays.asList(INPUT, "d", "y", INPUT, "b");
+			for (int i = 0; i < keys.size(); i++) {
+				transParams.put(keys.get(i), values.get(i));
+			}
+		}
+		
+//		// Tuning
+//		transParams.put(TUNING, cliOptsVals.get(TUNING));
+//		// Staff
+//		if (cliOptsVals.containsKey(STAFF)) {
+//			transParams.put(STAFF, cliOptsVals.get(STAFF));
+//		}
+//		// Tablature
+//		transParams.put(TABLATURE, cliOptsVals.get(TABLATURE));
+//		// Type
+//		String type = cliOptsVals.get(TYPE);
+//		transParams.put(TYPE, type == null ? INPUT : type);
+//		// Placement
+//		if (cliOptsVals.containsKey(PLACEMENT)) {
+//			transParams.put(PLACEMENT, cliOptsVals.get(PLACEMENT));
+//		}
 
 		return transParams;
 	}

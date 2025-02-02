@@ -20,8 +20,6 @@ import interfaces.CLInterface;
 import internal.core.ScorePiece;
 import tools.text.StringTools;
 
-//import de.uos.fmt.musitech.data.score.NotationVoice;
-//import de.uos.fmt.musitech.utility.math.Rational;
 
 public class PitchKeyTools {
 	// For each key, represented by number of flats (-) or sharps (+), the MIDI 
@@ -903,6 +901,21 @@ public class PitchKeyTools {
 		else {
 			return Math.abs(numAlts[0]) < numAlts[1] ? numAlts[0] : numAlts[1];
 		}
+	}
+
+
+	/**
+	 * Transposes the given key signature by the given transposition interval (in semitones).
+	 * 
+	 * @return
+	 */
+	// TESTED
+	public static int transposeKeySig(int ks, int transInterval) {
+		// Accidentals for C, Db, D, Eb, E, F, F#, G, Ab, A, Bb, B
+		List<Integer> kss = Arrays.asList(0, -5, 2, -3, 4, -1, 6, 1, -4, 3, -2, 5);
+		int indTransKs = (kss.indexOf(ks) + transInterval);
+
+		return kss.get((indTransKs < 0) ? indTransKs + 12 : indTransKs % 12);
 	}
 
 
