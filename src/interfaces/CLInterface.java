@@ -17,7 +17,10 @@ import java.util.Map;
 import conversion.exports.MEIExport;
 import conversion.imports.MIDIImport;
 import conversion.imports.TabImport;
+import external.Tablature;
+import external.Tablature.Tuning;
 import internal.core.Encoding;
+import tbp.symbols.TabSymbol.TabSymbolSet;
 import tools.ToolBox;
 import tools.text.StringTools;
 
@@ -51,9 +54,7 @@ public class CLInterface {
 
 	// Input
 	public static final String FILE = "-f";
-	public static final String FORMAT = "-r";
-	
-
+	public static final String FORMAT = "-a";
 
 	public final static String INPUT = "i";
 	
@@ -366,39 +367,58 @@ public class CLInterface {
 	}
 
 
+	/**
+	 * Sets piece-specific transParams that (can) have CLInterface.INPUT as value.
+	 * 
+	 * @param cliOptsVals
+	 * @param tab
+	 * @param tool
+	 * @return
+	 */
+	public static Map<String, String> setPieceSpecificTransParams(Map<String, String> cliOptsVals, Tablature tab, String tool) {
+		Tuning[] tunings = tab.getTunings();
+		TabSymbolSet tss = tab.getEncoding().getTabSymbolSet();
+
+		if (tool.equals("converter")) {
+			// Tuning and type are always INPUT
+			cliOptsVals.put(CLInterface.TUNING, tunings[Tablature.ENCODED_TUNING_IND].getName());
+			cliOptsVals.put(CLInterface.TYPE, tss.getShortType());
+		}
+		else if (tool.equals("tabmapper")) {
+			// Tuning is always INPUT; type can be INPUT
+			cliOptsVals.put(CLInterface.TUNING, tunings[Tablature.ENCODED_TUNING_IND].getName());
+			if (cliOptsVals.get(CLInterface.TYPE).equals(CLInterface.INPUT)) {
+				cliOptsVals.put(CLInterface.TYPE, tss.getShortType());
+			}	
+		}
+		else if (tool.equals("transcriber-dev")) {
+			// Tuning and type are always INPUT
+			cliOptsVals.put(CLInterface.TUNING, tunings[Tablature.NORMALISED_TUNING_IND].getName());
+			cliOptsVals.put(CLInterface.TYPE, tss.getShortType());
+		}
+		else if (tool.equals("transcriber")) {
+			// Tuning and type can be INPUT
+			if (cliOptsVals.get(CLInterface.TUNING).equals(CLInterface.INPUT)) {
+				cliOptsVals.put(CLInterface.TUNING, tunings[Tablature.ENCODED_TUNING_IND].getName());
+			}
+			if (cliOptsVals.get(CLInterface.TYPE).equals(CLInterface.INPUT)) {
+				cliOptsVals.put(CLInterface.TYPE, tss.getShortType());
+			}
+		}
+		
+		return cliOptsVals;
+	}
+
+
 	public static Map<String, String> getTranscriptionParams(Map<String, String> cliOptsVals) {
 		Map<String, String> transParams = new LinkedHashMap<String, String>();
-		
+
 		List<String> keys = Arrays.asList(TUNING, STAFF, TABLATURE, TYPE, PLACEMENT);
-		if (cliOptsVals != null) {
-			for (String key : keys) {
-				if (cliOptsVals.containsKey(key)) {
-					transParams.put(key, cliOptsVals.get(key));
-				}
+		for (String key : keys) {
+			if (cliOptsVals.containsKey(key)) {
+				transParams.put(key, cliOptsVals.get(key));
 			}
 		}
-		else {
-			List<String> values = Arrays.asList(INPUT, "d", "y", INPUT, "b");
-			for (int i = 0; i < keys.size(); i++) {
-				transParams.put(keys.get(i), values.get(i));
-			}
-		}
-		
-//		// Tuning
-//		transParams.put(TUNING, cliOptsVals.get(TUNING));
-//		// Staff
-//		if (cliOptsVals.containsKey(STAFF)) {
-//			transParams.put(STAFF, cliOptsVals.get(STAFF));
-//		}
-//		// Tablature
-//		transParams.put(TABLATURE, cliOptsVals.get(TABLATURE));
-//		// Type
-//		String type = cliOptsVals.get(TYPE);
-//		transParams.put(TYPE, type == null ? INPUT : type);
-//		// Placement
-//		if (cliOptsVals.containsKey(PLACEMENT)) {
-//			transParams.put(PLACEMENT, cliOptsVals.get(PLACEMENT));
-//		}
 
 		return transParams;
 	}
