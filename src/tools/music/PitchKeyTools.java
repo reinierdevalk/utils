@@ -379,7 +379,17 @@ public class PitchKeyTools {
 	}
 
 
-	// TODO test
+	/**
+	 * Gets the root (one of [C, D, E, F, G, A, B]) and the alteration (1 or nothing) for the 
+	 * given key and mode. The alteration is 1 if the key has a lowered or raised root, e.g.,
+	 * the key of Bb has root B and alteration 1; the key of F# has root F and alteration 1 --
+	 * but the key of A has root A and no alteration.
+	 * 
+	 * @param numAlt
+	 * @param mode
+	 * @return
+	 */
+	// TESTED
 	public static String[] getRootAndRootAlteration(int numAlt, int mode) {
 		Integer[] mpcs = KEY_SIG_MPCS.get(numAlt);
 		int mpc = mpcs[mode];
@@ -401,7 +411,7 @@ public class PitchKeyTools {
 	 * Given a <code>ScorePiece</code>, detects its key (as the number of alterations).
 	 *
 	 * This method does not always give good results for key signatures with more than five key 
-	 * accidentals (KA) because of enharmonicity issues (the sixth flat/sharp is Cb/E#).
+	 * accidentals (KA) because of enharmonicity issues.
 	 *
 	 * @param sp
 	 * @return
@@ -409,6 +419,17 @@ public class PitchKeyTools {
 	// TESTED
 	public static int detectKey(ScorePiece sp) {
 		List<Integer> pitchClassCounts = getPitchClassCount(sp);
+
+//		String outp = "";
+//		for (String s : Arrays.asList("C", ".", "D", ".", "E", "F", ".", "G", ".", "A", ".", "B")) {
+//			outp += s + "   ";
+//		}
+//		outp += "\r\n";
+//		for (int i : pitchClassCounts) {
+//			String s = String.valueOf(i);
+//			outp += s + " ".repeat(4 - s.length());
+//		}
+//		System.out.println(outp);
 
 		// Add first double flat/sharp (Bbb/Fx)
 		List<Integer> kaMpcFlat = new ArrayList<>(KEY_ACCID_MPC_FLAT);
@@ -462,6 +483,7 @@ public class PitchKeyTools {
 		}
 		// Key with flats and key with sharps found: return the one with
 		// fewer accidentals (e.g., Cb (7 flats) == B (5 sharps))
+		// When there is a tie, return sharps
 		else {
 			return Math.abs(numAlts[0]) < numAlts[1] ? numAlts[0] : numAlts[1];
 		}
@@ -515,7 +537,7 @@ public class PitchKeyTools {
 	 * signature with zero flats.)
 	 *
 	 * This method does not always give good results for key signatures with more than five 
-	 * key accidentals (KA) because of enharmonicity issues (the sixth flat/sharp is Cb/E#).<br><br>
+	 * key accidentals (KA) because of enharmonicity issues.<br><br>
 	 *  
 	 * @param pitch
 	 * @param numAlt
@@ -527,6 +549,7 @@ public class PitchKeyTools {
 	 *         <li>As element 1: the updated <code>accidsInEffect</code> (if it is not <code>null</code>).</li>
 	 *         </ul>
 	 */
+	// TESTED
 	public static List<Object> spellPitch(int pitch, int numAlt, List<Object> grids, List<List<Integer>> accidsInEffect) {
 		String pname = "";
 		String accid = "";
@@ -535,15 +558,6 @@ public class PitchKeyTools {
 		Integer[] mpcGrid = (Integer[]) grids.get(0); 
 		String[] altGrid = (String[]) grids.get(1);  
 		String[] pcGrid = (String[]) grids.get(2);
-
-		String keySigAccidType = numAlt <= 0 ? "f" : "s";
-		// Key sig accidentals as MIDI pitch classes (e.g. 10, 3 for Bb, Eb)
-		List<Integer> keySigAccidMpc = new ArrayList<>();
-		for (int i = 0; i < altGrid.length; i++) {
-			if (altGrid[i].equals(keySigAccidType)) {
-				keySigAccidMpc.add(mpcGrid[i]);
-			}
-		}
 
 		List<Integer> doubleFlatsInEffect = null;
 		List<Integer> flatsInEffect = null; 
@@ -558,34 +572,13 @@ public class PitchKeyTools {
 			doubleSharpsInEffect = accidsInEffect.get(4);
 		}
 
-		List<Integer> mpcGridList = Arrays.asList(mpcGrid);
 		int mpc = pitch % 12; // value is between and including [0, 11]
-		List<String> accids = Arrays.asList(new String[]{"ff", "f", "n", "s", "x"});
 		boolean considerContext = accidsInEffect != null && !accidsInEffect.contains(null);
-		boolean isMinor = mpcGrid[2] - mpcGrid[0] == 3 || Math.abs(mpcGrid[2] - mpcGrid[0]) == 9;
-
-		// Get the grids for the nominal major of minor (or the minor parallel), e.g., 
-		// E for Em/G; B for Bm/D; etc.		
-		Integer[] mpcGridNomMajOfMin = 
-			isMinor ? Arrays.copyOf(mpcGrid, mpcGrid.length) :
-			ArrayUtils.addAll(Arrays.copyOfRange(mpcGrid, 5, 7), Arrays.copyOfRange(mpcGrid, 0, 5));
-		mpcGridNomMajOfMin[2] = (mpcGridNomMajOfMin[2] + 1) % 12;
-		mpcGridNomMajOfMin[5] = (mpcGridNomMajOfMin[5] + 1) % 12;
-		mpcGridNomMajOfMin[6] = (mpcGridNomMajOfMin[6] + 1) % 12;
-		String[] altGridNomMajOfMin = 	
-			isMinor ? Arrays.copyOf(altGrid, altGrid.length) :
-			ArrayUtils.addAll(Arrays.copyOfRange(altGrid, 5, 7), Arrays.copyOfRange(altGrid, 0, 5));
-		altGridNomMajOfMin[2] = accids.get(accids.indexOf(altGridNomMajOfMin[2]) + 1);
-		altGridNomMajOfMin[5] = accids.get(accids.indexOf(altGridNomMajOfMin[5]) + 1);
-		altGridNomMajOfMin[6] = accids.get(accids.indexOf(altGridNomMajOfMin[6]) + 1);
-		String[] pcGridNomMajOfMin =
-			isMinor ? Arrays.copyOf(pcGrid, pcGrid.length) :
-			ArrayUtils.addAll(Arrays.copyOfRange(pcGrid, 5, 7), Arrays.copyOfRange(pcGrid, 0, 5));
 
 		// a. pitch is in key
-		if (mpcGridList.contains(mpc)) {
+		if (Arrays.asList(mpcGrid).contains(mpc)) {
 			if (verbose) System.err.println("pitch is in key");
-			int pcInd = mpcGridList.indexOf(mpc);
+			int pcInd = Arrays.asList(mpcGrid).indexOf(mpc);
 			pname = pcGrid[pcInd];
 			if (!considerContext) {
 				accid = altGrid[pcInd];
@@ -624,48 +617,39 @@ public class PitchKeyTools {
 				// No accidental
 				else {
 					accid = "";
-					if (keySigAccidMpc.contains(mpc)) {
-						accidGes = keySigAccidType;
+					if (getMIDIPitchClassKeySigs(numAlt).contains(mpc)) {
+						accidGes = numAlt <= 0 ? "f" : "s";
 					}
 				}
 			}
 		}
 		// b. pitch is not in key
-		else {			
-//			Integer[][] mpcGridAll = makeMIDIPitchClassGrids(0);
-//			String[][] pcGridAll = makePitchClassGrids(0);
-//			String[][] aGridAll = makeAlterationGrids(mpcGridAll);
-
-			// Find the closest key signature that has pitch
-			List<Integer> keys = new ArrayList<>(KEY_SIG_MPCS.keySet());
-			int indNumAlt = keys.indexOf(numAlt);
+		else {
+			// Iterate over all key sigs and find the closest key sig that has pitch
+			List<Integer> kss = new ArrayList<>(KEY_SIG_MPCS.keySet());
+			int indNumAlt = kss.indexOf(numAlt);
 			outerLoop: for (int i = 1; i <= KEY_SIG_MPCS.size() - 1; i++) {
-				// Check if KS to the left or right contains mpc
-				int currNumAltLeft = (indNumAlt - i) < 0 ? Integer.MAX_VALUE : keys.get(indNumAlt - i);
-				int currNumAltRight = (indNumAlt + i) >= keys.size() ? Integer.MAX_VALUE : keys.get(indNumAlt + i);
-				// NB The ks to the right must be checked first, so that the case of the LLT for the minor parallel
-				// is spelled correctly. In this case, the distance to the key that contains mpc is the same left 
-				// and right. Example:
+				// Check if key sig to the left or right contains mpc
+				int currNumAltLeft = (indNumAlt - i) < 0 ? Integer.MAX_VALUE : kss.get(indNumAlt - i);
+				int currNumAltRight = (indNumAlt + i) >= kss.size() ? Integer.MAX_VALUE : kss.get(indNumAlt + i);
+				// NB The key sig to the right must be checked first, so that the case of the LLT for the minor 
+				// parallel is spelled correctly. In this case, the distance to the key that contains mpc is the 
+				// same left and right. Example:
 				// - 68 in C should be spelled G# (it is the LLT for minor parallel)
 				//   - distance to first ks that has G# (3) is three steps to the right from 0 
 				//   - distance to first ks that has Ab (-3) is three steps to the left from 0
 				for (int currNumAlt : Arrays.asList(currNumAltRight, currNumAltLeft)) {
-					if (currNumAlt != Integer.MAX_VALUE) {
-//						int currIndNumAlt = keys.indexOf(currNumAlt);
-						
+					if (currNumAlt != Integer.MAX_VALUE) {						
 						List<Object> currGrids = createGrids(currNumAlt, 0);
 						Integer[] currMpcGrid = (Integer[]) currGrids.get(0);
 						String[] currAltGrid = (String[]) currGrids.get(1);
 						String[] currPcGrid = (String[]) currGrids.get(2);
-						
-//						Integer[] currMpcGrid = mpcGridAll[currIndNumAlt];
+
 						// If mpc is in the current key
 						if (Arrays.asList(currMpcGrid).contains(mpc)) {
 							int currIndMpc = Arrays.asList(currMpcGrid).indexOf(mpc);
 							pname = currPcGrid[currIndMpc];
-//							pname = pcGridAll[currIndNumAlt][currIndMpc];
 							accid = currAltGrid[currIndMpc];
-//							accid = aGridAll[currIndNumAlt][currIndMpc];
 							if (considerContext) {
 								boolean isInEffect = false; 
 								// If mpc is a KA in the current key: flat or sharp
@@ -675,22 +659,10 @@ public class PitchKeyTools {
 										// Not a double flat
 										if (!accid.equals("ff")) {
 											isInEffect = addToListIfNotInList(flatsInEffect, pitch);
-//											if (!flatsInEffect.contains(pitch)) {
-//												flatsInEffect.add(pitch);
-//											}
-//											else {
-//												isInEffect = true;
-//											}
 										}
 										// Double flat
 										else {
 											isInEffect = addToListIfNotInList(doubleFlatsInEffect, pitch);
-//											if (!doubleFlatsInEffect.contains(pitch)) {
-//												doubleFlatsInEffect.add(pitch);
-//											}
-//											else {
-//												isInEffect = true;
-//											}
 										}
 									}
 									// Sharps
@@ -698,34 +670,16 @@ public class PitchKeyTools {
 										// Not a double sharp
 										if (!accid.equals("x")) {
 											isInEffect = addToListIfNotInList(sharpsInEffect, pitch);
-//											if (!sharpsInEffect.contains(pitch)) {
-//												sharpsInEffect.add(pitch);
-//											}
-//											else {
-//												isInEffect = true;
-//											}
 										}
 										// Double sharp
 										else {
 											isInEffect = addToListIfNotInList(doubleSharpsInEffect, pitch);
-//											if (!doubleSharpsInEffect.contains(pitch)) {
-//												doubleSharpsInEffect.add(pitch);
-//											}
-//											else {
-//												isInEffect = true;
-//											}
 										}
 									}
 								}
 								// If mpc is not a KA in the current key: natural
 								else {
 									isInEffect = addToListIfNotInList(naturalsInEffect, pitch);
-//									if (!naturalsInEffect.contains(pitch)) {
-//										naturalsInEffect.add(pitch);
-//									}
-//									else {
-//										isInEffect = true;
-//									}
 								}
 								// If pitch was already an accidental in effect: set accidGes
 								if (isInEffect) {
@@ -738,12 +692,6 @@ public class PitchKeyTools {
 					}
 				}
 			}
-
-			// 0  1  2  3  4  5  6  7 8  9  10 11 12 13 14
-			// Fb Cb Gb Db Ab Eb Bb X F# C# G# D# A# E# B#
-			// -7 -6 -5 -4 -3 -2 -1 0 1  2  3  4  5  6  7
-			// key = G
-			// midi nr = 10: Bb or A#?
 		}
 		String[] pa = new String[]{pname, accid, accidGes};
 		return Arrays.asList(new Object[]{pa, accidsInEffect});
@@ -859,12 +807,8 @@ public class PitchKeyTools {
 
 		String keySigAccidType = numAlt <= 0 ? "f" : "s";
 		// Key sig accidentals as MIDI pitch classes (e.g. 10, 3 for Bb, Eb)
-		List<Integer> keySigAccidMpc = new ArrayList<>();
-		for (int i = 0; i < altGrid.length; i++) {
-			if (altGrid[i].equals(keySigAccidType)) {
-				keySigAccidMpc.add(mpcGrid[i]);
-			}
-		}
+		List<Integer> keySigAccidMpc = getMIDIPitchClassKeySigs(numAlt);
+
 
 		List<Integer> doubleFlatsInEffect = null;
 		List<Integer> flatsInEffect = null; 

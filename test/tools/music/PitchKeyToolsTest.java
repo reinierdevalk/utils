@@ -271,7 +271,37 @@ public class PitchKeyToolsTest {
 
 	@Test
 	public void testGetRootAndAlteration() {
-		
+		List<String[]> expected = Arrays.asList(
+			new String[]{"C", ""}, new String[]{"A", ""}, 
+			new String[]{"F", ""}, new String[]{"D", ""}, 
+			new String[]{"B", "1"}, new String[]{"G", ""}, 
+			new String[]{"E", "1"}, new String[]{"C", ""}, 
+			new String[]{"G", ""}, new String[]{"E", ""}, 
+			new String[]{"D", ""}, new String[]{"B", ""}, 
+			new String[]{"F", "1"}, new String[]{"D", "1"}, 
+			new String[]{"C", "1"}, new String[]{"A", "1"} 
+		);
+
+		List<String[]> actual = new ArrayList<>();
+		List<Integer[]> keyAndMode = Arrays.asList(
+			new Integer[]{0, 0}, new Integer[]{0, 1},   // C/am
+			new Integer[]{-1, 0}, new Integer[]{-1, 1}, // F/dm
+			new Integer[]{-2, 0}, new Integer[]{-2, 1}, // Bb/gm
+			new Integer[]{-3, 0}, new Integer[]{-3, 1}, // Eb/cm
+			new Integer[]{1, 0}, new Integer[]{1, 1},   // G/em
+			new Integer[]{2, 0}, new Integer[]{2, 1},   // D/bm
+			new Integer[]{6, 0}, new Integer[]{6, 1},   // F#/d#m
+			new Integer[]{7, 0}, new Integer[]{7, 1}    // C#/a#m
+		);
+		keyAndMode.forEach(in -> actual.add(PitchKeyTools.getRootAndRootAlteration(in[0], in[1])));
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).length, actual.get(i).length);
+			for (int j = 0; j < expected.get(i).length; j++) {
+				assertEquals(expected.get(i)[j], actual.get(i)[j]);
+			}
+		}
 	}
 
 
@@ -279,24 +309,24 @@ public class PitchKeyToolsTest {
 	public void testDetectKey() {
 		// 3vv
 		int BWV_847 = -3;
-		int BWV_848 = -5; // ks in score is 7 (C# major) -- detection fails --> MORE THAN 5 KA
-		int BWV_851 = 0; // ks in score is -1 (d minor) -- detection fails because there are more B than Bb (47:48) --> FAIL
+		int BWV_848 = -5; // ks in score is 7 (C# major) -- spelt as Db major (enharmonically equivalent); check fails at 'more F# than F': key has also E# 
+		int BWV_851 = 0;  // ks in score is -1 (d minor) -- fail because there are more B than Bb (47:48) (raised 6th) --> PREREQ FOR ALG NOT MET
 		int BWV_852 = -3;
-		int BWV_853 = 6; // ks in score is 6 (d# minor) -- detection fails --> MORE THAN 5 KA --> LUCKY
+		int BWV_853 = 6;  // ks in score is 6 (d# minor) -- correct result for both -6 and 6 (enharmonically equivalent); sharps chosen
 		int BWV_854 = 4;
 		int BWV_856 = -1;
-		int BWV_858 = 6; // ks in score is 6 (F# major) -- detection fails --> MORE THAN 5 KA --> LUCKY
+		int BWV_858 = 6;  // ks in score is 6 (F# major) -- correct result for both -6 and 6 (enharmonically equivalent); sharps chosen
 		int BWV_860 = 1;
 		int BWV_864 = 3;
 		int BWV_866 = -2;
 		int BWV_870 = 0;
-		int BWV_872 = -5; // ks in score is 7 (C# major) -- detection fails --> MORE THAN 5 KA
+		int BWV_872 = -5; // ks in score is 7 (C# major) -- spelt as Db major (enharmonically equivalent); check fails at 'more F# than F': key has also E#
 		int BWV_873 = 4;
 		int BWV_875 = -1;
 		int BWV_879 = 1;
 		int BWV_880 = -1;
 		int BWV_881 = -4;
-		int BWV_882 = 6; // ks in score is 6 (F# major) -- detection fails --> MORE THAN 5 KA --> LUCKY
+		int BWV_882 = 6;  // ks in score is 6 (F# major) -- correct result for both -6 and 6 (enharmonically equivalent); sharps chosen
 		int BWV_883 = 3;
 		int BWV_884 = 1;
 		int BWV_887 = 5;
@@ -314,8 +344,8 @@ public class PitchKeyToolsTest {
 		// 4vv
 		int BWV_846 = 0;
 		int BWV_850 = 2;
-		int BWV_857 = -3; // ks in score is -4 (f minor) -- detection fails because there are more D than Db (76:119) --> raised 6th
-		int BWV_859 = 4; // ks in score is 3 (f# minor) -- detection fails because there are more D# than D (46:54) --> raised 6th
+		int BWV_857 = -3; // ks in score is -4 (f minor) -- fail because there are more D than Db (76:119) (raised 6th) --> PREREQ FOR ALG NOT MET
+		int BWV_859 = 4;  // ks in score is 3 (f# minor) -- fail because there are more D# than D (46:54) (raised 6th) --> PREREQ FOR ALG NOT MET
 		int BWV_861 = -2;
 		int BWV_862 = -4;
 		int BWV_863 = 5;
@@ -325,15 +355,17 @@ public class PitchKeyToolsTest {
 		int BWV_871 = -3;
 		int BWV_874 = 2;
 		int BWV_876 = -3;
-		int BWV_877 = -6; // ks in score is 6 (d# minor) -- detection fails --> MORE THAN 5 KA
+		int BWV_877 = -6; // ks in score is 6 (d# minor) -- correct result for only -6 (enharmonically equivalent); check fails at 'more F# than F': key has also E#
 		int BWV_878 = 4;
 		int BWV_885 = -2;
 		int BWV_886 = -4;
 		int BWV_891 = -5;
 		int BWV_892 = 5;
 		expected.addAll(Arrays.asList(
-			BWV_846, BWV_850, BWV_857, BWV_859, BWV_861, BWV_862, BWV_863, BWV_865, BWV_868, BWV_869, 
-			BWV_871, BWV_874, BWV_876, BWV_877, BWV_878, BWV_885, BWV_886, BWV_891, BWV_892
+			BWV_846, BWV_850, 
+			BWV_857, BWV_859, BWV_861, BWV_862, BWV_863, BWV_865, BWV_868, BWV_869, 
+			BWV_871, BWV_874, BWV_876, 
+			BWV_877, BWV_878, BWV_885, BWV_886, BWV_891, BWV_892
 		));
 
 		List<Transcription> trans = new ArrayList<>();
