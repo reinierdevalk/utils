@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import tools.labels.LabelTools;
+import tools.text.StringTools;
 import de.uos.fmt.musitech.utility.math.Rational;
 import external.Tablature;
 import external.Transcription;
@@ -63,10 +64,10 @@ public class LabelToolsTest {
 		String mp = paths.get("MIDI_PATH");
 		String td = "test/5vv/";
 
-		encodingTestpiece = new File(CLInterface.getPathString(
+		encodingTestpiece = new File(StringTools.getPathString(
 			Arrays.asList(ep, td)) + "testpiece.tbp"
 		);
-		midiTestpiece = new File(CLInterface.getPathString(
+		midiTestpiece = new File(StringTools.getPathString(
 			Arrays.asList(mp, td)) + "testpiece.mid"
 		);
 	}

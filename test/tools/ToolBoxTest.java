@@ -17,6 +17,7 @@ import java.util.Map;
 import de.uos.fmt.musitech.utility.math.Rational;
 import interfaces.CLInterface;
 import internal.core.Encoding;
+import tools.text.StringTools;
 
 
 public class ToolBoxTest {
@@ -30,7 +31,7 @@ public class ToolBoxTest {
 		String ep = paths.get("ENCODINGS_PATH");
 		String td = "test/5vv/";
 
-		encodingTestpiece = new File(CLInterface.getPathString(
+		encodingTestpiece = new File(StringTools.getPathString(
 			Arrays.asList(ep, td)) + "testpiece.tbp"
 		);
 		delta = 1e-9;

@@ -11,6 +11,7 @@ import external.Transcription;
 import interfaces.CLInterface;
 import internal.core.ScorePiece;
 import tools.ToolBox;
+import tools.text.StringTools;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,9 +32,9 @@ public class PitchKeyToolsTest {
 		String mp = paths.get("MIDI_PATH");
 		String td = "test/5vv/";
 		String bd = "bach-WTC/thesis/";
-		bachPath = CLInterface.getPathString(Arrays.asList(mp, bd));
+		bachPath = StringTools.getPathString(Arrays.asList(mp, bd));
 
-		midiTestpiece = new File(CLInterface.getPathString(
+		midiTestpiece = new File(StringTools.getPathString(
 			Arrays.asList(mp, td)) + "testpiece.mid"
 		);		
 	}
@@ -372,13 +373,13 @@ public class PitchKeyToolsTest {
 		List<String> three = ToolBox.getFilesInFolder(bachPath + "3vv/", Arrays.asList(MIDIImport.MID_EXT), true);
 		three = ToolBox.sortBySubstring(three, "BWV_", null, "number");
 		for (String p : three) {
-			File f = new File(CLInterface.getPathString(Arrays.asList(bachPath, "3vv/")) + p);
+			File f = new File(StringTools.getPathString(Arrays.asList(bachPath, "3vv/")) + p);
 			trans.add(new Transcription(f));
 		}
 		List<String> four = ToolBox.getFilesInFolder(bachPath + "4vv/", Arrays.asList(MIDIImport.MID_EXT), true);
 		four = ToolBox.sortBySubstring(four, "BWV_", null, "number");
 		for (String p : four) {
-			File f = new File(CLInterface.getPathString(Arrays.asList(bachPath, "4vv/")) + p);
+			File f = new File(StringTools.getPathString(Arrays.asList(bachPath, "4vv/")) + p);
 			trans.add(new Transcription(f));
 		}
 

@@ -2,6 +2,7 @@ package tools.text;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -135,5 +136,57 @@ public class StringTools {
 			e.printStackTrace();
 		}
 		return m;
+	}
+
+
+	/**
+	 * Removes the extensions from the Strings in the given list.
+	 * 
+	 * @param l
+	 * @return
+	 */
+	// TESTED
+	public static List<String> removeExtensions(List<String> l) {
+		List<String> res = new ArrayList<>();
+		for (String s : l) {
+			if (s.contains(".")) {
+				res.add(s.substring(0, s.lastIndexOf(".")));
+			}
+			else {
+				res.add(s);
+			}
+		}
+
+		return res;
+
+		// This works if it is guaranteed that all List elements have an extension
+//		return l.stream()
+//			.map(s -> s.substring(0, s.lastIndexOf(".")))
+//			.collect(Collectors.toList());
+	}
+
+
+	/**
+	 * Constructs a path <code>String</code> from the given list of dir names.
+	 * The list elements are added in the order they appear in the list; a file
+	 * separator (/) is added to the end of the path.
+	 * 
+	 * @param l
+	 * @return
+	 */
+	public static String getPathString(List<String> l) {
+		Path path = Path.of(l.get(0));
+		for (int i = 1; i < l.size(); i++) {
+			path = path.resolve(l.get(i));
+		}
+		String pathStr = path.toString();
+		// Replace any backward slashes (Windows)
+		pathStr = pathStr.replace("\\", "/");
+		// Add final file separator
+		if (!pathStr.equals("")) {
+			pathStr += "/";
+		}
+	
+		return pathStr;
 	}
 }

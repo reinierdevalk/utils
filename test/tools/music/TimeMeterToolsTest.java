@@ -20,6 +20,7 @@ import external.Transcription;
 import interfaces.CLInterface;
 import internal.core.Encoding;
 import internal.structure.TimelineTest;
+import tools.text.StringTools;
 
 
 public class TimeMeterToolsTest {
@@ -49,10 +50,10 @@ public class TimeMeterToolsTest {
 		String ep = paths.get("ENCODINGS_PATH");
 		String td = "test/5vv/";
 
-		encodingTestpiece = new File(CLInterface.getPathString(
+		encodingTestpiece = new File(StringTools.getPathString(
 			Arrays.asList(ep, td)) + "testpiece.tbp"
 		);
-		encodingTestGetMeterInfo = new File(CLInterface.getPathString(
+		encodingTestGetMeterInfo = new File(StringTools.getPathString(
 			Arrays.asList(ep, td)) + "test_get_meter_info.tbp"
 		);
 //		midiTestpiece = new File(

@@ -66,4 +66,19 @@ public class StringToolsTest {
 		assertEquals(expected, actual);
 	}
 
+
+	@Test
+	public void testRemoveExtensions() {
+		List<String> expected = Arrays.asList("a", "b", "c", "d");
+		List<String> actual = StringTools.removeExtensions(
+			Arrays.asList("a.txt", "b.mei", "c.pdf", "d")
+		);
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i), actual.get(i));
+		}
+		
+	}
+
 }

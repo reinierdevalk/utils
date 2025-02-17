@@ -1,5 +1,6 @@
 package tools.music;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,12 +13,16 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import conversion.imports.TabImport;
 import de.uos.fmt.musitech.data.score.NotationChord;
 import de.uos.fmt.musitech.data.score.NotationStaff;
 import de.uos.fmt.musitech.data.score.NotationVoice;
 import de.uos.fmt.musitech.data.structure.Note;
 import interfaces.CLInterface;
+import internal.core.Encoding;
 import internal.core.ScorePiece;
+import internal.core.Encoding.Stage;
+import tools.ToolBox;
 import tools.text.StringTools;
 
 
@@ -93,22 +98,30 @@ public class PitchKeyTools {
 			}
 		}
 		else {
+			boolean dev = args[CLInterface.DEV_IND].equals(String.valueOf(true));
+			String type = args[1]; 
+
 			// NB If this class is called from Python, the _call_java() function reads the stdout
 			// returned by this class, and passes it to json.loads(). Therefore, in this class
 			// - System.out.println() (the stdout) must be used to return a json-formatted string
 			// - System.err.println() (the stderr) must be used for any debugging -- if the stdout
 			//   is used for this, it makes the output returned non-valid json
 			// 1. To make grids
-			if (args.length == 2) {
+			if (type.equals("grids")) {
 				verbose = false;
-				int numAlt;
-				if (args[0].equals(CLInterface.INPUT)) {
-					numAlt = 0; // TODO calculate with method
-				}
-				else {
-					numAlt = Integer.parseInt(args[0]);
-				}
-				int mode = Integer.parseInt(args[1]) == 0 ? 0 : 1;
+				int numAlt = Integer.parseInt(args[2]);
+				int mode = Integer.parseInt(args[3]); // == 0 ? 0 : 1;
+				
+//				String k = args[1];
+//				String m = args[2];
+//				int numAlt;
+//				if (args[0].equals(CLInterface.INPUT)) {
+//					numAlt = 0;
+//				}
+//				else {
+//					int numAlt = Integer.parseInt(args[1]);
+//				}
+
 				List<Object> grids = PitchKeyTools.createGrids(numAlt, mode);
 				Integer[] mpcGrid = (Integer[]) grids.get(0);
 				String[] altGrid = (String[]) grids.get(1);
@@ -127,34 +140,96 @@ public class PitchKeyTools {
 					.collect(Collectors.joining(", ")) + "]") + "}";
 				System.out.println(dict);
 			}
-			// 2. To spell pitch
-			else {
+			// 2. To detect key
+			else if (type.equals("key")) {
+				String tuning = args[2];
+				String file = args[3];
+
+				Map<String, String> paths = CLInterface.getPaths(dev);
+				String filePath = StringTools.getPathString(
+					Arrays.asList(paths.get("DIPLOMAT_PATH"), "in"
+				));
+				
+				// any format comes in, loses extension in parseCLIargs and is converted into tbp if not tbp
+				// this way, no need to worry about input format
+				// tbp file is deleted again
+				
+				boolean mimic = true;		
+				Encoding e;
+				if (mimic) {
+					// Mimic abtab java-style args
+					String opts = "-u -f -v";
+					String defaultVals = "i n/a n";
+					String uov = "-u " + tuning +"," + "-f " + file;
+					String[] argsJava = new String[4];
+					argsJava[CLInterface.DEV_IND] = Boolean.toString(dev);
+					argsJava[CLInterface.OPTS_IND] = opts;
+					argsJava[CLInterface.DEFAULT_VALS_IND] = defaultVals;
+					argsJava[CLInterface.USER_OPTS_VALS_IND] = uov;
+
+					List<Object> parsed = CLInterface.parseCLIArgs(
+						argsJava, StringTools.getPathString(
+							Arrays.asList(paths.get("DIPLOMAT_PATH"), "in")
+						)
+					);
+					Map<String, String> cliOptsVals = (Map<String, String>) parsed.get(0);
+					List<String> pieces = (List<String>) parsed.get(1);
+	
+					verbose = cliOptsVals.get(CLInterface.VERBOSE).equals("y") ? true : false;
+	
+//					for (Map.Entry<String, String> entry : cliOptsVals.entrySet()) {
+//						System.err.println(entry.getKey() + " -- " + entry.getValue());
+//					}
+//					System.err.println(pieces);
+	
+					String rawEncoding = TabImport.convertToTbp(filePath, cliOptsVals.get(CLInterface.FILE));
+					e = new Encoding(rawEncoding, ToolBox.splitExt(file)[0], Stage.RULES_CHECKED);
+//					e = CLInterface.getEncodingFromAnyFormat(filePath, cliOptsVals.get(CLInterface.FILE));
+//					e = new Encoding(new File(filePath + pieces.get(0) + Encoding.TBP_EXT));
+					e.overwriteTuning(cliOptsVals.get(CLInterface.TUNING));
+				}
+				else {
+					String rawEncoding = TabImport.convertToTbp(filePath, file);
+					e = new Encoding(rawEncoding, ToolBox.splitExt(file)[0], Stage.RULES_CHECKED);
+//					// If file is not tbp: convert
+//					e = CLInterface.getEncodingFromAnyFormat(filePath, file);
+//					e = new Encoding(new File(filePath + ToolBox.splitExt(file)[0] + Encoding.TBP_EXT));
+					e.overwriteTuning(tuning);
+				}
+				
+				System.err.print(e.getMetadata());
+				System.exit(0);
+				int key = detectKey(null, e);
+				System.out.println(-1);
+			}
+			// 3. To spell pitch
+			else if (type.equals("pitch")) {
 				verbose = true;
-				int pitch = Integer.parseInt(args[0]);
-				int numAlt = Integer.parseInt(args[1]);
+				int pitch = Integer.parseInt(args[2]);
+				int numAlt = Integer.parseInt(args[3]);
 				// Convert grids back from String. NB: The String representations of altGrid and
 				// pcGrid contain single quotes around the 'list' items; these need to be removed
 				// when constructing the Arrays
 				// mpcGrid
-				String mpcGridStr = args[2];
+				String mpcGridStr = args[4];
 				Integer[] mpcGrid = Arrays.stream(
 					mpcGridStr.substring(1, mpcGridStr.length()-1).split("\\s*,\\s*"))
 					.map(Integer::valueOf)
 					.toArray(Integer[]::new);
 				// altGrid
-				String altGridStr = args[3];
+				String altGridStr = args[5];
 				String[] altGrid = Arrays.stream(
 					altGridStr.substring(1, altGridStr.length()-1).split("\\s*,\\s*"))
 					.map(s -> s.replace("'", ""))
 					.toArray(String[]::new);
 				// pcGrid 
-				String pcGridStr = args[4];
+				String pcGridStr = args[6];
 				String[] pcGrid = Arrays.stream(
 					pcGridStr.substring(1, pcGridStr.length()-1).split("\\s*,\\s*"))
 					.map(s -> s.replace("'", ""))
 					.toArray(String[]::new);
 				// Convert accidsInEffect back from String.
-				String accidsInEffectStr = args[5];				
+				String accidsInEffectStr = args[7];				
 				List<List<Integer>> accidsInEffect = 
 					accidsInEffectStr.equals("null") ? null : 
 					StringTools.parseStringifiedListOfIntegers(accidsInEffectStr);
@@ -414,12 +489,18 @@ public class PitchKeyTools {
 	 * accidentals (KA) because of enharmonicity issues.
 	 *
 	 * @param sp
+	 * @param e
 	 * @return
 	 */
 	// TESTED
-	public static int detectKey(ScorePiece sp) {
-		List<Integer> pitchClassCounts = getPitchClassCount(sp);
-
+	public static int detectKey(ScorePiece sp, Encoding e) {
+		List<Integer> pitchClassCounts;
+		if (sp != null) {
+			pitchClassCounts = getPitchClassCount(sp);
+		}
+		else {
+			pitchClassCounts = null;
+		}
 //		String outp = "";
 //		for (String s : Arrays.asList("C", ".", "D", ".", "E", "F", ".", "G", ".", "A", ".", "B")) {
 //			outp += s + "   ";

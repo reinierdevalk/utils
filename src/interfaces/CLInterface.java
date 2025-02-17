@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import conversion.exports.MEIExport;
 import conversion.imports.MIDIImport;
@@ -20,6 +21,7 @@ import conversion.imports.TabImport;
 import external.Tablature;
 import external.Tablature.Tuning;
 import internal.core.Encoding;
+import internal.core.Encoding.Stage;
 import tbp.symbols.TabSymbol.TabSymbolSet;
 import tools.ToolBox;
 import tools.text.StringTools;
@@ -29,9 +31,10 @@ public class CLInterface {
 	private static final String PATHS_FILE_DEV = "paths-dev.json";
 	private static final String CONFIG_FILE = "config.cfg";
 
-	private static final int OPTS_IND = 1;
-	private static final int DEFAULT_VALS_IND = 2;
-	private static final int USER_OPTS_VALS_IND = 3;
+	public static final int DEV_IND = 0;
+	public static final int OPTS_IND = 1;
+	public static final int DEFAULT_VALS_IND = 2;
+	public static final int USER_OPTS_VALS_IND = 3;
 
 	
 	// CLI args (as in abtab script)
@@ -94,7 +97,7 @@ public class CLInterface {
 
 		// 2. Read the Map from the JSON file
 		Map<String, Map<String, String>> config = StringTools.readJSONFile(
-			getPathString(Arrays.asList(cp)) + (dev ? PATHS_FILE_DEV : PATHS_FILE)		
+			StringTools.getPathString(Arrays.asList(cp)) + (dev ? PATHS_FILE_DEV : PATHS_FILE)		
 		);
 		Map<String, String> paths = config.get("paths");
 		Map<String, String> files = config.get("files");
@@ -102,59 +105,59 @@ public class CLInterface {
 		// 3. Set paths in m
 		m = new LinkedHashMap<String, String>();
 		// a. Set ROOT_PATH and CODE_PATH
-		m.put("ROOT_PATH", getPathString(Arrays.asList(rp)));
-		m.put("CODE_PATH", getPathString(Arrays.asList(cp)));
+		m.put("ROOT_PATH", StringTools.getPathString(Arrays.asList(rp)));
+		m.put("CODE_PATH", StringTools.getPathString(Arrays.asList(cp)));
 		// b. Complete paths on ROOT_PATH by prepending ROOT_PATH
-		m.put("ENCODINGS_PATH", getPathString(
+		m.put("ENCODINGS_PATH", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("ENCODINGS_PATH"))
 		));
-		m.put("MIDI_PATH", getPathString(
+		m.put("MIDI_PATH", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("MIDI_PATH"))
 		));
-		m.put("ENCODINGS_PATH_JOSQUINTAB", getPathString(
+		m.put("ENCODINGS_PATH_JOSQUINTAB", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("ENCODINGS_PATH_JOSQUINTAB"))
 		));
-		m.put("MIDI_PATH_JOSQUINTAB", getPathString(
+		m.put("MIDI_PATH_JOSQUINTAB", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("MIDI_PATH_JOSQUINTAB"))
 		));
-		m.put("DATASETS_PATH", getPathString(
+		m.put("DATASETS_PATH", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("DATASETS_PATH"))
 		));
-		m.put("EXPERIMENTS_PATH", getPathString(
+		m.put("EXPERIMENTS_PATH", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("EXPERIMENTS_PATH"))
 		));
-		m.put("MODELS_PATH", getPathString(
+		m.put("MODELS_PATH", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("MODELS_PATH"))
 		));
-		m.put("TEMPLATES_PATH", getPathString(
+		m.put("TEMPLATES_PATH", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("TEMPLATES_PATH"))
 		));
-		m.put("ANALYSER_PATH", getPathString(
+		m.put("ANALYSER_PATH", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("ANALYSER_PATH"))
 		));
-		m.put("CONVERTER_PATH", getPathString(
+		m.put("CONVERTER_PATH", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("CONVERTER_PATH"))
 		));
-		m.put("TABMAPPER_PATH", getPathString(
+		m.put("TABMAPPER_PATH", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("TABMAPPER_PATH"))
 		));
-		m.put("DIPLOMAT_PATH", getPathString(
+		m.put("DIPLOMAT_PATH", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("DIPLOMAT_PATH"))
 		));
-		m.put("POLYPHONIST_PATH", getPathString(
+		m.put("POLYPHONIST_PATH", StringTools.getPathString(
 			Arrays.asList(rp, paths.get("POLYPHONIST_PATH"))
 		));
 		// c. Complete paths on CODE_PATH by prepending CODE_PATH
-		m.put("UTILS_PYTHON_PATH", getPathString(
+		m.put("UTILS_PYTHON_PATH", StringTools.getPathString(
 			Arrays.asList(cp, paths.get("UTILS_PYTHON_PATH"))
 		));
-		m.put("VOICE_SEP_PYTHON_PATH", getPathString(
+		m.put("VOICE_SEP_PYTHON_PATH", StringTools.getPathString(
 			Arrays.asList(cp, paths.get("VOICE_SEP_PYTHON_PATH"))
 		));
-		m.put("VOICE_SEP_MATLAB_PATH", getPathString(
+		m.put("VOICE_SEP_MATLAB_PATH", StringTools.getPathString(
 			Arrays.asList(cp, paths.get("VOICE_SEP_MATLAB_PATH"))
 		));
-		m.put("ANALYSIS_PYTHON_PATH", getPathString(
+		m.put("ANALYSIS_PYTHON_PATH", StringTools.getPathString(
 			Arrays.asList(cp, paths.get("ANALYSIS_PYTHON_PATH"))
 		));
 
@@ -207,7 +210,7 @@ public class CLInterface {
 	 * 
 	 * @return
 	 */
-	public static Map<String, String> getUserDefinedPaths(boolean dev) {
+	static Map<String, String> getUserDefinedPaths(boolean dev) {
 		try {
 			Map<String, String> userPaths = new HashMap<>();
 
@@ -235,7 +238,7 @@ public class CLInterface {
 
 			// Read config file
 			try (BufferedReader br = new BufferedReader(
-				new FileReader(getPathString(Arrays.asList(codePath)) + CONFIG_FILE))) {
+				new FileReader(StringTools.getPathString(Arrays.asList(codePath)) + CONFIG_FILE))) {
 //				new FileReader(getPathString(Arrays.asList(codePath)) + (dev ? CONFIG_FILE_DEV : CONFIG_FILE)))) {
 				String line;
 				while ((line = br.readLine()) != null) {
@@ -261,33 +264,8 @@ public class CLInterface {
 
 
 	/**
-	 * Constructs a path <code>String</code> from the given list of dir names.
-	 * The list elements are added in the order they appear in the list; a file
-	 * separator (/) is added to the end of the path.
-	 * 
-	 * @param l
-	 * @return
-	 */
-	// TODO move to more general class (ToolBox? StringTools?)
-	public static String getPathString(List<String> l) {
-		Path path = Path.of(l.get(0));
-		for (int i = 1; i < l.size(); i++) {
-			path = path.resolve(l.get(i));
-		}
-		String pathStr = path.toString();
-		// Replace any backward slashes (Windows)
-		pathStr = pathStr.replace("\\", "/");
-		// Add final file separator
-		if (!pathStr.equals("")) {
-			pathStr += "/";
-		}
-
-		return pathStr;
-	}
-
-
-	/**
-	 * Parses the given CLI arguments. 
+	 * Parses the given CLI arguments.
+	 *
 	 * @param args Has a fixed sequence -- see abtab script.
 	 * @param path
 	 * @return
@@ -297,10 +275,11 @@ public class CLInterface {
 		String[] defaultVals = args[DEFAULT_VALS_IND].split(" ");
 		String uov = args[USER_OPTS_VALS_IND];
 		String[] userOptsVals = !uov.equals("") ? uov.split(",") : new String[]{};
-		System.out.println("from CLIinterface.parseCLIArgs():");
-		System.out.println("opts :" + Arrays.asList(opts));
-		System.out.println("defs :" + Arrays.asList(defaultVals));
-		System.out.println("user :" + Arrays.asList(userOptsVals));
+		System.out.println("from CLInterface.parseCLIArgs():");
+		System.out.println("opts : " + Arrays.asList(opts));
+		System.out.println("defs : " + Arrays.asList(defaultVals));
+		System.out.println("user : " + Arrays.asList(userOptsVals));
+//		System.exit(0);
 
 		// Populate cliOptsVals with default values
 		Map<String, String> cliOptsVals = new LinkedHashMap<String, String>();
@@ -319,51 +298,21 @@ public class CLInterface {
 		if (path != null) {
 			// Single piece
 			if (!cliOptsVals.get(FILE).equals("n/a")) {
-				piecenames.add(ToolBox.splitExt(cliOptsVals.get(FILE))[0]);
+				piecenames.add(cliOptsVals.get(FILE));
+//				piecenames.add(ToolBox.splitExt(cliOptsVals.get(FILE))[0]);
 			}
 			// All pieces in path
 			else {
 				piecenames.addAll(ToolBox.getFilesInFolder(
-					path, cliOptsVals.get(FORMAT).equals("y") ? ALLOWED_FILE_FORMATS : 
-					Arrays.asList(MIDIImport.MID_EXT), false
+					path, cliOptsVals.get(FORMAT).equals("t") ? ALLOWED_FILE_FORMATS : 
+					Arrays.asList(MIDIImport.MID_EXT), true
 				));
 			}
-			// Convert any non-.tbp in piecenames to .tbp
-			convertToTbp(path, piecenames);
+//			// Convert any non-.tbp in piecenames to .tbp
+//			convertToTbp(path, piecenames);
 		}
 		
 		return Arrays.asList(new Object[]{cliOptsVals, piecenames});
-	}
-
-
-	/**
-	 * Converts, for each piece in piecenames, <inPath/piece> into the .tbp format (if it does 
-	 * not exist yet).
-	 * 
-	 * @param inPath
-	 * @param piecenames
-	 */
-	public static void convertToTbp(String inPath, List<String> piecenames) {
-		for (String p : piecenames) {
-			String ip = inPath + p;
-			if (!Files.exists(Paths.get(ip + Encoding.TBP_EXT))) {
-				// .tc file
-				if (Files.exists(Paths.get(ip + TabImport.TC_EXT))) {
-					String s = TabImport.tc2tbp(
-						ToolBox.readTextFile(new File(ip + TabImport.TC_EXT))
-					);
-					ToolBox.storeTextFile(s, new File(ip + Encoding.TBP_EXT));
-				}
-				// .mei file
-				else if (Files.exists(Paths.get(ip + MEIExport.MEI_EXT))) {
-					// TODO luteconv .mei -> .tc; TabImport.tc2tbp()
-				}
-				// .xml file 
-				else if (Files.exists(Paths.get(ip + MEIExport.XML_EXT))) {
-					// TODO luteconv .xml -> .tc; TabImport.tc2tbp()
-				}
-			}
-		}
 	}
 
 
@@ -421,6 +370,63 @@ public class CLInterface {
 		}
 
 		return transParams;
+	}
+
+
+	/**
+	 * Converts, for each piece in piecenames, <inPath/piece> into the .tbp format (if it does 
+	 * not exist yet).
+	 * 
+	 * @param inPath
+	 * @param piecenames
+	 */
+	private static void convertToTbp(String inPath, List<String> piecenames) {
+		for (String p : piecenames) {
+			String ip = inPath + p;
+			if (!Files.exists(Paths.get(ip + Encoding.TBP_EXT))) {
+				// .tc file
+				if (Files.exists(Paths.get(ip + TabImport.TC_EXT))) {
+					String s = TabImport.tc2tbp(
+						ToolBox.readTextFile(new File(ip + TabImport.TC_EXT))
+					);
+					ToolBox.storeTextFile(s, new File(ip + Encoding.TBP_EXT));
+				}
+				// .mei file
+				else if (Files.exists(Paths.get(ip + MEIExport.MEI_EXT))) {
+					// TODO luteconv .mei -> .tc; TabImport.tc2tbp()
+				}
+				// .xml file 
+				else if (Files.exists(Paths.get(ip + MEIExport.XML_EXT))) {
+					// TODO luteconv .xml -> .tc; TabImport.tc2tbp()
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Extracts an <code>Encoding</code> from the file in the given format.
+	 * 
+	 * @param path
+	 * @param filename
+	 * @return
+	 */
+	private static Encoding getEncodingFromAnyFormat(String path, String filename) {
+		Encoding e = null;
+		for (String s : CLInterface.ALLOWED_FILE_FORMATS) {
+			if (Files.exists(Paths.get(path + filename + s))) {
+				String rawEncoding;
+				if (s.equals(Encoding.TBP_EXT)) {
+					rawEncoding = ToolBox.readTextFile(new File(path + filename + s));
+				}
+				else {
+					rawEncoding = TabImport.convertToTbp(path, filename + s);
+				}
+				e = new Encoding(rawEncoding, filename, Stage.RULES_CHECKED);
+				break;
+			}
+		}
+		return e;
 	}
 
 }
