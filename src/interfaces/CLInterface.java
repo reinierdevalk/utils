@@ -274,10 +274,10 @@ public class CLInterface {
 		String[] defaultVals = args[DEFAULT_VALS_IND].split(" ");
 		String uov = args[USER_OPTS_VALS_IND];
 		String[] userOptsVals = !uov.equals("") ? uov.split(",") : new String[]{};
-//		System.out.println("from CLInterface.parseCLIArgs():");
-//		System.out.println("opts : " + Arrays.asList(opts));
-//		System.out.println("defs : " + Arrays.asList(defaultVals));
-//		System.out.println("user : " + Arrays.asList(userOptsVals));
+		System.err.println("from CLInterface.parseCLIArgs():");
+		System.err.println("opts : " + Arrays.asList(opts));
+		System.err.println("defs : " + Arrays.asList(defaultVals));
+		System.err.println("user : " + Arrays.asList(userOptsVals));
 //		System.exit(0);
 
 		// Populate cliOptsVals with default values
