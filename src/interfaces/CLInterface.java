@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import conversion.exports.MEIExport;
 import conversion.imports.MIDIImport;
@@ -266,7 +265,7 @@ public class CLInterface {
 	/**
 	 * Parses the given CLI arguments.
 	 *
-	 * @param args Has a fixed sequence -- see abtab script.
+	 * @param args Has a fixed sequence -- see <code>abtab</code> script.
 	 * @param path
 	 * @return
 	 */
@@ -275,10 +274,10 @@ public class CLInterface {
 		String[] defaultVals = args[DEFAULT_VALS_IND].split(" ");
 		String uov = args[USER_OPTS_VALS_IND];
 		String[] userOptsVals = !uov.equals("") ? uov.split(",") : new String[]{};
-		System.out.println("from CLInterface.parseCLIArgs():");
-		System.out.println("opts : " + Arrays.asList(opts));
-		System.out.println("defs : " + Arrays.asList(defaultVals));
-		System.out.println("user : " + Arrays.asList(userOptsVals));
+//		System.out.println("from CLInterface.parseCLIArgs():");
+//		System.out.println("opts : " + Arrays.asList(opts));
+//		System.out.println("defs : " + Arrays.asList(defaultVals));
+//		System.out.println("user : " + Arrays.asList(userOptsVals));
 //		System.exit(0);
 
 		// Populate cliOptsVals with default values

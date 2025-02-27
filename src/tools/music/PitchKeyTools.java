@@ -97,6 +97,7 @@ public class PitchKeyTools {
 				System.out.println(aie);
 			}
 		}
+		// Called from diplomat.py
 		else {
 			boolean dev = args[CLInterface.DEV_IND].equals(String.valueOf(true));
 			String type = args[1]; 
@@ -110,35 +111,19 @@ public class PitchKeyTools {
 			if (type.equals("grids")) {
 				verbose = false;
 				int numAlt = Integer.parseInt(args[2]);
-				int mode = Integer.parseInt(args[3]); // == 0 ? 0 : 1;
-				
-//				String k = args[1];
-//				String m = args[2];
-//				int numAlt;
-//				if (args[0].equals(CLInterface.INPUT)) {
-//					numAlt = 0;
-//				}
-//				else {
-//					int numAlt = Integer.parseInt(args[1]);
-//				}
+				int mode = Integer.parseInt(args[3]);
 
 				List<Object> grids = PitchKeyTools.createGrids(numAlt, mode);
 				Integer[] mpcGrid = (Integer[]) grids.get(0);
 				String[] altGrid = (String[]) grids.get(1);
 				String[] pcGrid = (String[]) grids.get(2);
-				String dict = 
-					"{\"mpcGrid\": " + Arrays.toString(mpcGrid) + ", " + 
-//					"\"altGrid\": " + Arrays.toString(altGrid) + ", " +
-//					"\"pcGrid\": " + Arrays.toString(pcGrid) + "}"; 
-					"\"altGrid\": " + ("[" + 
-					Arrays.asList(altGrid).stream()
-					.map(s -> "\"" + s + "\"") // s needs to be placed in double quotes for json.loads() 
-					.collect(Collectors.joining(", ")) + "]") + ", " +
-					"\"pcGrid\": " + ("[" + 
-					Arrays.asList(pcGrid).stream()
-					.map(s -> "\"" + s + "\"") // s needs to be placed in double quotes for json.loads()
-					.collect(Collectors.joining(", ")) + "]") + "}";
-				System.out.println(dict);
+
+				Map<String, Object> m = new LinkedHashMap<>();
+				m.put("mpcGrid", mpcGrid);
+				m.put("altGrid", altGrid);
+				m.put("pcGrid", pcGrid);
+				String pythonDict = StringTools.createJSONString(m);
+				System.out.println(pythonDict);
 			}
 			// 2. To detect key
 			else if (type.equals("key")) {
@@ -154,21 +139,21 @@ public class PitchKeyTools {
 				// this way, no need to worry about input format
 				// tbp file is deleted again
 				
-				boolean mimic = true;		
+				boolean mimic = false;		
 				Encoding e;
 				if (mimic) {
-					// Mimic abtab java-style args
+					// Mimic abtab args (java-style)
 					String opts = "-u -f -v";
 					String defaultVals = "i n/a n";
 					String uov = "-u " + tuning +"," + "-f " + file;
-					String[] argsJava = new String[4];
-					argsJava[CLInterface.DEV_IND] = Boolean.toString(dev);
-					argsJava[CLInterface.OPTS_IND] = opts;
-					argsJava[CLInterface.DEFAULT_VALS_IND] = defaultVals;
-					argsJava[CLInterface.USER_OPTS_VALS_IND] = uov;
+					String[] argsAbtabMimicked = new String[4];
+					argsAbtabMimicked[CLInterface.DEV_IND] = Boolean.toString(dev);
+					argsAbtabMimicked[CLInterface.OPTS_IND] = opts;
+					argsAbtabMimicked[CLInterface.DEFAULT_VALS_IND] = defaultVals;
+					argsAbtabMimicked[CLInterface.USER_OPTS_VALS_IND] = uov;
 
 					List<Object> parsed = CLInterface.parseCLIArgs(
-						argsJava, StringTools.getPathString(
+						argsAbtabMimicked, StringTools.getPathString(
 							Arrays.asList(paths.get("DIPLOMAT_PATH"), "in")
 						)
 					);
@@ -207,46 +192,38 @@ public class PitchKeyTools {
 				verbose = true;
 				int pitch = Integer.parseInt(args[2]);
 				int numAlt = Integer.parseInt(args[3]);
-				// Convert grids back from String. NB: The String representations of altGrid and
-				// pcGrid contain single quotes around the 'list' items; these need to be removed
-				// when constructing the Arrays
-				// mpcGrid
+				// Convert grids back from String
 				String mpcGridStr = args[4];
-				Integer[] mpcGrid = Arrays.stream(
-					mpcGridStr.substring(1, mpcGridStr.length()-1).split("\\s*,\\s*"))
-					.map(Integer::valueOf)
-					.toArray(Integer[]::new);
-				// altGrid
+				Integer[] mpcGrid = (Integer[]) StringTools.parseStringifiedPythonList(
+					mpcGridStr, "Array", "Integer"
+				);
 				String altGridStr = args[5];
-				String[] altGrid = Arrays.stream(
-					altGridStr.substring(1, altGridStr.length()-1).split("\\s*,\\s*"))
-					.map(s -> s.replace("'", ""))
-					.toArray(String[]::new);
-				// pcGrid 
+				String[] altGrid = (String[]) StringTools.parseStringifiedPythonList(
+					altGridStr, "Array", "String"
+				);
 				String pcGridStr = args[6];
-				String[] pcGrid = Arrays.stream(
-					pcGridStr.substring(1, pcGridStr.length()-1).split("\\s*,\\s*"))
-					.map(s -> s.replace("'", ""))
-					.toArray(String[]::new);
+				String[] pcGrid = (String[]) StringTools.parseStringifiedPythonList(
+					pcGridStr, "Array", "String"
+				);
 				// Convert accidsInEffect back from String.
 				String accidsInEffectStr = args[7];				
 				List<List<Integer>> accidsInEffect = 
 					accidsInEffectStr.equals("null") ? null : 
-					StringTools.parseStringifiedListOfIntegers(accidsInEffectStr);
+					(List<List<Integer>>) StringTools.parseStringifiedPythonList(
+						accidsInEffectStr, "List", "Integer"
+					);
 
-//				System.err.println("FROM JAVA");
-//				System.err.println(pitch);
-//				System.err.println(accidsInEffectStr);
 				List<Object> pitchSpell = spellPitch(
 					pitch, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), accidsInEffect
 				);
 				String[] pa = (String[]) pitchSpell.get(0);
-				String dict = 
-					"{\"pname\": " + "\"" + pa[0] + "\"" + ", " + // pa[<n>] needs to be placed in double quotes for json.loads()
-					"\"accid\": " + "\"" + pa[1] + "\"" + ", " +
-					"\"accid.ges\": " + "\"" + pa[2] + "\"" + ", " +
-					"\"accidsInEffect\": " + accidsInEffect.toString() + "}";
-				System.out.println(dict);
+				Map<String, String> m = new LinkedHashMap<>();
+				m.put("pname", pa[0]);
+				m.put("accid", pa[1]);
+				m.put("accid.ges", pa[2]);
+				m.put("accidsInEffect", accidsInEffect.toString());	
+				String pythonDict = StringTools.createJSONString(m);
+				System.out.println(pythonDict);
 			}
 		}
 	}
