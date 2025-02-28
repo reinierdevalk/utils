@@ -100,7 +100,7 @@ public class PitchKeyTools {
 		// Called from diplomat.py
 		else {
 			boolean dev = args[CLInterface.DEV_IND].equals(String.valueOf(true));
-			String type = args[1]; 
+			String type = args[1];
 
 			// NB If this class is called from Python, the _call_java() function reads the stdout
 			// returned by this class, and passes it to json.loads(). Therefore, in this class
@@ -127,61 +127,61 @@ public class PitchKeyTools {
 			}
 			// 2. To detect key
 			else if (type.equals("key")) {
+				verbose = false;
 				String tuning = args[2];
 				String file = args[3];
-
 				Map<String, String> paths = CLInterface.getPaths(dev);
 				String filePath = StringTools.getPathString(
 					Arrays.asList(paths.get("DIPLOMAT_PATH"), "in"
 				));
-				
-				// any format comes in, loses extension in parseCLIargs and is converted into tbp if not tbp
-				// this way, no need to worry about input format
-				// tbp file is deleted again
-				
-				boolean mimic = false;		
-				Encoding e;
-				if (mimic) {
-					// Mimic abtab args (java-style)
-					String opts = "-u -f -v";
-					String defaultVals = "i n/a n";
-					String uov = "-u " + tuning +"," + "-f " + file;
-					String[] argsAbtabMimicked = new String[4];
-					argsAbtabMimicked[CLInterface.DEV_IND] = Boolean.toString(dev);
-					argsAbtabMimicked[CLInterface.OPTS_IND] = opts;
-					argsAbtabMimicked[CLInterface.DEFAULT_VALS_IND] = defaultVals;
-					argsAbtabMimicked[CLInterface.USER_OPTS_VALS_IND] = uov;
 
-					List<Object> parsed = CLInterface.parseCLIArgs(
-						argsAbtabMimicked, StringTools.getPathString(
-							Arrays.asList(paths.get("DIPLOMAT_PATH"), "in")
-						)
-					);
-					Map<String, String> cliOptsVals = (Map<String, String>) parsed.get(0);
-					List<String> pieces = (List<String>) parsed.get(1);
-	
-					verbose = cliOptsVals.get(CLInterface.VERBOSE).equals("y") ? true : false;
-	
-//					for (Map.Entry<String, String> entry : cliOptsVals.entrySet()) {
-//						System.err.println(entry.getKey() + " -- " + entry.getValue());
-//					}
-//					System.err.println(pieces);
-	
-					String rawEncoding = TabImport.convertToTbp(filePath, cliOptsVals.get(CLInterface.FILE));
-					e = new Encoding(rawEncoding, ToolBox.splitExt(file)[0], Stage.RULES_CHECKED);
-//					e = CLInterface.getEncodingFromAnyFormat(filePath, cliOptsVals.get(CLInterface.FILE));
-//					e = new Encoding(new File(filePath + pieces.get(0) + Encoding.TBP_EXT));
-					e.overwriteTuning(cliOptsVals.get(CLInterface.TUNING));
-				}
-				else {
-					String rawEncoding = TabImport.convertToTbp(filePath, file);
-					e = new Encoding(rawEncoding, ToolBox.splitExt(file)[0], Stage.RULES_CHECKED);
-//					// If file is not tbp: convert
-//					e = CLInterface.getEncodingFromAnyFormat(filePath, file);
-//					e = new Encoding(new File(filePath + ToolBox.splitExt(file)[0] + Encoding.TBP_EXT));
-					e.overwriteTuning(tuning);
-				}
-				
+//				boolean mimic = false;		
+//				Encoding e;
+//				if (mimic) {
+//					// Mimic abtab args (java-style)
+//					String opts = "-u -f -v";
+//					String defaultVals = "i n/a n";
+//					String uov = "-u " + tuning +"," + "-f " + file;
+//					String[] argsAbtabMimicked = new String[4];
+//					argsAbtabMimicked[CLInterface.DEV_IND] = Boolean.toString(dev);
+//					argsAbtabMimicked[CLInterface.OPTS_IND] = opts;
+//					argsAbtabMimicked[CLInterface.DEFAULT_VALS_IND] = defaultVals;
+//					argsAbtabMimicked[CLInterface.USER_OPTS_VALS_IND] = uov;
+//
+//					List<Object> parsed = CLInterface.parseCLIArgs(
+//						argsAbtabMimicked, StringTools.getPathString(
+//							Arrays.asList(paths.get("DIPLOMAT_PATH"), "in")
+//						)
+//					);
+//					Map<String, String> cliOptsVals = (Map<String, String>) parsed.get(0);
+//					List<String> pieces = (List<String>) parsed.get(1);
+//	
+//					verbose = cliOptsVals.get(CLInterface.VERBOSE).equals("y") ? true : false;
+//	
+////					for (Map.Entry<String, String> entry : cliOptsVals.entrySet()) {
+////						System.err.println(entry.getKey() + " -- " + entry.getValue());
+////					}
+////					System.err.println(pieces);
+//	
+//					String rawEncoding = TabImport.convertToTbp(filePath, cliOptsVals.get(CLInterface.FILE));
+//					e = new Encoding(rawEncoding, ToolBox.splitExt(file)[0], Stage.RULES_CHECKED);
+////					e = CLInterface.getEncodingFromAnyFormat(filePath, cliOptsVals.get(CLInterface.FILE));
+////					e = new Encoding(new File(filePath + pieces.get(0) + Encoding.TBP_EXT));
+//					e.overwriteTuning(cliOptsVals.get(CLInterface.TUNING));
+//				}
+//				else {
+//					String rawEncoding = TabImport.convertToTbp(filePath, file);
+//					Encoding e = new Encoding(rawEncoding, ToolBox.splitExt(file)[0], Stage.RULES_CHECKED);
+////					// If file is not tbp: convert
+////					e = CLInterface.getEncodingFromAnyFormat(filePath, file);
+////					e = new Encoding(new File(filePath + ToolBox.splitExt(file)[0] + Encoding.TBP_EXT));
+//					e.overwriteTuning(tuning);
+//				}
+
+				String rawEncoding = TabImport.convertToTbp(filePath, file);
+				Encoding e = new Encoding(rawEncoding, ToolBox.splitExt(file)[0], Stage.RULES_CHECKED);
+				e.overwriteTuning(tuning);
+
 				System.err.print(e.getMetadata());
 				System.exit(0);
 				int key = detectKey(null, e);
@@ -189,9 +189,10 @@ public class PitchKeyTools {
 			}
 			// 3. To spell pitch
 			else if (type.equals("pitch")) {
-				verbose = true;
+				verbose = false;
 				int pitch = Integer.parseInt(args[2]);
 				int numAlt = Integer.parseInt(args[3]);
+
 				// Convert grids back from String
 				String mpcGridStr = args[4];
 				Integer[] mpcGrid = (Integer[]) StringTools.parseStringifiedPythonList(
@@ -205,7 +206,7 @@ public class PitchKeyTools {
 				String[] pcGrid = (String[]) StringTools.parseStringifiedPythonList(
 					pcGridStr, "Array", "String"
 				);
-				// Convert accidsInEffect back from String.
+				// Convert accidsInEffect back from String
 				String accidsInEffectStr = args[7];				
 				List<List<Integer>> accidsInEffect = 
 					accidsInEffectStr.equals("null") ? null : 
