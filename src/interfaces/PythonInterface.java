@@ -21,6 +21,31 @@ public class PythonInterface {
 	private static final boolean VERBOSE_APP = false;
 
 
+	public static boolean python2Installed() {
+		try {
+			// Try running the 'python2 --version' command
+			ProcessBuilder processBuilder = new ProcessBuilder("python2", "--version");
+			processBuilder.redirectErrorStream(true); // Combine stdout and stderr
+			Process process = processBuilder.start();
+
+			// Read the output of the command
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				// Check if the output contains 'Python 2'
+				if (line.contains("Python 2")) {
+					return true;
+				}
+			}
+		} catch (Exception e) {
+			// Handle the case where the command fails (python2 not found)
+			return false;
+		}
+
+		return false;
+	}
+
+
 	/**
 	 * Runs a Python file as a script. 
 	 *    
