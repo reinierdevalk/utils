@@ -25,7 +25,8 @@ public class PythonInterface {
 		try {
 			// Try running the 'python2 --version' command
 			ProcessBuilder processBuilder = new ProcessBuilder("python2", "--version");
-			processBuilder.redirectErrorStream(true); // Combine stdout and stderr
+			// Combine stdout and stderr
+			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
 
 			// Read the output of the command

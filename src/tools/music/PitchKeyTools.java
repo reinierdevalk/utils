@@ -18,6 +18,7 @@ import de.uos.fmt.musitech.data.score.NotationChord;
 import de.uos.fmt.musitech.data.score.NotationStaff;
 import de.uos.fmt.musitech.data.score.NotationVoice;
 import de.uos.fmt.musitech.data.structure.Note;
+import external.Tablature;
 import interfaces.CLInterface;
 import internal.core.Encoding;
 import internal.core.ScorePiece;
@@ -183,9 +184,8 @@ public class PitchKeyTools {
 				e.overwriteTuning(tuning);
 
 				System.err.print(e.getMetadata());
-				System.exit(0);
 				int key = detectKey(null, e);
-				System.out.println(-1);
+				System.out.println(key);
 			}
 			// 3. To spell pitch
 			else if (type.equals("pitch")) {
@@ -461,7 +461,8 @@ public class PitchKeyTools {
 
 
 	/**
-	 * Given a <code>ScorePiece</code>, detects its key (as the number of alterations).
+	 * Given a <code>ScorePiece</code> or <code>Encoding</code>, detects its key (as the number 
+	 * of alterations).
 	 *
 	 * This method does not always give good results for key signatures with more than five key 
 	 * accidentals (KA) because of enharmonicity issues.
@@ -472,13 +473,8 @@ public class PitchKeyTools {
 	 */
 	// TESTED
 	public static int detectKey(ScorePiece sp, Encoding e) {
-		List<Integer> pitchClassCounts;
-		if (sp != null) {
-			pitchClassCounts = getPitchClassCount(sp);
-		}
-		else {
-			pitchClassCounts = null;
-		}
+		List<Integer> pitchClassCounts = getPitchClassCount(sp, e);
+		
 //		String outp = "";
 //		for (String s : Arrays.asList("C", ".", "D", ".", "E", "F", ".", "G", ".", "A", ".", "B")) {
 //			outp += s + "   ";
@@ -550,24 +546,35 @@ public class PitchKeyTools {
 
 
 	/**
-	 * Counts the pitch class frequencies for the given <code>ScorePiece</code>, where C is pitch
-	 * class 0, C#/Db pitch class 1, etc.
+	 * Counts the pitch class frequencies for the given <code>ScorePiece</code> or <code>Encoding</code>, 
+	 * where C is pitch class 0, C#/Db pitch class 1, etc.
 	 *
 	 * @param sp
+	 * @param e
 	 * @return A list containing 12 elements, each representing a pitch class. The value of the element
 	 *         is the frequency of the represented pitch class.
 	 */
 	// TESTED
-	static List<Integer> getPitchClassCount(ScorePiece sp) {
+	static List<Integer> getPitchClassCount(ScorePiece sp, Encoding e) {
 		List<Integer> pitchClassCounts = new ArrayList<>(Collections.nCopies(12, 0));
-		for (NotationStaff nst : sp.getScore()) {
-			for (NotationVoice nv : nst) {
-				for (NotationChord nc : nv) {
-					for (Note n : nc) {
-						int pc = n.getMidiPitch() % 12;
-						pitchClassCounts.set(pc, pitchClassCounts.get(pc) +1);
+		if (sp != null) {
+			for (NotationStaff nst : sp.getScore()) {
+				for (NotationVoice nv : nst) {
+					for (NotationChord nc : nv) {
+						for (Note n : nc) {
+							int pc = n.getMidiPitch() % 12;
+							pitchClassCounts.set(pc, pitchClassCounts.get(pc) +1);
+						}
 					}
 				}
+			}
+		}
+		else {
+			Tablature t = new Tablature(e, false);
+			Integer[][] btp = t.getBasicTabSymbolProperties();
+			for (Integer[] in : btp) {
+				int pc = in[Tablature.PITCH] % 12;
+				pitchClassCounts.set(pc, pitchClassCounts.get(pc) +1);
 			}
 		}
 

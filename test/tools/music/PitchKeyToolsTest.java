@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import conversion.imports.MIDIImport;
+import external.Tablature;
 import external.Transcription;
 import interfaces.CLInterface;
 import internal.core.ScorePiece;
@@ -23,17 +24,22 @@ import java.util.Map;
 public class PitchKeyToolsTest {
 
 	private Map<String, String> paths;
+	private File encodingTestpiece;
 	private File midiTestpiece;
 	private String bachPath;
 
 	@Before
 	public void setUp() throws Exception {
 		paths = CLInterface.getPaths(true);
+		String ep = paths.get("ENCODINGS_PATH");
 		String mp = paths.get("MIDI_PATH");
 		String td = "test/5vv/";
 		String bd = "bach-WTC/thesis/";
 		bachPath = StringTools.getPathString(Arrays.asList(mp, bd));
 
+		encodingTestpiece = new File(StringTools.getPathString(
+			Arrays.asList(ep, td)) + "testpiece.tbp"
+		);		
 		midiTestpiece = new File(StringTools.getPathString(
 			Arrays.asList(mp, td)) + "testpiece.mid"
 		);		
@@ -308,6 +314,8 @@ public class PitchKeyToolsTest {
 
 	@Test
 	public void testDetectKey() {
+		int tab = 0;
+
 		// 3vv
 		int BWV_847 = -3;
 		int BWV_848 = -5; // ks in score is 7 (C# major) -- spelt as Db major (enharmonically equivalent); check fails at 'more F# than F': key has also E# 
@@ -336,6 +344,7 @@ public class PitchKeyToolsTest {
 		int BWV_890 = -2;
 		int BWV_893 = 2;
 		List<Integer> expected = new ArrayList<>();
+		expected.add(tab);
 		expected.addAll(Arrays.asList(
 			BWV_847, BWV_848, BWV_851, BWV_852, BWV_853, BWV_854, BWV_856, BWV_858, BWV_860, 
 			BWV_864, BWV_866, BWV_870, BWV_872, BWV_873, BWV_875, BWV_879, BWV_880, BWV_881, 
@@ -384,8 +393,9 @@ public class PitchKeyToolsTest {
 		}
 
 		List<Integer> actual = new ArrayList<>();
+		actual.add(PitchKeyTools.detectKey(null, new Tablature(encodingTestpiece, false).getEncoding()));
 		for (int i = 0; i < trans.size(); i++) {
-			actual.add(PitchKeyTools.detectKey(trans.get(i).getScorePiece()));
+			actual.add(PitchKeyTools.detectKey(trans.get(i).getScorePiece(), null));
 		}
 
 		assertEquals(expected.size(), actual.size());
@@ -398,10 +408,14 @@ public class PitchKeyToolsTest {
 
 	@Test
 	public void testGetPitchClassCounts() {
-		Transcription t = new Transcription(midiTestpiece);
+		Tablature tab = new Tablature(encodingTestpiece, false);
+		Transcription trans = new Transcription(midiTestpiece);
 
-		List<Integer> expected = Arrays.asList(4, 0, 2, 0, 3, 3, 1, 0, 4, 20, 0, 3);
-		List<Integer> actual = PitchKeyTools.getPitchClassCount(t.getScorePiece());
+		List<Integer> expected = new ArrayList<Integer>(Arrays.asList(4, 0, 2, 0, 3, 2, 1, 0, 4, 20, 0, 3)); // tab
+		expected.addAll(Arrays.asList(4, 0, 2, 0, 3, 3, 1, 0, 4, 20, 0, 3)); // trans
+
+		List<Integer> actual = PitchKeyTools.getPitchClassCount(null, tab.getEncoding()); // tab
+		actual.addAll(PitchKeyTools.getPitchClassCount(trans.getScorePiece(), null)); // trans
 
 		assertEquals(expected.size(), actual.size());
 		for (int i = 0; i < expected.size(); i++) {
