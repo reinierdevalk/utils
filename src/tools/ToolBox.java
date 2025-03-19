@@ -39,6 +39,7 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
 
 import de.uos.fmt.musitech.utility.math.Rational;
+import tools.text.StringTools;
 
 
 public class ToolBox {
@@ -270,7 +271,8 @@ public class ToolBox {
 				e.printStackTrace();           
 			}       
 		}
-		return contents.toString();
+		return StringTools.crlf2lf(contents.toString());
+//		return contents.toString();
 //		return contents.toString().replace("\r\n\r\n", "\r\n");
 	}
 

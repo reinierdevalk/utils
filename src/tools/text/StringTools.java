@@ -252,6 +252,12 @@ public class StringTools {
 	}
 
 
+	// TESTED
+	public static String crlf2lf(String s) {
+		return s.replace("\r\n", "\n");
+	}
+
+
 	/**
 	 * Removes the extensions from the Strings in the given list.
 	 * 

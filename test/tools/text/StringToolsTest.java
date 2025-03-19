@@ -219,6 +219,17 @@ public class StringToolsTest {
 
 
 	@Test
+	public void testCrlf2lf() {
+		String s = "a\r\nb\r\nc";
+
+		String expected = "a\nb\nc";
+		String actual = StringTools.crlf2lf(s);
+
+		assertEquals(expected, actual);
+	}
+
+
+	@Test
 	public void testRemoveExtensions() {
 		List<String> expected = Arrays.asList("a", "b", "c", "d");
 		List<String> actual = StringTools.removeExtensions(
