@@ -68,7 +68,7 @@ public class PythonInterface {
 			if (VERBOSE) System.out.println(">>> output received from Process (Python)");
 			String line = null;
 			while((line = bfr.readLine()) != null) {
-				scriptOutput += line + "\r\n";
+				scriptOutput += line + "\n"; // WOENS
 //				if (VERBOSE) System.out.println(line);
 			}
 //			System.out.println(scriptOutput);
