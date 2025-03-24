@@ -179,7 +179,7 @@ public class PitchKeyTools {
 //					e.overwriteTuning(tuning);
 //				}
 
-				String rawEncoding = TabImport.convertToTbp(filePath, file);
+				String rawEncoding = TabImport.convertToTbp(filePath, file, paths);
 				Encoding e = new Encoding(rawEncoding, ToolBox.splitExt(file)[0], Stage.RULES_CHECKED);
 				e.overwriteTuning(tuning);
 

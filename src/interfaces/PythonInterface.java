@@ -69,7 +69,7 @@ public class PythonInterface {
 			String line = null;
 			while((line = bfr.readLine()) != null) {
 				scriptOutput += line + "\n"; // WOENS
-//				if (VERBOSE) System.out.println(line);
+				if (VERBOSE) System.out.println(line);
 			}
 //			System.out.println(scriptOutput);
 //			System.out.println(Arrays.asList(cmd));
@@ -87,6 +87,7 @@ public class PythonInterface {
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
+
 		return scriptOutput;
 	}
 

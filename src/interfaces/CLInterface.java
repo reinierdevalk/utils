@@ -159,8 +159,12 @@ public class CLInterface {
 		m.put("ANALYSIS_PYTHON_PATH", StringTools.getPathString(
 			Arrays.asList(cp, paths.get("ANALYSIS_PYTHON_PATH"))
 		));
+		m.put("FORMATS_PYTHON_PATH", StringTools.getPathString(
+			Arrays.asList(cp, paths.get("FORMATS_PYTHON_PATH"))
+		));
 
 		// 4. Set scripts in m
+		m.put("MEI2TBP_SCRIPT", files.get("MEI2TBP_SCRIPT"));
 		m.put("BEAM_SCRIPT", files.get("BEAM_SCRIPT"));
 		m.put("SCIKIT_SCRIPT", files.get("SCIKIT_SCRIPT"));
 		m.put("TENSORFLOW_SCRIPT", files.get("TENSORFLOW_SCRIPT"));
@@ -372,60 +376,66 @@ public class CLInterface {
 	}
 
 
-	/**
-	 * Converts, for each piece in piecenames, <inPath/piece> into the .tbp format (if it does 
-	 * not exist yet).
-	 * 
-	 * @param inPath
-	 * @param piecenames
-	 */
-	private static void convertToTbp(String inPath, List<String> piecenames) {
-		for (String p : piecenames) {
-			String ip = inPath + p;
-			if (!Files.exists(Paths.get(ip + Encoding.TBP_EXT))) {
-				// .tc file
-				if (Files.exists(Paths.get(ip + TabImport.TC_EXT))) {
-					String s = TabImport.tc2tbp(
-						ToolBox.readTextFile(new File(ip + TabImport.TC_EXT))
-					);
-					ToolBox.storeTextFile(s, new File(ip + Encoding.TBP_EXT));
-				}
-				// .mei file
-				else if (Files.exists(Paths.get(ip + MEIExport.MEI_EXT))) {
-					// TODO luteconv .mei -> .tc; TabImport.tc2tbp()
-				}
-				// .xml file 
-				else if (Files.exists(Paths.get(ip + MEIExport.XML_EXT))) {
-					// TODO luteconv .xml -> .tc; TabImport.tc2tbp()
-				}
-			}
-		}
+	public static boolean isWin() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.contains("win");
 	}
 
 
-	/**
-	 * Extracts an <code>Encoding</code> from the file in the given format.
-	 * 
-	 * @param path
-	 * @param filename
-	 * @return
-	 */
-	private static Encoding getEncodingFromAnyFormat(String path, String filename) {
-		Encoding e = null;
-		for (String s : CLInterface.ALLOWED_FILE_FORMATS) {
-			if (Files.exists(Paths.get(path + filename + s))) {
-				String rawEncoding;
-				if (s.equals(Encoding.TBP_EXT)) {
-					rawEncoding = ToolBox.readTextFile(new File(path + filename + s));
-				}
-				else {
-					rawEncoding = TabImport.convertToTbp(path, filename + s);
-				}
-				e = new Encoding(rawEncoding, filename, Stage.RULES_CHECKED);
-				break;
-			}
-		}
-		return e;
-	}
+//	/**
+//	 * Converts, for each piece in piecenames, <inPath/piece> into the .tbp format (if it does 
+//	 * not exist yet).
+//	 * 
+//	 * @param inPath
+//	 * @param piecenames
+//	 */
+//	private static void convertToTbp(String inPath, List<String> piecenames) {
+//		for (String p : piecenames) {
+//			String ip = inPath + p;
+//			if (!Files.exists(Paths.get(ip + Encoding.TBP_EXT))) {
+//				// .tc file
+//				if (Files.exists(Paths.get(ip + TabImport.TC_EXT))) {
+//					String s = TabImport.tc2tbp(
+//						ToolBox.readTextFile(new File(ip + TabImport.TC_EXT))
+//					);
+//					ToolBox.storeTextFile(s, new File(ip + Encoding.TBP_EXT));
+//				}
+//				// .mei file
+//				else if (Files.exists(Paths.get(ip + MEIExport.MEI_EXT))) {
+//					// TODO luteconv .mei -> .tc; TabImport.tc2tbp()
+//				}
+//				// .xml file 
+//				else if (Files.exists(Paths.get(ip + MEIExport.XML_EXT))) {
+//					// TODO luteconv .xml -> .tc; TabImport.tc2tbp()
+//				}
+//			}
+//		}
+//	}
+
+
+//	/**
+//	 * Extracts an <code>Encoding</code> from the file in the given format.
+//	 * 
+//	 * @param path
+//	 * @param filename
+//	 * @return
+//	 */
+//	private static Encoding getEncodingFromAnyFormat(String path, String filename) {
+//		Encoding e = null;
+//		for (String s : CLInterface.ALLOWED_FILE_FORMATS) {
+//			if (Files.exists(Paths.get(path + filename + s))) {
+//				String rawEncoding;
+//				if (s.equals(Encoding.TBP_EXT)) {
+//					rawEncoding = ToolBox.readTextFile(new File(path + filename + s));
+//				}
+//				else {
+//					rawEncoding = TabImport.convertToTbp(path, filename + s);
+//				}
+//				e = new Encoding(rawEncoding, filename, Stage.RULES_CHECKED);
+//				break;
+//			}
+//		}
+//		return e;
+//	}
 
 }

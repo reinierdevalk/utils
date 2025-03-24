@@ -17,8 +17,13 @@ lb = '\n'
 #                   (0.25, 'n', 'e'), (0.25, 'n', 'f'), (0.25, 'n', 'e'), (0.25, 'n', 'd'), 
 #                   (0.25, 'n', 'c'), (0.25, 'n', 'd'), (0.25, 'n', 'c'), (0.25, 'n', 'b')]]
 
-with open(file_) as file:
-	data = file.read().split('\n')
+# Arg is filename
+if file_.endswith('.txt'):
+	with open(file_) as file:
+		data = file.read().split('\n')
+# Arg is file content
+else:
+	data = file_.split('\n')	
 
 #with open('notes.txt') as file:  
 #    data = file.read().split('\n')
