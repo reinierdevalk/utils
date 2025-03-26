@@ -21,7 +21,32 @@ public class PythonInterface {
 	private static final boolean VERBOSE_APP = false;
 
 
-	public static boolean python2Installed() {
+	public static String selectPython() {
+		if (!CLInterface.isWin()) {
+			return "python3";
+		}
+		else {
+			return PythonInterface.isCommandAvailable("python3") ? "python3" : "python";
+		}
+	}
+
+
+	private static boolean isCommandAvailable(String command) {
+		try {
+			ProcessBuilder pb = new ProcessBuilder(command, "--version");
+			pb.redirectErrorStream(true);
+			Process process = pb.start();
+			process.waitFor();
+			// If exit code is 0, the command exists
+			return process.exitValue() == 0; 
+		} catch (IOException | InterruptedException e) {
+			// Command not found or failed
+			return false; 
+		}
+	}
+
+
+	private static boolean python2Installed() {
 		try {
 			// Try running the 'python2 --version' command
 			ProcessBuilder processBuilder = new ProcessBuilder("python2", "--version");
