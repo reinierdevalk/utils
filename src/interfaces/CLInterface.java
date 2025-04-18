@@ -275,7 +275,7 @@ public class CLInterface {
 	 */
 	public static List<Object> parseCLIArgs(String[] args, String path) {
 		for (int i = 0; i < args.length; i++) {
-			if ("__EMPTY__".equals(args[i])) {
+			if (args[i].equals("__EMPTY__")) {
 				args[i] = "";
 			}
 		}
