@@ -274,6 +274,12 @@ public class CLInterface {
 	 * @return
 	 */
 	public static List<Object> parseCLIArgs(String[] args, String path) {
+		for (int i = 0; i < args.length; i++) {
+			if ("__EMPTY__".equals(args[i])) {
+				args[i] = "";
+			}
+		}
+
 		String[] opts = args[OPTS_IND].split(" ");
 		String[] defaultVals = args[DEFAULT_VALS_IND].split(" ");
 		String uov = args[USER_OPTS_VALS_IND];
