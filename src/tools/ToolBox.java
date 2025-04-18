@@ -793,7 +793,7 @@ public class ToolBox {
 	// TESTED
 	public static String formatDouble(double d, int maxLen, int totalNumChars) {
 		// Convert the double to a String, making sure that no scientific notation is used
-		String s =  String.format("%.15f", d);
+		String s = String.format(Locale.US, "%.15f", d);
 		if (maxLen != 0) { 
 			s = zerofy(s, maxLen);
 		}
@@ -890,7 +890,7 @@ public class ToolBox {
 		}
 		// See https://stackoverflow.com/questions/36747661/java-how-to-align-text-in-jtextarea-regardless-of-length-of-characters
 		else {
-			return String.format("%-" + totalLen + "s", s);	
+			return String.format(Locale.US, "%-" + totalLen + "s", s);	
 		}
 	}
 
