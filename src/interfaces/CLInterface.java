@@ -172,9 +172,7 @@ public class CLInterface {
 		m.put("MODEL_PARAMETERS", files.get("MODEL_PARAMETERS"));
 
 //		System.out.println("completed paths:");
-//		for (Map.Entry<String, String> entry : m.entrySet()) {
-//			System.out.println(entry.getKey() + " -- " + entry.getValue());
-//		}
+//		ToolBox.printMap(m);
 //		System.exit(0);
 
 		return m;

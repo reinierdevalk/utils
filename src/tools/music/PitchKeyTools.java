@@ -158,10 +158,8 @@ public class PitchKeyTools {
 //					List<String> pieces = (List<String>) parsed.get(1);
 //	
 //					verbose = cliOptsVals.get(CLInterface.VERBOSE).equals("y") ? true : false;
-//	
-////					for (Map.Entry<String, String> entry : cliOptsVals.entrySet()) {
-////						System.err.println(entry.getKey() + " -- " + entry.getValue());
-////					}
+//
+////					ToolBox.printMap(cliOptsVals);
 ////					System.err.println(pieces);
 //	
 //					String rawEncoding = TabImport.convertToTbp(filePath, cliOptsVals.get(CLInterface.FILE));

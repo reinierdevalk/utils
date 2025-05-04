@@ -12,7 +12,6 @@ import java.io.OutputStreamWriter;
 public class PythonInterface {
 	
 	public static void main(String[] args) {
-		
 	}
 
 	// See https://norwied.wordpress.com/2012/03/28/call-python-script-from-java-app/ and

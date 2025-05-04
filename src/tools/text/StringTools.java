@@ -308,4 +308,5 @@ public class StringTools {
 
 		return pathStr;
 	}
+
 }

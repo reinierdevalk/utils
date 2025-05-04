@@ -720,8 +720,6 @@ public class PitchKeyToolsTest {
 		
 		List<List<Integer>> actual = new ArrayList<List<Integer>>();
 		for (Integer key : PitchKeyTools.KEY_SIG_MPCS.keySet()) {
-//		for (Entry<Integer, Integer[]> entry : MEIExport.getKeys().entrySet()) {
-//		for (Integer[] key : MEIExport.getKeys()) {
 			actual.add(PitchKeyTools.getMIDIPitchClassKeySigs(key));
 		}
 		

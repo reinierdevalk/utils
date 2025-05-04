@@ -31,6 +31,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -47,6 +48,13 @@ public class ToolBox {
 	public static final int TAB_LEN = 8;
 
 	public static void main(String[] args) {
+	}
+
+
+	public static <K, V> void printMap(Map<K, V> m) {
+		for (Map.Entry<K, V> entry : m.entrySet()) {
+			System.err.println(entry.getKey() + " -- " + entry.getValue());
+		}
 	}
 
 
