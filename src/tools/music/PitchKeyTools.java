@@ -1,6 +1,5 @@
 package tools.music;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,8 +20,8 @@ import de.uos.fmt.musitech.data.structure.Note;
 import external.Tablature;
 import interfaces.CLInterface;
 import internal.core.Encoding;
-import internal.core.ScorePiece;
 import internal.core.Encoding.Stage;
+import internal.core.ScorePiece;
 import tools.ToolBox;
 import tools.text.StringTools;
 

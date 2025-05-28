@@ -1,3 +1,4 @@
+import json
 import music21 as music21
 from sys import argv
 
@@ -159,7 +160,8 @@ for i in range(0, len(all_voices)):
 	if i < len(all_voices)-1:
 		as_string += lb  
 
-print(as_string)
+print(json.dumps([as_string]))
+#print(as_string)
 
 write_file = False
 if write_file:

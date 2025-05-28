@@ -7,6 +7,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.List;
+
+import tools.text.StringTools;
 
 
 public class PythonInterface {
@@ -78,7 +81,7 @@ public class PythonInterface {
 	 * @return Any lines output by the script.
 	 * @throws IOException
 	 */
-	public static String runPythonFileAsScript(String[] cmd) {
+	public static List<String> runPythonFileAsScript(String[] cmd) {
 		String scriptOutput = "";
 		if (VERBOSE) System.out.println(">>> PythonInterface.runPythonFileAsScript() called");
 		try {
@@ -112,7 +115,8 @@ public class PythonInterface {
 			t.printStackTrace();
 		}
 
-		return scriptOutput;
+		return StringTools.parseJSONString(scriptOutput);
+//		return scriptOutput;
 	}
 
 

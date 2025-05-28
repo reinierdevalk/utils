@@ -259,6 +259,23 @@ public class StringTools {
 
 
 	/**
+	 * Parses a JSON String returned by Python's <code>json.dumps()</code>.
+	 * 
+	 * @param s
+	 * @return
+	 */
+	public static List<String> parseJSONString(String s) {
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			return mapper.readValue(s, new TypeReference<List<String>>(){});
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+
+	/**
 	 * Removes the extensions from the Strings in the given list.
 	 * 
 	 * @param l
