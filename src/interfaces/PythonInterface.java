@@ -81,7 +81,7 @@ public class PythonInterface {
 	 * @return Any lines output by the script.
 	 * @throws IOException
 	 */
-	public static List<String> runPythonFileAsScript(String[] cmd) {
+	public static List<String> /*String*/ runPythonFileAsScript(String[] cmd) {
 		String scriptOutput = "";
 		if (VERBOSE) System.out.println(">>> PythonInterface.runPythonFileAsScript() called");
 		try {
