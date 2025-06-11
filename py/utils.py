@@ -71,6 +71,23 @@ def parse_tree(xml_contents: str): # -> Tuple
 	return (tree, root)
 
 
+def get_main_MEI_elements(root: ET.Element, ns: dict): # -> tuple
+	meiHead = root.find('mei:meiHead', ns)
+	music = root.find('mei:music', ns)
+
+	return (meiHead, music)
+
+
+def collect_xml_ids(root: ET.Element, key: str): # -> list
+	return [elem.attrib[key] for elem in root.iter() if key in elem.attrib]
+
+
+def find_first_elem_after(ind: int, elems_flat: list, tag: str):
+	return next(
+		(e for e in elems_flat[ind + 1:] if e.tag == tag), None
+	)
+
+
 def write_xml(root: ET.Element, filepath: str): # -> None
 	ET.ElementTree(root).write(
 		filepath, encoding='unicode', xml_declaration=True
