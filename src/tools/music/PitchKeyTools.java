@@ -187,41 +187,98 @@ public class PitchKeyTools {
 			// 3. To spell pitch
 			else if (type.equals("pitch")) {
 				verbose = false;
-				int pitch = Integer.parseInt(args[2]);
+//				int pitch = Integer.parseInt(args[2]);
 				int numAlt = Integer.parseInt(args[3]);
 
 				// Convert grids back from String
 				String mpcGridStr = args[4];
-				Integer[] mpcGrid = (Integer[]) StringTools.parseStringifiedPythonList(
-					mpcGridStr, "Array", "Integer"
-				);
-				String altGridStr = args[5];
-				String[] altGrid = (String[]) StringTools.parseStringifiedPythonList(
-					altGridStr, "Array", "String"
-				);
-				String pcGridStr = args[6];
-				String[] pcGrid = (String[]) StringTools.parseStringifiedPythonList(
-					pcGridStr, "Array", "String"
-				);
-				// Convert accidsInEffect back from String
-				String accidsInEffectStr = args[7];				
-				List<List<Integer>> accidsInEffect = 
-					accidsInEffectStr.equals("null") ? null : 
-					(List<List<Integer>>) StringTools.parseStringifiedPythonList(
-						accidsInEffectStr, "List", "Integer"
-					);
+				Integer[] mpcGrid = (Integer[]) StringTools.parseJSONString(mpcGridStr, 1, "Array", "Integer");
+//				Integer[] mpcGrid = (Integer[]) StringTools.parseStringifiedPythonList(
+//					mpcGridStr, "Array", "Integer"
+//				);
 
-				List<Object> pitchSpell = spellPitch(
-					pitch, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), accidsInEffect
+				String altGridStr = args[5];
+				String[] altGrid = (String[]) StringTools.parseJSONString(altGridStr, 1, "Array", "String");
+//				String[] altGrid = (String[]) StringTools.parseStringifiedPythonList(
+//					altGridStr, "Array", "String"
+//				);
+
+				String pcGridStr = args[6];
+				String[] pcGrid = (String[]) StringTools.parseJSONString(pcGridStr, 1, "Array", "String");
+//				String[] pcGrid = (String[]) StringTools.parseStringifiedPythonList(
+//					pcGridStr, "Array", "String"
+//				);
+
+				// Convert accidsInEffect back from String
+//				String accidsInEffectStr = args[7];
+//				System.err.println(accidsInEffectStr);
+//				List<List<Integer>> accidsInEffectOLD = (List<List<Integer>>) StringTools.parseJSONString(
+//					accidsInEffectStr, 2, "List", "Integer"
+//				);
+//				List<List<Integer>> accidsInEffect = 
+//					accidsInEffectStr.equals("null") ? null : 
+//					(List<List<Integer>>) StringTools.parseStringifiedPythonList(
+//						accidsInEffectStr, "List", "Integer"
+//					);
+				
+				// Convert unspelledByID back from String
+				String unspelledByIDStr = args[2];
+				List<List<String>> unspelledByID = (List<List<String>>) StringTools.parseJSONString(
+					unspelledByIDStr, 2, "List", "String"
 				);
-				String[] pa = (String[]) pitchSpell.get(0);
-				Map<String, String> m = new LinkedHashMap<>();
-				m.put("pname", pa[0]);
-				m.put("accid", pa[1]);
-				m.put("accid.ges", pa[2]);
-				m.put("accidsInEffect", accidsInEffect.toString());	
-				String pythonDict = StringTools.createJSONString(m);
-				System.out.println(pythonDict);
+//				List<List<Integer>> unspelledByID = 
+//					unspelledByIDStr.equals("null") ? null : 
+//					(List<List<Integer>>) StringTools.parseStringifiedPythonList(
+//						unspelledByIDStr, "List", "String"
+//					);
+
+				// Make List with five empty lists (double flats, flats, naturals, sharps, double sharps)  
+				Map<String, Map<String, String>> outerMap = new LinkedHashMap<>();
+				List<List<Integer>> accidsInEffect = IntStream.range(0, 5)
+					.mapToObj(i -> new ArrayList<Integer>())
+					.collect(Collectors.toList());
+				for (int i = 0; i < unspelledByID.size(); i++) {
+					List<String> note = unspelledByID.get(i);
+					String id = note.get(0);
+					int bar = Integer.parseInt(note.get(1));
+					int pitch = Integer.parseInt(note.get(2));
+					// Empty accidsInEffect if the current note is the first of a new bar 
+					if (i > 0) {
+						int prevBar = Integer.parseInt(unspelledByID.get(i - 1).get(1));
+						if (prevBar < bar) {
+							accidsInEffect = IntStream.range(0, 5)
+								.mapToObj(j -> new ArrayList<Integer>())
+								.collect(Collectors.toList());
+						}
+					}
+					List<Object> pitchSpell = spellPitch(
+						pitch, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), accidsInEffect
+					);
+					String[] pa = (String[]) pitchSpell.get(0);
+					Map<String, String> innerMap = new LinkedHashMap<>();
+					
+					innerMap.put("pname", pa[0]);
+					innerMap.put("accid", pa[1]);
+					innerMap.put("accid.ges", pa[2]);
+					innerMap.put("accidsInEffect", accidsInEffect.toString());
+					innerMap.put("pitch", String.valueOf(pitch));
+					outerMap.put(id, innerMap);
+//					String pythonDict = StringTools.createJSONString(m);
+//					res.add(pythonDict);
+					
+				}
+				
+//				List<Object> pitchSpell = spellPitch(
+//					666, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), accidsInEffect
+//				);
+//				String[] pa = (String[]) pitchSpell.get(0);
+//				Map<String, String> m = new LinkedHashMap<>();
+//				m.put("pname", pa[0]);
+//				m.put("accid", pa[1]);
+//				m.put("accid.ges", pa[2]);
+//				m.put("accidsInEffect", accidsInEffect.toString());	
+//				String json = StringTools.createJSONString(pythonDict);
+				System.out.println(StringTools.createJSONString(outerMap));
 			}
 		}
 	}

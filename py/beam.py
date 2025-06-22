@@ -2,9 +2,9 @@ import json
 import music21 as music21
 from sys import argv
 
-script, file_ = argv
+_, in_file = argv
 
-lb = '\n'
+LB = '\n'
 
 # https://web.mit.edu/music21/doc/moduleReference/moduleStreamMakeNotation.html#music21.stream.makeNotation.makeBeams
 # https://web.mit.edu/music21/doc/moduleReference/moduleBeam.html
@@ -19,12 +19,12 @@ lb = '\n'
 #                   (0.25, 'n', 'c'), (0.25, 'n', 'd'), (0.25, 'n', 'c'), (0.25, 'n', 'b')]]
 
 # Arg is filename
-if file_.endswith('.txt'):
-	with open(file_) as file:
+if in_file.endswith('.txt'):
+	with open(in_file) as file:
 		data = file.read().split('\n')
 # Arg is file content
 else:
-	data = file_.split('\n')	
+	data = in_file.split('\n')	
 
 #with open('notes.txt') as file:  
 #    data = file.read().split('\n')
@@ -119,32 +119,32 @@ def compute_beams(bars_curr_voice):
 			mei_note = mei_note.strip()
 			# In case of bar rest
 			if len(m21_bar) == 1 and (type(m21_bar[0]) is music21.note.Rest):
-				beamed_mei = beamed_mei + mei_note + lb 
+				beamed_mei = beamed_mei + mei_note + LB 
 			# In case of note or rest
 			else: # beams = m21_note.beams.beamsList 
 				# Rest: add 
 				if m21_note.isRest: # if len(beams) == 0: # if type(m21_bar[j]) is music21.note.Rest:
-					beamed_mei = beamed_mei + mei_note + lb
+					beamed_mei = beamed_mei + mei_note + LB
 				# Note: only the beginning and end of the topmost beam (beams[0]) are relevant
 				else:
 					beams = m21_note.beams.beamsList
 					if len(beams) == 0:                        
-						beamed_mei = beamed_mei + mei_note + lb
+						beamed_mei = beamed_mei + mei_note + LB
 					if len(beams) > 0:
 						# Start of beaming group
 						if '1/start' in str(beams[0]):
-#							beamed_mei = beamed_mei + '<beam>' + lb
-#							beamed_mei = beamed_mei + '    ' + mei_note + lb
-							beamed_mei = beamed_mei + '<beam>' + mei_note + lb
+#							beamed_mei = beamed_mei + '<beam>' + LB
+#							beamed_mei = beamed_mei + '    ' + mei_note + LB
+							beamed_mei = beamed_mei + '<beam>' + mei_note + LB
 						# End of beaming group beam 
 						elif '1/stop' in str(beams[0]):
-#							beamed_mei = beamed_mei + '    ' + mei_note + lb
-#							beamed_mei = beamed_mei + '</beam>' + lb
-							beamed_mei = beamed_mei + mei_note + '</beam>' + lb
+#							beamed_mei = beamed_mei + '    ' + mei_note + LB
+#							beamed_mei = beamed_mei + '</beam>' + LB
+							beamed_mei = beamed_mei + mei_note + '</beam>' + LB
 						# Middle beam of beaming group
 						else:
-#							beamed_mei = beamed_mei + '    ' + mei_note + lb
-							beamed_mei = beamed_mei + mei_note + lb
+#							beamed_mei = beamed_mei + '    ' + mei_note + LB
+							beamed_mei = beamed_mei + mei_note + LB
 
 		beams_output.append(beamed_mei)
 
@@ -153,12 +153,12 @@ def compute_beams(bars_curr_voice):
 as_string = ''
 for i in range(0, len(all_voices)):
 	bars_curr_voice = all_voices[i]
-#	as_string += 'voice ' + str(i) + lb
+#	as_string += 'voice ' + str(i) + LB
 	for item in compute_beams(bars_curr_voice):
-		as_string += item + 'end of bar' + lb
+		as_string += item + 'end of bar' + LB
 	as_string += 'end of voice' 
 	if i < len(all_voices)-1:
-		as_string += lb  
+		as_string += LB  
 
 print(json.dumps([as_string]))
 #print(as_string)

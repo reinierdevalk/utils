@@ -259,6 +259,108 @@ public class StringTools {
 
 
 	/**
+	 * Parses a String representation of a 1D or 2D Python list as returned by 
+	 * Python's <code>json.dumps()</code>.
+	 * 
+	 * @param s
+	 * @param ds Target data structure; one of <code>Array</code> or <code>List</code>.
+	 * @param dt Target data type; one of <code>String</code>, <code>Integer</code>, or <code>Double</code>.
+	 * @return The target data structure, which is 1D if the given String is a representation 
+	 *         of a 1D data structure and 2D if it is a representation of a 2D data structure.
+	 */
+	public static Object parseJSONString(String json, int dim, String ds, String dt) {
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			if (ds.equalsIgnoreCase("List")) {
+				if (dim == 1) {
+					switch (dt.toLowerCase()) {
+						case "string": return mapper.readValue(json, new TypeReference<List<String>>() {});
+						case "integer": return mapper.readValue(json, new TypeReference<List<Integer>>() {});
+						case "double": return mapper.readValue(json, new TypeReference<List<Double>>() {});
+						default: throw new IllegalArgumentException("Unsupported type for List: " + dt);
+					}
+				} else if (dim == 2) {
+					switch (dt.toLowerCase()) {
+						case "string": return mapper.readValue(json, new TypeReference<List<List<String>>>() {});
+						case "integer": return mapper.readValue(json, new TypeReference<List<List<Integer>>>() {});
+						case "double": return mapper.readValue(json, new TypeReference<List<List<Double>>>() {});
+						default: throw new IllegalArgumentException("Unsupported type for List: " + dt);
+					}
+				} else {
+					throw new IllegalArgumentException("Only dimensions 1 or 2 are supported.");
+				}
+			} else if (ds.equalsIgnoreCase("Array")) {
+				if (dim == 1) {
+					switch (dt.toLowerCase()) {
+						case "string": return mapper.readValue(json, String[].class);
+						case "integer": return mapper.readValue(json, Integer[].class);
+						case "double": return mapper.readValue(json, Double[].class);
+						default: throw new IllegalArgumentException("Unsupported type for Array: " + dt);
+					}
+				} else if (dim == 2) {
+					switch (dt.toLowerCase()) {
+						case "string": return mapper.readValue(json, String[][].class);
+						case "integer": return mapper.readValue(json, Integer[][].class);
+						case "double": return mapper.readValue(json, Double[][].class);
+						default: throw new IllegalArgumentException("Unsupported type for Array: " + dt);
+					}
+				} else {
+					throw new IllegalArgumentException("Only dimensions 1 or 2 are supported.");
+				}
+			} else {
+				throw new IllegalArgumentException("ds must be 'List' or 'Array'");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+
+	/**
+	 * Parses a JSON String returned by Python's <code>json.dumps()</code>. Accepts
+	 * 1D and 2D lists.
+	 * 
+	 * @param s
+	 * @param dim
+	 * @return 
+	 */
+	public static Object parseJSONString(String json, int dim, String ds) {
+		ObjectMapper mapper = new ObjectMapper();
+		
+		if (ds.equals("List")) {
+			try {
+				if (dim == 1) {
+					return mapper.readValue(json, new TypeReference<List<String>>() {});
+				} else if (dim == 2) {
+					return mapper.readValue(json, new TypeReference<List<List<String>>>() {});
+				} else {
+					throw new IllegalArgumentException("Only dimensions 1 or 2 are supported.");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		else {
+			try {
+				if (dim == 1) {
+					return mapper.readValue(json, String[].class);  // 1D array
+				} else if (dim == 2) {
+					return mapper.readValue(json, String[][].class);  // 2D array
+				} else {
+					throw new IllegalArgumentException("Only dimensions 1 or 2 are supported.");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+	}
+
+
+	/**
 	 * Parses a JSON String returned by Python's <code>json.dumps()</code>.
 	 * 
 	 * @param s

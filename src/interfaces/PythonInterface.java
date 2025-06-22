@@ -115,7 +115,8 @@ public class PythonInterface {
 			t.printStackTrace();
 		}
 
-		return StringTools.parseJSONString(scriptOutput);
+		return (List<String>) StringTools.parseJSONString(scriptOutput, 1, "List", "String");
+//		return StringTools.parseJSONString(scriptOutput);
 //		return scriptOutput;
 	}
 

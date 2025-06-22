@@ -14,9 +14,10 @@ A6G = 'A6G'
 MAJOR = '0'
 MINOR = '1'
 
-# --staff
+# --score
 SINGLE = 's'
 DOUBLE = 'd'
+VOCAL = 'v'
 
 # --tablature
 YES = 'y'
