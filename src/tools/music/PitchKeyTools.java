@@ -240,12 +240,15 @@ public class PitchKeyTools {
 				for (int i = 0; i < unspelledByID.size(); i++) {
 					List<String> note = unspelledByID.get(i);
 					String id = note.get(0);
-					int bar = Integer.parseInt(note.get(1));
+					String bar = note.get(1); // cannot be int because a bar can have an 'a', 'b', ... suffix
+//					int bar = Integer.parseInt(note.get(1));
 					int pitch = Integer.parseInt(note.get(2));
 					// Empty accidsInEffect if the current note is the first of a new bar 
 					if (i > 0) {
-						int prevBar = Integer.parseInt(unspelledByID.get(i - 1).get(1));
-						if (prevBar < bar) {
+						String prevBar = unspelledByID.get(i - 1).get(1); // cannot be int because a bar can have an 'a', 'b', ... suffix
+//						int prevBar = Integer.parseInt(unspelledByID.get(i - 1).get(1));
+						if (!prevBar.equals(bar)) {
+//						if (prevBar < bar) {
 							accidsInEffect = IntStream.range(0, 5)
 								.mapToObj(j -> new ArrayList<Integer>())
 								.collect(Collectors.toList());
