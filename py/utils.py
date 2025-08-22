@@ -3,6 +3,7 @@ import string
 import xml.etree.ElementTree as ET
 from py.constants import *
 from io import StringIO
+from xml.dom import minidom
 
 LEN_ID = 8
 
@@ -110,3 +111,23 @@ def print_all_labelled_elements(root: ET.Element, xml_id_key: str): # -> None
 			count += 1
 	print(f'{count} labelled elements in total\n')
 
+
+def pretty_print(elem: ET.Element) -> str:
+	rough_string = ET.tostring(elem, encoding='unicode')
+	parsed = minidom.parseString(rough_string)
+
+	# Remove whitespace-only text nodes
+	def strip_whitespace_nodes(node):
+		for child in list(node.childNodes):
+			if child.nodeType == child.TEXT_NODE and not child.data.strip():
+				node.removeChild(child)
+			elif child.hasChildNodes():
+				strip_whitespace_nodes(child)
+
+	strip_whitespace_nodes(parsed)
+
+	pretty = parsed.toprettyxml(indent="   ")
+	# Remove XML declaration if not needed
+	pretty = '\n'.join(line for line in pretty.split('\n') if line.strip() and not line.startswith('<?xml'))
+
+	return pretty
