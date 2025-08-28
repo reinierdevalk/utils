@@ -2,7 +2,9 @@ package tools.text;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +24,29 @@ import tools.ToolBox;
 public class StringTools {
 
 	public static void main(String[] args) {
+	}
+
+
+	/**
+	 * Reads a CSV file into a {@code List<String[]>}. Empty lines in the file are ignored.
+	 * 
+	 * @return
+	 */
+	public static List<String[]> readCSVFile(String f) {
+		List<String[]> l = new ArrayList<>();
+		try {
+			l = Files.lines(Paths.get(f))
+					.map(String::trim) // trim the line itself
+					.filter(line -> !line.isEmpty()) // skip empty lines
+					.map(line -> line.split(","))
+					.map(arr -> Arrays.stream(arr).map(String::trim).toArray(String[]::new))
+					.collect(Collectors.toList());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return l;
 	}
 
 

@@ -564,7 +564,7 @@ public class ToolBox {
 
 
 	/**
-	 * Reads the contents of the given csv file into a list. 
+	 * Reads the contents of the given CSV file into a list. 
 	 * 
 	 * @param contents
 	 * @param delimiter The delimiter used to separate inidividual line items
@@ -667,7 +667,7 @@ public class ToolBox {
 
 
 	/**
-	 * Stores the given List<List>> as a CSV-file.
+	 * Stores the given List<List>> as a CSV file.
 	 * 
 	 * @param matrix
 	 * @param file
@@ -694,7 +694,7 @@ public class ToolBox {
 
 
 	/**
-	 * Stores the given List<List>> as a CSV-file.
+	 * Stores the given List<List>> as a CSV file.
 	 * @param <T>
 	 * 
 	 * @param matrix

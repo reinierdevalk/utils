@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -301,20 +302,33 @@ public class CLInterface {
 		// Set piecenames
 		List<String> piecenames = new ArrayList<>();
 		if (path != null) {
-			// Single piece
-			if (!cliOptsVals.get(FILE).equals("n/a")) {
-				piecenames.add(cliOptsVals.get(FILE));
-//				piecenames.add(ToolBox.splitExt(cliOptsVals.get(FILE))[0]);
-			}
 			// All pieces in path
-			else {
+			if (cliOptsVals.get(FILE).equals("n/a")) {
 				piecenames.addAll(ToolBox.getFilesInFolder(
 					path, cliOptsVals.get(FORMAT).equals("t") ? ALLOWED_FILE_FORMATS : 
 					Arrays.asList(MIDIImport.MID_EXT), true
 				));
 			}
-//			// Convert any non-.tbp in piecenames to .tbp
-//			convertToTbp(path, piecenames);
+			// Selection of pieces or single piece
+			else {
+				// Selection of pieces
+				if (cliOptsVals.get(FILE).equals("files.txt")) {
+					List<String[]> l = StringTools.readCSVFile(Paths.get(path).getParent().resolve("files.txt").toString());
+					// tabmapper case where tab and MIDI file do not have the same name
+					if (l.get(0).length == 2) {
+						l.forEach(s -> piecenames.add(s[0] + "," + s[1]));
+					}
+					// Other cases
+					else {
+						l.forEach(s -> piecenames.add(s[0]));
+					}
+				}
+				// Single piece
+				else {
+					piecenames.add(cliOptsVals.get(FILE));
+//					piecenames.add(ToolBox.splitExt(cliOptsVals.get(FILE))[0]);
+				}
+			}
 		}
 		
 		return Arrays.asList(new Object[]{cliOptsVals, piecenames});
