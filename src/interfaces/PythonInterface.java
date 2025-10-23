@@ -81,7 +81,7 @@ public class PythonInterface {
 	 * @return Any lines output by the script.
 	 * @throws IOException
 	 */
-	public static List<String> /*String*/ runPythonFileAsScript(String[] cmd) {
+	public static List<String> /*String*/ runPythonFileAsScriptOLD(String[] cmd) {
 		String scriptOutput = "";
 		if (VERBOSE) System.out.println(">>> PythonInterface.runPythonFileAsScript() called");
 		try {
@@ -95,16 +95,13 @@ public class PythonInterface {
 			if (VERBOSE) System.out.println(">>> output received from Process (Python)");
 			String line = null;
 			while((line = bfr.readLine()) != null) {
-				scriptOutput += line + "\n"; // WOENS
+				scriptOutput += line + "\n";
 				if (VERBOSE) System.out.println(line);
 			}
-//			System.out.println(scriptOutput);
-//			System.out.println(Arrays.asList(cmd));
-//			System.out.println("Fuuuuuuuuuuuuuuuuuuu");
 
-			// bfrErr reads Process) errors (i.e., reads any errors given by the commands passed to Process). 
+			// bfrErr reads Process errors (i.e., reads any errors given by the commands passed to Process). 
 			// See Listing 4.3 at http://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html
-			BufferedReader bfrErr = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
+			BufferedReader bfrErr = new BufferedReader(new InputStreamReader(pr.getErrorStream()));			
 			if (VERBOSE) System.out.println(">>> errors received from Process (Python)");
 			line = null;
 			while ((line = bfrErr.readLine()) != null) {
@@ -118,6 +115,79 @@ public class PythonInterface {
 		return (List<String>) StringTools.parseJSONString(scriptOutput, 1, "List", "String");
 //		return StringTools.parseJSONString(scriptOutput);
 //		return scriptOutput;
+	}
+
+
+	/**
+	 * Runs a Python file as a script.
+	 *
+	 * <p>This method spawns a new process to execute a Python script with the given command-line
+	 * arguments. It captures the script's standard output (stdout) and standard error (stderr)
+	 * asynchronously in separate threads to prevent the process from blocking.</p>
+	 *
+	 * @param cmd The command to run the script, e.g.:
+	 *            <code>new String[]{"python", "path/to/file.py", "arg1", "arg2", ...}</code>
+	 * @return The lines output by the script (captured from stdout), parsed into a list of strings.
+	 * @throws IOException If the process cannot be started or the I/O streams cannot be read.
+	 */
+	public static List<String> runPythonFileAsScript(String[] cmd) {
+		StringBuilder scriptOutput = new StringBuilder();
+
+		if (VERBOSE) System.out.println(">>> PythonInterface.runPythonFileAsScript() called");
+		try {
+			// Create a Runtime instance to interface with the environment the Java application 
+			// is running in, and execute the given command to start the Python process
+			Runtime rt = Runtime.getRuntime();
+			Process pr = rt.exec(cmd);
+
+			// Read stdout in one thread
+			Thread outThread = new Thread(() -> {
+				// bfr reads the standard output of the Python process (stdout)
+				try (BufferedReader bfr = new BufferedReader(new InputStreamReader(pr.getInputStream()))) {
+					if (VERBOSE) System.out.println(">>> output received from Process (Python)");
+					String line;
+					while ((line = bfr.readLine()) != null) {
+						scriptOutput.append(line).append("\n");
+						if (VERBOSE) System.out.println(line);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+
+			// Read stderr in another thread
+			Thread errThread = new Thread(() -> {
+				// bfrErr reads the standard error output of the Python process (stderr)
+				try (BufferedReader bfrErr = new BufferedReader(new InputStreamReader(pr.getErrorStream()))) {
+					if (VERBOSE) System.out.println(">>> errors received from Process (Python)");
+					String line;
+					while ((line = bfrErr.readLine()) != null) {
+						if (VERBOSE) System.err.println(line);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+
+			// Start both threads so that stdout and stderr are read concurrently. This prevents 
+			// the Python process from blocking if one of its output buffers fills up
+			outThread.start();
+			errThread.start();
+
+			// Wait for the Python process to complete and for both reader threads to finish.
+			// - `waitFor()` blocks until the process terminates
+			// - `join()` ensures both threads have finished reading their respective streams
+			int exitCode = pr.waitFor();
+			outThread.join();
+			errThread.join();
+
+			if (VERBOSE) System.out.println(">>> Process exitValue: " + exitCode);
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+
+		// Convert the collected JSON-formatted script output into a List<String>
+		return (List<String>) StringTools.parseJSONString(scriptOutput.toString(), 1, "List", "String");
 	}
 
 

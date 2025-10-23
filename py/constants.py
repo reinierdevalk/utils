@@ -5,6 +5,7 @@ INPUT = 'i'
 # NB Must be the same as in representations.external.Tablature
 F = 'F'
 F6Eb = 'F6Eb'
+G5 = 'G5'
 G = 'G'
 G6F = 'G6F'
 A = 'A'
@@ -48,6 +49,7 @@ NOTATIONTYPES = {FLT: 'tab.lute.french',
 
 TUNINGS = {F   : [('f', 4), ('c', 4), ('g', 3), ('eb', 3), ('bb', 2), ('f', 2)],
 		   F6Eb: [('f', 4), ('c', 4), ('g', 3), ('eb', 3), ('bb', 2), ('eb', 2)],
+		   G5  : [('g', 4), ('d', 4), ('a', 3), ('f', 3), ('c', 3)],
 		   G   : [('g', 4), ('d', 4), ('a', 3), ('f', 3), ('c', 3), ('g', 2)], 
 		   G6F : [('g', 4), ('d', 4), ('a', 3), ('f', 3), ('c', 3), ('f', 2)], 
 		   A   : [('a', 4), ('e', 4), ('b', 3), ('g', 3), ('d', 3), ('a', 2)], 
