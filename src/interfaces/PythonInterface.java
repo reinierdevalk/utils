@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import tools.text.StringTools;
@@ -19,20 +21,114 @@ public class PythonInterface {
 
 	// See https://norwied.wordpress.com/2012/03/28/call-python-script-from-java-app/ and
 	// https://norwied.wordpress.com/2012/07/23/pass-arguments-from-java-to-python-app/
-	private static final boolean VERBOSE = false;
+	private static final boolean VERBOSE = true;
 	private static final boolean VERBOSE_APP = false;
 
 
-	public static String selectPython() {
+	public static String selectPython(boolean useForTensorFlow) {
 		if (!CLInterface.isWin()) {
 			return "python3";
 		}
 		else {
-			return PythonInterface.isCommandAvailable("python3") ? "python3" : "python";
+			boolean python3Available = PythonInterface.isCommandAvailable("python3");
+			List<String> pythons = 
+				python3Available ? Arrays.asList("python3", "python") : Arrays.asList("python");
+			
+			try {
+				// NB the default of a Program is the one that comes first on the system PATH, 
+				// and is also the one that is used when running <program> ... in the terminal
+				//
+				// Collect all python3 (if available) and python executables visible on the PATH.
+				// `where <program>` list all <program> executables in the same order as they are on the
+				// PATH, so the default <Program> will be the first list element
+				// NB Note that python3 is tried first; if it is available, the default Python 
+				// will be the default python3 installation; else, the default python installation
+				List<String> allPythonPaths = new ArrayList<>();
+				for (String python : pythons) {
+					Process listProc = new ProcessBuilder("where", python)
+						.redirectErrorStream(true)
+						.start();
+
+					try (BufferedReader reader = new BufferedReader(
+							new InputStreamReader(listProc.getInputStream()))) {
+						String line;
+						while ((line = reader.readLine()) != null) {
+							allPythonPaths.add(line.trim());
+						}
+					}
+					listProc.waitFor();
+				}
+				if (allPythonPaths.isEmpty()) {
+					if (VERBOSE) System.out.println(">>> No Python installations found on PATH.");
+					return null;
+				}
+				else {
+					String defaultPython = allPythonPaths.get(0);
+					if (VERBOSE) {
+						System.out.println(">>> One or more Python installations found on PATH:");
+						allPythonPaths.forEach(p -> System.out.println("    " + p));
+					}
+
+					// If TensorFlow is not required, return the default Python
+					if (!useForTensorFlow) {
+						if (VERBOSE) System.out.println(">>> Using default Python: " + defaultPython);
+						return defaultPython;
+					}
+					else {
+						// If TensorFlow is required, return the Python with TensorFlow (which 
+						// may not be the default Python)
+						for (String path : allPythonPaths) {
+							File pythonExe = new File(path);
+							if (!pythonExe.exists()) {
+								continue;
+							}
+
+							String absPath = pythonExe.getAbsolutePath(); 
+							Process testProc = new ProcessBuilder(
+								absPath, "-c", "import tensorflow"
+							).redirectErrorStream(true).start();
+
+							// Read and discard all output from the process to prevent the buffer from
+							// blocking execution
+							try (BufferedReader errOut = new BufferedReader(
+									new InputStreamReader(testProc.getInputStream()))) {
+								while (errOut.readLine() != null) {
+									// discard output
+								}
+							}
+
+							int exitCode = testProc.waitFor();
+							if (exitCode == 0) {
+								if (VERBOSE)
+									System.out.println(">>> Using Python with TensorFlow: " + absPath);
+								return absPath;
+							}
+						}
+
+						// If no Python with TensorFlow is found, return the default Python
+						if (VERBOSE)
+							System.out.println(">>> No TensorFlow installation found; using default Python.");
+						return defaultPython;
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
 		}
 	}
 
 
+	/**
+	 * Checks whether a given command-line program is available on the system. 
+	 * <br><br>
+	 * NB: If the given program exists in multiple locations on the system PATH, 
+	 * this method only tests the default one (i.e., whichever one the system 
+	 * finds on the PATH first).
+	 * 
+	 * @param command
+	 * @return
+	 */
 	private static boolean isCommandAvailable(String command) {
 		try {
 			ProcessBuilder pb = new ProcessBuilder(command, "--version");
@@ -127,16 +223,18 @@ public class PythonInterface {
 	 *
 	 * @param cmd The command to run the script, e.g.:
 	 *            <code>new String[]{"python", "path/to/file.py", "arg1", "arg2", ...}</code>
+	 * @param captureFromStdOut <code>true</code> if any script output must be captured from stdout
 	 * @return The lines output by the script (captured from stdout), parsed into a list of strings.
 	 * @throws IOException If the process cannot be started or the I/O streams cannot be read.
 	 */
-	public static List<String> runPythonFileAsScript(String[] cmd) {
+	public static List<String> runPythonFileAsScript(String[] cmd, boolean captureFromStdout) {
 		StringBuilder scriptOutput = new StringBuilder();
 
 		if (VERBOSE) System.out.println(">>> PythonInterface.runPythonFileAsScript() called");
 		try {
 			// Create a Runtime instance to interface with the environment the Java application 
 			// is running in, and execute the given command to start the Python process
+			// TODO replace Runtime with ProcessBuilder (as in selectPython()?
 			Runtime rt = Runtime.getRuntime();
 			Process pr = rt.exec(cmd);
 
@@ -186,8 +284,13 @@ public class PythonInterface {
 			t.printStackTrace();
 		}
 
-		// Convert the collected JSON-formatted script output into a List<String>
-		return (List<String>) StringTools.parseJSONString(scriptOutput.toString(), 1, "List", "String");
+		if (captureFromStdout) {
+			// Convert the collected JSON-formatted script output into a List<String>
+			return (List<String>) StringTools.parseJSONString(scriptOutput.toString(), 1, "List", "String");
+		}
+		else {
+			return null;
+		}
 	}
 
 
