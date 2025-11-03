@@ -24,6 +24,32 @@ public class StringToolsTest {
 
 
 	@Test
+	public void testCrlf2lf() {
+		String s = "a\r\nb\r\nc";
+
+		String expected = "a\nb\nc";
+		String actual = StringTools.crlf2lf(s);
+
+		assertEquals(expected, actual);
+	}
+
+
+	@Test
+	public void testRemoveExtensions() {
+		List<String> expected = Arrays.asList("a", "b", "c", "d");
+		List<String> actual = StringTools.removeExtensions(
+			Arrays.asList("a.txt", "b.mei", "c.pdf", "d")
+		);
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i), actual.get(i));
+		}
+		
+	}
+
+
+	@Test
 	public void testParseStringifiedPythonList() {
 		List<String> strs = Arrays.asList(
 			// 1D
@@ -217,31 +243,5 @@ public class StringToolsTest {
 				}
 			}
 		}
-	}
-
-
-	@Test
-	public void testCrlf2lf() {
-		String s = "a\r\nb\r\nc";
-
-		String expected = "a\nb\nc";
-		String actual = StringTools.crlf2lf(s);
-
-		assertEquals(expected, actual);
-	}
-
-
-	@Test
-	public void testRemoveExtensions() {
-		List<String> expected = Arrays.asList("a", "b", "c", "d");
-		List<String> actual = StringTools.removeExtensions(
-			Arrays.asList("a.txt", "b.mei", "c.pdf", "d")
-		);
-
-		assertEquals(expected.size(), actual.size());
-		for (int i = 0; i < expected.size(); i++) {
-			assertEquals(expected.get(i), actual.get(i));
-		}
-		
 	}
 }

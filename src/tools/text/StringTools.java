@@ -50,134 +50,6 @@ public class StringTools {
 	}
 
 
-	/**
-	 * Parses a String representation of a 1D or 2D Python list.
-	 * 
-	 * @param s
-	 * @param ds Target data structure; one of <code>Array</code> or <code>List</code>.
-	 * @param dt Target data type; one of <code>String</code>, <code>Integer</code>, or <code>Double</code>.
-	 * @return The target data structure, which is 1D if the given String is a representation 
-	 *         of a 1D data structure and 2D if it is a representation of a 2D data structure.
-	 */
-	// TESTED
-	public static Object parseStringifiedPythonList(String s, String ds, String dt) {
-		// Remove all spaces
-		s = s.replaceAll(" ", "");
-		// Remove any single or double quotes around the 'list' items
-		if (dt.equals("String")) {
-			s = s.replaceAll("'", "");
-			s = s.replaceAll("\"", "");
-		}
-
-		// 1D data structures
-		if (!s.startsWith("[[")) {
-			if (s.equals("[]")) {
-				if (ds.equals("Array")) {
-					return 
-						dt.equals("String") ? new String[0] :
-						dt.equals("Integer") ? new Integer[0] : 
-						new Double[0];
-				}
-				else {
-					return new ArrayList<>();
-				}
-			}
-			else {
-				Stream<String> strm = Arrays.stream(s.substring(1, s.length()-1).split(","));
-				if (ds.equals("Array")) {
-					return
-						dt.equals("String")	? strm.toArray(String[]::new) :
-						dt.equals("Integer") ? strm.map(Integer::valueOf).toArray(Integer[]::new) :	
-						null; // TODO
-				}
-				else {
-					return 
-						dt.equals("String") ? strm.collect(Collectors.toList()) :
-						dt.equals("Integer") ? strm.map(Integer::valueOf).collect(Collectors.toList()) :
-						null; // TODO
-				}
-			}
-		}
-		// 2D data structures
-		else {
-			// Split s into sublists; remove the outer [] of the first dimension
-			s = s.replaceAll(",\\[", "x\\[");
-			String[] split = s.substring(1, s.length()-1).split("x"); // [...],[...],[...]
-
-			String[][] arrStr = new String[split.length][];
-			Integer[][] arrInt = new Integer[split.length][];
-			Double[][] arrDbl = new Double[split.length][];
-			List<List<String>> listStr = new ArrayList<>();
-			List<List<Integer>> listInt = new ArrayList<>();
-			List<List<Double>> listDbl = new ArrayList<>();
-			for (int i = 0; i < split.length; i++) {
-				String ss = split[i];
-				if (ss.equals("[]")) {
-					if (ds.equals("Array")) {
-						if (dt.equals("String")) {
-							arrStr[i] = new String[0];
-						}
-						else if (dt.equals("Integer")) {
-							arrInt[i] = new Integer[0];
-						}
-						else {
-							arrDbl[i] = new Double[0];
-						}
-					}
-					else {
-						if (dt.equals("String")) {
-							listStr.add(new ArrayList<>());
-						}
-						else if (dt.equals("Integer")) {
-							listInt.add(new ArrayList<>());
-						}
-						else {
-							listDbl.add(new ArrayList<>());
-						}
-					}
-				}
-				else {
-					Stream<String> strm = Arrays.stream(ss.substring(1, ss.length()-1).split(","));
-					if (ds.equals("Array")) {
-						if (dt.equals("String")) {
-							arrStr[i] = strm.toArray(String[]::new);
-						}
-						else if (dt.equals("Integer")) {
-							arrInt[i] = strm.map(Integer::valueOf).toArray(Integer[]::new);
-						}
-						else {
-							arrDbl[i] = null; // TODO
-						}
-					}
-					else {
-						if (dt.equals("String")) {
-							listStr.add(strm.collect(Collectors.toList()));
-						}
-						else if (dt.equals("Integer")) {
-							listInt.add(strm.map(Integer::valueOf).collect(Collectors.toList()));
-						}
-						else {
-							listDbl.add(null); // TODO
-						}
-					}
-				}
-			}
-			if (ds.equals("Array")) {
-				return
-					dt.equals("String") ? arrStr :
-					dt.equals("Integer") ? arrInt :
-					arrDbl;
-			}
-			else {
-				return 
-					dt.equals("String") ? listStr :
-					dt.equals("Integer") ? listInt :
-					listDbl;		
-			}
-		}
-	}
-
-
 	public static String removeTrailingSymbolSeparator(String s) {
 		if (s.endsWith(Symbol.SYMBOL_SEPARATOR)) {
 			s = s.substring(0, s.lastIndexOf(Symbol.SYMBOL_SEPARATOR)); 
@@ -451,6 +323,135 @@ public class StringTools {
 		}
 
 		return pathStr;
+	}
+
+
+	/**
+	 * Parses a String representation of a 1D or 2D Python list.
+	 * NB Obsolete: replaced by parseJSONString().
+	 * 
+	 * @param s
+	 * @param ds Target data structure; one of <code>Array</code> or <code>List</code>.
+	 * @param dt Target data type; one of <code>String</code>, <code>Integer</code>, or <code>Double</code>.
+	 * @return The target data structure, which is 1D if the given String is a representation 
+	 *         of a 1D data structure and 2D if it is a representation of a 2D data structure.
+	 */
+	// TESTED
+	public static Object parseStringifiedPythonList(String s, String ds, String dt) {
+		// Remove all spaces
+		s = s.replaceAll(" ", "");
+		// Remove any single or double quotes around the 'list' items
+		if (dt.equals("String")) {
+			s = s.replaceAll("'", "");
+			s = s.replaceAll("\"", "");
+		}
+
+		// 1D data structures
+		if (!s.startsWith("[[")) {
+			if (s.equals("[]")) {
+				if (ds.equals("Array")) {
+					return 
+						dt.equals("String") ? new String[0] :
+						dt.equals("Integer") ? new Integer[0] : 
+						new Double[0];
+				}
+				else {
+					return new ArrayList<>();
+				}
+			}
+			else {
+				Stream<String> strm = Arrays.stream(s.substring(1, s.length()-1).split(","));
+				if (ds.equals("Array")) {
+					return
+						dt.equals("String")	? strm.toArray(String[]::new) :
+						dt.equals("Integer") ? strm.map(Integer::valueOf).toArray(Integer[]::new) :	
+						null; // TODO
+				}
+				else {
+					return 
+						dt.equals("String") ? strm.collect(Collectors.toList()) :
+						dt.equals("Integer") ? strm.map(Integer::valueOf).collect(Collectors.toList()) :
+						null; // TODO
+				}
+			}
+		}
+		// 2D data structures
+		else {
+			// Split s into sublists; remove the outer [] of the first dimension
+			s = s.replaceAll(",\\[", "x\\[");
+			String[] split = s.substring(1, s.length()-1).split("x"); // [...],[...],[...]
+
+			String[][] arrStr = new String[split.length][];
+			Integer[][] arrInt = new Integer[split.length][];
+			Double[][] arrDbl = new Double[split.length][];
+			List<List<String>> listStr = new ArrayList<>();
+			List<List<Integer>> listInt = new ArrayList<>();
+			List<List<Double>> listDbl = new ArrayList<>();
+			for (int i = 0; i < split.length; i++) {
+				String ss = split[i];
+				if (ss.equals("[]")) {
+					if (ds.equals("Array")) {
+						if (dt.equals("String")) {
+							arrStr[i] = new String[0];
+						}
+						else if (dt.equals("Integer")) {
+							arrInt[i] = new Integer[0];
+						}
+						else {
+							arrDbl[i] = new Double[0];
+						}
+					}
+					else {
+						if (dt.equals("String")) {
+							listStr.add(new ArrayList<>());
+						}
+						else if (dt.equals("Integer")) {
+							listInt.add(new ArrayList<>());
+						}
+						else {
+							listDbl.add(new ArrayList<>());
+						}
+					}
+				}
+				else {
+					Stream<String> strm = Arrays.stream(ss.substring(1, ss.length()-1).split(","));
+					if (ds.equals("Array")) {
+						if (dt.equals("String")) {
+							arrStr[i] = strm.toArray(String[]::new);
+						}
+						else if (dt.equals("Integer")) {
+							arrInt[i] = strm.map(Integer::valueOf).toArray(Integer[]::new);
+						}
+						else {
+							arrDbl[i] = null; // TODO
+						}
+					}
+					else {
+						if (dt.equals("String")) {
+							listStr.add(strm.collect(Collectors.toList()));
+						}
+						else if (dt.equals("Integer")) {
+							listInt.add(strm.map(Integer::valueOf).collect(Collectors.toList()));
+						}
+						else {
+							listDbl.add(null); // TODO
+						}
+					}
+				}
+			}
+			if (ds.equals("Array")) {
+				return
+					dt.equals("String") ? arrStr :
+					dt.equals("Integer") ? arrInt :
+					arrDbl;
+			}
+			else {
+				return 
+					dt.equals("String") ? listStr :
+					dt.equals("Integer") ? listInt :
+					listDbl;		
+			}
+		}
 	}
 
 }

@@ -57,6 +57,7 @@ public class CLInterface {
 	public static final String FORMAT = "-a";
 
 	public final static String INPUT = "i";
+	public final static String SINGLE_STAFF = "s";
 	
 	public static final List<String> ALLOWED_FILE_FORMATS = Arrays.asList(
 		MEIExport.MEI_EXT, // .mei

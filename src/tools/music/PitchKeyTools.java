@@ -85,16 +85,16 @@ public class PitchKeyTools {
 			System.out.println(aie);
 			
 			for (int i : pitches) {
-				List<Object> ps = spellPitch(
-					i, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), aie
-				);
-				String[] pa = (String[]) ps.get(0);
-				System.out.println("MIDI :     " + i);
-				System.out.println("pname:     " + pa[0]);
-				System.out.println("accid:     " + pa[1]);
-				System.out.println("accid.ges: " + pa[2]);
-				aie = (List<List<Integer>>) ps.get(1);
-				System.out.println(aie);
+//				List<Object> ps = spellPitch(
+//					i, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), aie
+//				);
+//				String[] pa = (String[]) ps.get(0);
+//				System.out.println("MIDI :     " + i);
+//				System.out.println("pname:     " + pa[0]);
+//				System.out.println("accid:     " + pa[1]);
+//				System.out.println("accid.ges: " + pa[2]);
+//				aie = (List<List<Integer>>) ps.get(1);
+//				System.out.println(aie);
 			}
 		}
 		// Called from diplomat.py
@@ -109,7 +109,6 @@ public class PitchKeyTools {
 			//   is used for this, it makes the output returned non-valid json
 			// 1. To make grids
 			if (type.equals("grids")) {
-				verbose = false;
 				int numAlt = Integer.parseInt(args[2]);
 				int mode = Integer.parseInt(args[3]);
 
@@ -127,7 +126,6 @@ public class PitchKeyTools {
 			}
 			// 2. To detect key
 			else if (type.equals("key")) {
-				verbose = false;
 				String tuning = args[2];
 				String file = args[3];
 				Map<String, String> paths = CLInterface.getPaths(dev);
@@ -186,104 +184,82 @@ public class PitchKeyTools {
 			}
 			// 3. To spell pitch
 			else if (type.equals("pitch")) {
-				verbose = false;
-//				int pitch = Integer.parseInt(args[2]);
-				int numAlt = Integer.parseInt(args[3]);
-
-				// Convert grids back from String
-				String mpcGridStr = args[4];
-				Integer[] mpcGrid = (Integer[]) StringTools.parseJSONString(mpcGridStr, 1, "Array", "Integer");
-//				Integer[] mpcGrid = (Integer[]) StringTools.parseStringifiedPythonList(
-//					mpcGridStr, "Array", "Integer"
-//				);
-
-				String altGridStr = args[5];
-				String[] altGrid = (String[]) StringTools.parseJSONString(altGridStr, 1, "Array", "String");
-//				String[] altGrid = (String[]) StringTools.parseStringifiedPythonList(
-//					altGridStr, "Array", "String"
-//				);
-
-				String pcGridStr = args[6];
-				String[] pcGrid = (String[]) StringTools.parseJSONString(pcGridStr, 1, "Array", "String");
-//				String[] pcGrid = (String[]) StringTools.parseStringifiedPythonList(
-//					pcGridStr, "Array", "String"
-//				);
-
-				// Convert accidsInEffect back from String
-//				String accidsInEffectStr = args[7];
-//				System.err.println(accidsInEffectStr);
-//				List<List<Integer>> accidsInEffectOLD = (List<List<Integer>>) StringTools.parseJSONString(
-//					accidsInEffectStr, 2, "List", "Integer"
-//				);
-//				List<List<Integer>> accidsInEffect = 
-//					accidsInEffectStr.equals("null") ? null : 
-//					(List<List<Integer>>) StringTools.parseStringifiedPythonList(
-//						accidsInEffectStr, "List", "Integer"
-//					);
-				
 				// Convert unspelledByID back from String
 				String unspelledByIDStr = args[2];
 				List<List<String>> unspelledByID = (List<List<String>>) StringTools.parseJSONString(
 					unspelledByIDStr, 2, "List", "String"
 				);
-//				List<List<Integer>> unspelledByID = 
-//					unspelledByIDStr.equals("null") ? null : 
-//					(List<List<Integer>>) StringTools.parseStringifiedPythonList(
-//						unspelledByIDStr, "List", "String"
-//					);
+				int numAlt = Integer.parseInt(args[3]);
+				// Convert grids back from String
+				String mpcGridStr = args[4];
+				Integer[] mpcGrid = (Integer[]) StringTools.parseJSONString(mpcGridStr, 1, "Array", "Integer");
+				String altGridStr = args[5];
+				String[] altGrid = (String[]) StringTools.parseJSONString(altGridStr, 1, "Array", "String");
+				String pcGridStr = args[6];
+				String[] pcGrid = (String[]) StringTools.parseJSONString(pcGridStr, 1, "Array", "String");
+				String score = args[7];
 
-				// Make List with five empty lists (double flats, flats, naturals, sharps, double sharps)  
 				Map<String, Map<String, String>> outerMap = new LinkedHashMap<>();
-				List<List<Integer>> accidsInEffect = IntStream.range(0, 5)
-					.mapToObj(i -> new ArrayList<Integer>())
-					.collect(Collectors.toList());
+				// Make list with five sublists (double flats, flats, naturals, sharps, double sharps),
+				// each containing either one subsublist (score is "s" - one voice) or two subsublists 
+				// (score is "d" - two voices)
+				List<List<List<Integer>>> accidsInEffect = createEmptyAccidsInEffect(score);
 				for (int i = 0; i < unspelledByID.size(); i++) {
 					List<String> note = unspelledByID.get(i);
 					String id = note.get(0);
 					String bar = note.get(1); // cannot be int because a bar can have an 'a', 'b', ... suffix
-//					int bar = Integer.parseInt(note.get(1));
 					int pitch = Integer.parseInt(note.get(2));
+					int voice = score.equals(CLInterface.SINGLE_STAFF) ? 0 : (pitch >= 60 ? 0 : 1); // score can only be "s" or "d"; not "v"
+
 					// Empty accidsInEffect if the current note is the first of a new bar 
 					if (i > 0) {
 						String prevBar = unspelledByID.get(i - 1).get(1); // cannot be int because a bar can have an 'a', 'b', ... suffix
-//						int prevBar = Integer.parseInt(unspelledByID.get(i - 1).get(1));
 						if (!prevBar.equals(bar)) {
-//						if (prevBar < bar) {
-							accidsInEffect = IntStream.range(0, 5)
-								.mapToObj(j -> new ArrayList<Integer>())
-								.collect(Collectors.toList());
+							accidsInEffect = createEmptyAccidsInEffect(score);
 						}
 					}
 					List<Object> pitchSpell = spellPitch(
-						pitch, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), accidsInEffect
+						pitch, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), accidsInEffect, voice
 					);
 					String[] pa = (String[]) pitchSpell.get(0);
 					Map<String, String> innerMap = new LinkedHashMap<>();
-					
+
 					innerMap.put("pname", pa[0]);
 					innerMap.put("accid", pa[1]);
 					innerMap.put("accid.ges", pa[2]);
 					innerMap.put("accidsInEffect", accidsInEffect.toString());
 					innerMap.put("pitch", String.valueOf(pitch));
-					outerMap.put(id, innerMap);
-//					String pythonDict = StringTools.createJSONString(m);
-//					res.add(pythonDict);
-					
+					outerMap.put(id, innerMap);			
 				}
-				
-//				List<Object> pitchSpell = spellPitch(
-//					666, numAlt, Arrays.asList(new Object[]{mpcGrid, altGrid, pcGrid}), accidsInEffect
-//				);
-//				String[] pa = (String[]) pitchSpell.get(0);
-//				Map<String, String> m = new LinkedHashMap<>();
-//				m.put("pname", pa[0]);
-//				m.put("accid", pa[1]);
-//				m.put("accid.ges", pa[2]);
-//				m.put("accidsInEffect", accidsInEffect.toString());	
-//				String json = StringTools.createJSONString(pythonDict);
+
 				System.out.println(StringTools.createJSONString(outerMap));
 			}
 		}
+	}
+
+
+	static List<List<List<Integer>>> createEmptyAccidsInEffect(String score) {
+		List<List<List<Integer>>> accidsInEffect = new ArrayList<>();
+		for (int i = 0; i < 5; i++) {
+			List<List<Integer>> l = new ArrayList<>(); // accidental type	
+			for (int j = 0; j < (score.equals(CLInterface.SINGLE_STAFF) ? 1 : 2); j++) {
+				l.add(new ArrayList<>()); // voice
+			}
+			accidsInEffect.add(l);
+		}
+
+//		List<List<List<Integer>>> accidsInEffect = IntStream.range(0, 5)
+//			.mapToObj(i -> {
+//				List<List<Integer>> middle = new ArrayList<>();
+//				middle.add(new ArrayList<>());
+//				if (score.equals("d")) {
+//					middle.add(new ArrayList<>());
+//				}
+//				return middle;
+//			})
+//			.collect(Collectors.toList());
+
+		return accidsInEffect;
 	}
 
 
@@ -657,6 +633,278 @@ public class PitchKeyTools {
 	/**
 	 * Spells the given pitch, considering the given key signature as number of alterations. 
 	 * numAlt <= 0 indicates flats; numAlt > 0 indicates sharps (NB: Am/C is considered a key 
+	 * signature with zero flats.)<br>
+	 * <br>
+	 * This method does not always give good results for key signatures with more than five 
+	 * key accidentals (KA) because of enharmonicity issues.<br>
+	 * <br>
+	 * Looks at accidentals in effect *per voice*, and determines accid.ges assignment 
+	 * accordingly. Example for voices [3]-[0]:<br>
+	 * <pre>{@code
+	 *[0] F#4 G4  E4
+	 *[1] D4  D4  C#4		C# has accid
+	 *[2] -   C#4 C#4		first C# has accid; second has accid.ges
+	 *[3] -   G3  A3
+	 *}</pre>
+	 *  
+	 * @param pitch
+	 * @param numAlt
+	 * @param grids: mpcGrid, altGrid, pcGrid
+	 * @param accidsInEffect <code>null</code> if enharmonic context is not important.
+	 * @param voice The voice the pitch is in. Not needed if <code>accidsInEffect</code> is <code>null</code>.
+	 * @return A list containing
+	 *         <ul>
+	 *         <li>As element 0: a String[] containing pname, accid, and accid.ges (in MEI terminology). If accid is not 
+	 *             an empty string, accid.ges is, and vice versa.</li>
+	 *         <li>As element 1: the updated <code>accidsInEffect</code> (if it is not <code>null</code>).</li>
+	 *         </ul>
+	 */
+	// TESTED
+	public static List<Object> spellPitch(int pitch, int numAlt, List<Object> grids, List<List<List<Integer>>> accidsInEffect, 
+		int voice) {
+		String pname = "";
+		String accid = "";
+		String accidGes = "";
+
+		Integer[] mpcGrid = (Integer[]) grids.get(0); 
+		String[] altGrid = (String[]) grids.get(1);  
+		String[] pcGrid = (String[]) grids.get(2);
+
+		List<List<Integer>> doubleFlatsInEffect = null;
+		List<List<Integer>> flatsInEffect = null; 
+		List<List<Integer>> naturalsInEffect = null;
+		List<List<Integer>> sharpsInEffect = null;
+		List<List<Integer>> doubleSharpsInEffect = null;
+		if (accidsInEffect != null) {
+			doubleFlatsInEffect = accidsInEffect.get(0);
+			flatsInEffect = accidsInEffect.get(1);
+			naturalsInEffect = accidsInEffect.get(2);
+			sharpsInEffect = accidsInEffect.get(3);
+			doubleSharpsInEffect = accidsInEffect.get(4);
+		}
+
+		int mpc = pitch % 12; // value is between and including [0, 11]
+		boolean considerContext = accidsInEffect != null && !accidsInEffect.contains(null);
+
+		// a. pitch is in key
+		if (Arrays.asList(mpcGrid).contains(mpc)) {
+			if (verbose) System.err.println("pitch is in key");
+			int pcInd = Arrays.asList(mpcGrid).indexOf(mpc);
+			pname = pcGrid[pcInd];
+			if (!considerContext) {
+				accid = altGrid[pcInd];
+			}
+			else {
+				// Previously double flat (but must be flat)
+				if (elementIsInSublist(doubleFlatsInEffect, (pitch-1))) {
+					accid = "f";
+					removeElementFromSublists(doubleFlatsInEffect, (pitch-1));
+				}
+				// Previously flat (but must be natural)
+				else if (elementIsInSublist(flatsInEffect, (pitch-1))) {
+					accid = "n";
+					removeElementFromSublists(flatsInEffect, (pitch-1));
+				}
+				// Previously natural (but must be flat)
+				else if (elementIsInSublist(naturalsInEffect, (pitch+1)) && altGrid[pcInd].equals("f")) {
+					accid = "f";
+					removeElementFromSublists(naturalsInEffect, (pitch+1));
+				}
+				// Previously natural (but must be sharp)
+				else if (elementIsInSublist(naturalsInEffect, (pitch-1)) && altGrid[pcInd].equals("s")) {
+					accid = "s";
+					removeElementFromSublists(naturalsInEffect, (pitch-1));
+				}
+				// Previously sharp (but must be natural)
+				else if (elementIsInSublist(sharpsInEffect, (pitch+1))) {
+					accid = "n";
+					removeElementFromSublists(sharpsInEffect, (pitch+1));
+				}
+				// Previously double sharp (but must be sharp)
+				else if (elementIsInSublist(doubleSharpsInEffect, (pitch+1))) {
+					accid = "f";
+					removeElementFromSublists(doubleSharpsInEffect, (pitch+1));
+				}
+				// No accidental
+				else {
+					accid = "";
+					if (getMIDIPitchClassKeySigs(numAlt).contains(mpc)) {
+						accidGes = numAlt <= 0 ? "f" : "s";
+					}
+				}
+			}
+		}
+		// b. pitch is not in key
+		else {
+			// Iterate over all key sigs and find the closest key sig that has pitch
+			List<Integer> kss = new ArrayList<>(KEY_SIG_MPCS.keySet());
+			int indNumAlt = kss.indexOf(numAlt);
+			outerLoop: for (int i = 1; i <= KEY_SIG_MPCS.size() - 1; i++) {
+				// Check if key sig to the left or right contains mpc
+				int currNumAltLeft = (indNumAlt - i) < 0 ? Integer.MAX_VALUE : kss.get(indNumAlt - i);
+				int currNumAltRight = (indNumAlt + i) >= kss.size() ? Integer.MAX_VALUE : kss.get(indNumAlt + i);
+				// NB The key sig to the right must be checked first, so that the case of the LLT for the minor 
+				// parallel is spelled correctly. In this case, the distance to the key that contains mpc is the 
+				// same left and right. Example:
+				// - 68 in C should be spelled G# (it is the LLT for minor parallel)
+				//   - distance to first ks that has G# (3) is three steps to the right from 0 
+				//   - distance to first ks that has Ab (-3) is three steps to the left from 0
+				for (int currNumAlt : Arrays.asList(currNumAltRight, currNumAltLeft)) {
+					if (currNumAlt != Integer.MAX_VALUE) {						
+						List<Object> currGrids = createGrids(currNumAlt, 0);
+						Integer[] currMpcGrid = (Integer[]) currGrids.get(0);
+						String[] currAltGrid = (String[]) currGrids.get(1);
+						String[] currPcGrid = (String[]) currGrids.get(2);
+
+						// If mpc is in the current key
+						if (Arrays.asList(currMpcGrid).contains(mpc)) {
+							int currIndMpc = Arrays.asList(currMpcGrid).indexOf(mpc);
+							pname = currPcGrid[currIndMpc];
+							accid = currAltGrid[currIndMpc];
+							if (considerContext) {
+								boolean isInEffectInCurrVoice = false;
+								// If mpc is a KA in the current key: flat or sharp
+								if (getMIDIPitchClassKeySigs(currNumAlt).contains(mpc)) {
+									// Flats
+									if (currNumAlt <= 0) {
+										// Single flat
+										if (!accid.equals("ff")) {
+											isInEffectInCurrVoice = !addToSublistIfNotInSublist(flatsInEffect, voice, pitch);
+										}
+										// Double flat
+										else {
+											isInEffectInCurrVoice = !addToSublistIfNotInSublist(doubleFlatsInEffect, voice, pitch);
+										}
+									}
+									// Sharps
+									else {
+										// Single sharp
+										if (!accid.equals("x")) {
+											isInEffectInCurrVoice = !addToSublistIfNotInSublist(sharpsInEffect, voice, pitch);
+										}
+										// Double sharp
+										else {
+											isInEffectInCurrVoice = !addToSublistIfNotInSublist(doubleSharpsInEffect, voice, pitch);
+										}
+									}
+								}
+								// If mpc is not a KA in the current key: natural
+								else {
+									isInEffectInCurrVoice = !addToSublistIfNotInSublist(naturalsInEffect, voice, pitch);
+								}
+								// If pitch was already an accidental in effect in voice: set accidGes; otherwise, set accid
+								if (isInEffectInCurrVoice) {
+									accidGes = accid;
+									accid = "";
+								}
+							}
+							break outerLoop;
+						}
+					}
+				}
+			}
+		}
+		String[] pa = new String[]{pname, accid, accidGes};
+		return Arrays.asList(new Object[]{pa, accidsInEffect});
+	}
+
+
+	/**
+	 * Checks whether any of the sublists in the given list contains the given element.
+	 * 
+	 * @param l
+	 * @param e
+	 * @return
+	 */
+	// TESTED
+	static Boolean elementIsInSublist(List<List<Integer>> l, int e) {
+		return l.stream().anyMatch(sl -> sl.contains(e));
+	}
+
+
+	/**
+	 * Removes the given element from all of the sublists in the given list.
+	 * 
+	 * @param l
+	 * @param e
+	 */
+	// TESTED
+	static void removeElementFromSublists(List<List<Integer>> l, int e) {
+		l.forEach(sl -> sl.removeIf(i -> i == e));
+	}
+
+
+	/**
+	 * Returns, for the given key, the MIDI pitch classes of the key signature for that key. 
+	 * A MIDI pitch class is a note's MIDI pitch % 12, and has one of the values [0-11]. 
+	 * 
+	 * Example Ab major: [10, 3, 8, 1] (= Bb, Eb, Ab, Dd)
+	 * Example A major: [6, 1, 8] (= F#, C#, G#)
+	 * 
+	 * @param key
+	 * @return
+	 */
+	// TESTED
+	static List<Integer> getMIDIPitchClassKeySigs(int numAlt) {
+		List<Integer> mpcKeySigs = new ArrayList<Integer>();
+
+		// Flats
+		if (numAlt < 0) {
+			int end = numAlt >= -7 ? -numAlt : 7;
+			mpcKeySigs.addAll(KEY_ACCID_MPC_FLAT.subList(0, end));
+			// Double flat (first flat becomes Bbb)
+			if (numAlt == -8) {
+				mpcKeySigs.set(0, mpcKeySigs.get(0) - 1);
+			}
+		}
+		// Sharps
+		else if (numAlt > 0) {
+			int end = numAlt <= 7 ? numAlt : 7;
+			mpcKeySigs.addAll(KEY_ACCID_MPC_SHARP.subList(0, end));
+			// Double sharp (first sharp becomes Fx)
+			if (numAlt == 8) {
+				mpcKeySigs.set(0, mpcKeySigs.get(0) + 1);
+			}
+		}
+
+		return mpcKeySigs;
+	}
+
+
+	/**
+	 * Adds the given element to the sublist at the given index if it is not already in it.
+	 * 
+	 * @param list
+	 * @param element
+	 * @param index
+	 * @return <code>false</code> if the element is already in the sublist at the given index (and the element is not added); 
+	 *         <code>true </code> if not (and the element is added).
+	 */
+	// TESTED
+	static boolean addToSublistIfNotInSublist(List<List<Integer>> list, int index, int element) {
+		// One of the sublists contains element
+		if (list.stream().anyMatch(l -> l.contains(element))) {
+			// Sublist at index contains element
+			if (list.get(index).contains(element)) {
+				return false;
+			}
+			// Sublist at index does not contain element: add element to sublist
+			else {
+				list.get(index).add(element);
+				return true;
+			}
+		}
+		// None of the sublists contains element: add element to sublist at index
+		else {
+			list.get(index).add(element);
+			return true;
+		}
+	}
+
+
+	/**
+	 * Spells the given pitch, considering the given key signature as number of alterations. 
+	 * numAlt <= 0 indicates flats; numAlt > 0 indicates sharps (NB: Am/C is considered a key 
 	 * signature with zero flats.)
 	 *
 	 * This method does not always give good results for key signatures with more than five 
@@ -672,8 +920,7 @@ public class PitchKeyTools {
 	 *         <li>As element 1: the updated <code>accidsInEffect</code> (if it is not <code>null</code>).</li>
 	 *         </ul>
 	 */
-	// TESTED
-	public static List<Object> spellPitch(int pitch, int numAlt, List<Object> grids, List<List<Integer>> accidsInEffect) {
+	public static List<Object> spellPitchNotSmart(int pitch, int numAlt, List<Object> grids, List<List<Integer>> accidsInEffect) {
 		String pname = "";
 		String accid = "";
 		String accidGes = "";
@@ -779,30 +1026,30 @@ public class PitchKeyTools {
 								if (getMIDIPitchClassKeySigs(currNumAlt).contains(mpc)) {
 									// Flats
 									if (currNumAlt <= 0) {
-										// Not a double flat
+										// Single flat
 										if (!accid.equals("ff")) {
-											isInEffect = addToListIfNotInList(flatsInEffect, pitch);
+											isInEffect = !addToListIfNotInList(flatsInEffect, pitch);
 										}
 										// Double flat
 										else {
-											isInEffect = addToListIfNotInList(doubleFlatsInEffect, pitch);
+											isInEffect = !addToListIfNotInList(doubleFlatsInEffect, pitch);
 										}
 									}
 									// Sharps
 									else {
-										// Not a double sharp
+										// Single sharp
 										if (!accid.equals("x")) {
-											isInEffect = addToListIfNotInList(sharpsInEffect, pitch);
+											isInEffect = !addToListIfNotInList(sharpsInEffect, pitch);
 										}
 										// Double sharp
 										else {
-											isInEffect = addToListIfNotInList(doubleSharpsInEffect, pitch);
+											isInEffect = !addToListIfNotInList(doubleSharpsInEffect, pitch);
 										}
 									}
 								}
 								// If mpc is not a KA in the current key: natural
 								else {
-									isInEffect = addToListIfNotInList(naturalsInEffect, pitch);
+									isInEffect = !addToListIfNotInList(naturalsInEffect, pitch);
 								}
 								// If pitch was already an accidental in effect: set accidGes
 								if (isInEffect) {
@@ -822,56 +1069,20 @@ public class PitchKeyTools {
 
 
 	/**
-	 * Returns, for the given key, the MIDI pitch classes of the key signature for that key. 
-	 * A MIDI pitch class is a note's MIDI pitch % 12, and has one of the values [0-11]. 
-	 * 
-	 * Example Ab major: [10, 3, 8, 1] (= Bb, Eb, Ab, Dd)
-	 * Example A major: [6, 1, 8] (= F#, C#, G#)
-	 * 
-	 * @param key
-	 * @return
-	 */
-	// TESTED
-	static List<Integer> getMIDIPitchClassKeySigs(int numAlt) {
-		List<Integer> mpcKeySigs = new ArrayList<Integer>();
-
-		// Flats
-		if (numAlt < 0) {
-			int end = numAlt >= -7 ? -numAlt : 7;
-			mpcKeySigs.addAll(KEY_ACCID_MPC_FLAT.subList(0, end));
-			// Double flat (first flat becomes Bbb)
-			if (numAlt == -8) {
-				mpcKeySigs.set(0, mpcKeySigs.get(0) - 1);
-			}
-		}
-		// Sharps
-		else if (numAlt > 0) {
-			int end = numAlt <= 7 ? numAlt : 7;
-			mpcKeySigs.addAll(KEY_ACCID_MPC_SHARP.subList(0, end));
-			// Double sharp (first sharp becomes Fx)
-			if (numAlt == 8) {
-				mpcKeySigs.set(0, mpcKeySigs.get(0) + 1);
-			}
-		}
-
-		return mpcKeySigs;
-	}
-
-
-	/**
 	 * Adds the given element to the given list if it is not already in it.
 	 * 
 	 * @param list
 	 * @param element
-	 * @return <code>false</code> if the element is not already in the list; <code>true</code> if it is.
+	 * @return <code>false</code> if the element is already in the list (and the element is not added); 
+	 *         <code>true</code> if not (and the element is added).
 	 */
 	// TESTED
 	static boolean addToListIfNotInList(List<Integer> list, int element) {
 		if (!list.contains(element)) {
 			list.add(element);
-			return false;
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 

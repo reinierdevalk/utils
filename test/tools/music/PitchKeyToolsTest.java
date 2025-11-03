@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 
 public class PitchKeyToolsTest {
@@ -483,7 +484,7 @@ public class PitchKeyToolsTest {
 		List<Object> gridsMinGm = Arrays.asList(new Object[]{mpcGridMin[Gm], altGridMin[Gm], pcGridMin[Gm]});
 		List<Object> gridsMinBbm = Arrays.asList(new Object[]{mpcGridMin[Bbm], altGridMin[Bbm], pcGridMin[Bbm]});
 
-		List<List<Integer>> aie = null;
+		List<List<List<Integer>>> aie = null;
 
 		List<String[]> expected = new ArrayList<>();
 		// pitch is in key
@@ -589,103 +590,103 @@ public class PitchKeyToolsTest {
 		List<String[]> actual = new ArrayList<>();
 		// pitch is in key
 		// Flats
-		actual.add((String[]) PitchKeyTools.spellPitch(71, 0, gridsMinAm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(70, -1, gridsMinDm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(63, -2, gridsMajGm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(68, -3, gridsMinCm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(61, -4, gridsMinFm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(66, -5, gridsMajBbm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(71, 0, gridsMinAm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(70, -1, gridsMinDm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(63, -2, gridsMajGm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(68, -3, gridsMinCm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(61, -4, gridsMinFm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(66, -5, gridsMajBbm, aie, -1).get(0));
 		// Sharps
-		actual.add((String[]) PitchKeyTools.spellPitch(66, 1, gridsMinEm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(61, 2, gridsMinBm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(68, 3, gridsMinFsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(63, 4, gridsMinCsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(70, 5, gridsMinGsm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(66, 1, gridsMinEm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(61, 2, gridsMinBm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(68, 3, gridsMinFsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(63, 4, gridsMinCsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(70, 5, gridsMinGsm, aie, -1).get(0));
 		// pitch is not in key
 		// 1. next or second-next KA
 		// Flats
-		actual.add((String[]) PitchKeyTools.spellPitch(70, 0, gridsMinAm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(68, -1, gridsMinDm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(68, -2, gridsMajGm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(66, -3, gridsMinCm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(66, -4, gridsMinFm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(64, -5, gridsMajBbm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(70, 0, gridsMinAm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(68, -1, gridsMinDm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(68, -2, gridsMajGm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(66, -3, gridsMinCm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(66, -4, gridsMinFm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(64, -5, gridsMajBbm, aie, -1).get(0));
 		// Sharps
-		actual.add((String[]) PitchKeyTools.spellPitch(68, 1, gridsMinEm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(68, 2, gridsMinBm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(70, 3, gridsMinFsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(70, 4, gridsMinCsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(60, 5, gridsMinGsm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(68, 1, gridsMinEm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(68, 2, gridsMinBm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(70, 3, gridsMinFsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(70, 4, gridsMinCsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(60, 5, gridsMinGsm, aie, -1).get(0));
 		// 2. naturalised KA
 		// Flats
-		actual.add((String[]) PitchKeyTools.spellPitch(71, -1, gridsMinDm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(64, -2, gridsMajGm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(69, -3, gridsMinCm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(62, -4, gridsMinFm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(67, -5, gridsMajBbm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(71, -1, gridsMinDm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(64, -2, gridsMajGm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(69, -3, gridsMinCm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(62, -4, gridsMinFm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(67, -5, gridsMajBbm, aie, -1).get(0));
 		// Sharps
-		actual.add((String[]) PitchKeyTools.spellPitch(65, 1, gridsMinEm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(60, 2, gridsMinBm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(67, 3, gridsMinFsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(62, 4, gridsMinCsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(69, 5, gridsMinGsm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(65, 1, gridsMinEm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(60, 2, gridsMinBm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(67, 3, gridsMinFsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(62, 4, gridsMinCsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(69, 5, gridsMinGsm, aie, -1).get(0));
 		// 3. ULT/LLT for minor (or minor parallel)
 		// ULT, flats
-		actual.add((String[]) PitchKeyTools.spellPitch(70, 0, gridsMinAm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(63, -1, gridsMinDm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(68, -2, gridsMinGm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(61, -3, gridsMinCm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(66, -4, gridsMinFm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(71, -5, gridsMinBbm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(70, 0, gridsMinAm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(63, -1, gridsMinDm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(68, -2, gridsMinGm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(61, -3, gridsMinCm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(66, -4, gridsMinFm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(71, -5, gridsMinBbm, aie, -1).get(0));
 		// ULT, sharps
-		actual.add((String[]) PitchKeyTools.spellPitch(65, 1, gridsMinEm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(60, 2, gridsMinBm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(67, 3, gridsMinFsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(62, 4, gridsMinCsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(69, 5, gridsMinGsm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(65, 1, gridsMinEm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(60, 2, gridsMinBm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(67, 3, gridsMinFsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(62, 4, gridsMinCsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(69, 5, gridsMinGsm, aie, -1).get(0));
 
 		// LLT, flats
-		actual.add((String[]) PitchKeyTools.spellPitch(68, 0, gridsMinAm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(61, -1, gridsMinDm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(66, -2, gridsMinGm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(71, -3, gridsMinCm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(64, -4, gridsMinFm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(69, -5, gridsMinBbm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(68, 0, gridsMinAm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(61, -1, gridsMinDm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(66, -2, gridsMinGm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(71, -3, gridsMinCm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(64, -4, gridsMinFm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(69, -5, gridsMinBbm, aie, -1).get(0));
 		// LLT, sharps
-		actual.add((String[]) PitchKeyTools.spellPitch(63, 1, gridsMinEm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(70, 2, gridsMinBm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(65, 3, gridsMinFsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(60, 4, gridsMinCsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(67, 5, gridsMinGsm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(63, 1, gridsMinEm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(70, 2, gridsMinBm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(65, 3, gridsMinFsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(60, 4, gridsMinCsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(67, 5, gridsMinGsm, aie, -1).get(0));
 
 		// 4. R3 for minor (or minor parallel)
 		// Flats
-		actual.add((String[]) PitchKeyTools.spellPitch(61, 0, gridsMinAm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(66, -1, gridsMinDm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(71, -2, gridsMinGm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(64, -3, gridsMinCm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(69, -4, gridsMinFm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(62, -5, gridsMinBbm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(61, 0, gridsMinAm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(66, -1, gridsMinDm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(71, -2, gridsMinGm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(64, -3, gridsMinCm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(69, -4, gridsMinFm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(62, -5, gridsMinBbm, aie, -1).get(0));
 		// Sharps
-		actual.add((String[]) PitchKeyTools.spellPitch(68, 1, gridsMinEm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(63, 2, gridsMinBm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(70, 3, gridsMinFsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(65, 4, gridsMinCsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(60, 5, gridsMinGsm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(68, 1, gridsMinEm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(63, 2, gridsMinBm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(70, 3, gridsMinFsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(65, 4, gridsMinCsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(60, 5, gridsMinGsm, aie, -1).get(0));
 		// 5. R6 for minor (or minor parallel)
 		// Flats
-		actual.add((String[]) PitchKeyTools.spellPitch(66, 0, gridsMinAm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(71, -1, gridsMinDm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(64, -2, gridsMinGm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(69, -3, gridsMinCm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(62, -4, gridsMinFm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(67, -5, gridsMinBbm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(66, 0, gridsMinAm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(71, -1, gridsMinDm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(64, -2, gridsMinGm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(69, -3, gridsMinCm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(62, -4, gridsMinFm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(67, -5, gridsMinBbm, aie, -1).get(0));
 		// Sharps
-		actual.add((String[]) PitchKeyTools.spellPitch(61, 1, gridsMinEm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(68, 2, gridsMinBm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(63, 3, gridsMinFsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(70, 4, gridsMinCsm, aie).get(0));
-		actual.add((String[]) PitchKeyTools.spellPitch(65, 5, gridsMinGsm, aie).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(61, 1, gridsMinEm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(68, 2, gridsMinBm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(63, 3, gridsMinFsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(70, 4, gridsMinCsm, aie, -1).get(0));
+		actual.add((String[]) PitchKeyTools.spellPitch(65, 5, gridsMinGsm, aie, -1).get(0));
 
 		assertEquals(expected.size(), actual.size());
 		for (int i = 0; i < expected.size(); i++) {
@@ -698,7 +699,59 @@ public class PitchKeyToolsTest {
 
 
 	@Test
-	public void testGetMIDIPitchClassKeySigs() {		
+	public void testElementIsInSublist() {
+		List<Boolean> expected = Arrays.asList(false, true, false, true);
+
+		List<Boolean> actual = new ArrayList<>();
+		List<List<Integer>> l = Arrays.asList(
+			Arrays.asList(0, 1, 2, 3),
+			Arrays.asList(0, 1, 2, 3),
+			Arrays.asList(0, 1, 2, 3),
+			Arrays.asList(0, 1, 2, 3)
+		);
+		List<Integer> elems = Arrays.asList(4, 1, -1, 3);
+		elems.forEach(e -> actual.add(PitchKeyTools.elementIsInSublist(l, e)));
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i), actual.get(i));
+		}
+		assertEquals(expected, actual);
+	}
+
+
+	@Test
+	public void testRemoveElementFromSublists() {
+		List<List<Integer>> l = Arrays.asList(
+			new ArrayList<>(Arrays.asList(0, 1, 2, 3)),
+			new ArrayList<>(Arrays.asList(0, 1, 2, 3)),
+			new ArrayList<>(Arrays.asList(0, 1, 2, 3)),
+			new ArrayList<>(Arrays.asList(0, 1, 2, 3))
+		);
+		List<Integer> elems = Arrays.asList(4, 1, -1, 3);
+		IntStream.range(0, elems.size()).forEach(
+			i -> PitchKeyTools.removeElementFromSublists(l, elems.get(i))
+		);
+		List<List<Integer>> lUpdated = Arrays.asList(
+			Arrays.asList(0, 2),
+			Arrays.asList(0, 2),
+			Arrays.asList(0, 2),
+			Arrays.asList(0, 2)	
+		);
+
+		assertEquals(l.size(), lUpdated.size());
+		for (int i = 0; i < l.size(); i++) {
+			assertEquals(l.get(i).size(), lUpdated.get(i).size());
+			for (int j = 0; j < l.get(i).size(); j++) {
+				assertEquals(l.get(i).get(j), lUpdated.get(i).get(j));
+			}
+		}
+		assertEquals(l, lUpdated);
+	}
+
+
+	@Test
+	public void testGetMIDIPitchClassKeySigs() {
 		List<List<Integer>> expected = new ArrayList<List<Integer>>();
 		expected.add(Arrays.asList(new Integer[]{9, 3, 8, 1, 6, 11, 4}));
 		expected.add(Arrays.asList(new Integer[]{10, 3, 8, 1, 6, 11, 4}));
@@ -734,19 +787,65 @@ public class PitchKeyToolsTest {
 
 
 	@Test
-	public void testAddToListIfNotInList() {
-		List<Boolean> expected = Arrays.asList(false, true, false, true);
+	public void testAddToSublistIfNotInSublist() {
+		List<Boolean> expected = Arrays.asList(true, false, true, false);
 
 		List<Boolean> actual = new ArrayList<>();
-		List<Integer> l = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
+		List<List<Integer>> l = Arrays.asList(
+			new ArrayList<>(Arrays.asList(0, 1, 2, 3)),
+			new ArrayList<>(Arrays.asList(0, 1, 2, 3)),
+			new ArrayList<>(Arrays.asList(0, 1, 2, 3)),
+			new ArrayList<>(Arrays.asList(0, 1, 2, 3))
+		);
 		List<Integer> elems = Arrays.asList(4, 1, -1, 3);
-		elems.forEach(e -> actual.add(PitchKeyTools.addToListIfNotInList(l, e)));
+		IntStream.range(0, elems.size()).forEach(
+			i -> actual.add(PitchKeyTools.addToSublistIfNotInSublist(l, i, elems.get(i)))
+		);
+		List<List<Integer>> lUpdated = Arrays.asList(
+			Arrays.asList(0, 1, 2, 3, 4),
+			Arrays.asList(0, 1, 2, 3),
+			Arrays.asList(0, 1, 2, 3, -1),
+			Arrays.asList(0, 1, 2, 3)
+		);
 
 		assertEquals(expected.size(), actual.size());
 		for (int i = 0; i < expected.size(); i++) {
 			assertEquals(expected.get(i), actual.get(i));
 		}
 		assertEquals(expected, actual);
+
+		assertEquals(l.size(), lUpdated.size());
+		for (int i = 0; i < l.size(); i++) {
+			assertEquals(l.get(i).size(), lUpdated.get(i).size());
+			for (int j = 0; j < l.get(i).size(); j++) {
+				assertEquals(l.get(i).get(j), lUpdated.get(i).get(j));
+			}
+		}
+		assertEquals(l, lUpdated);
+	}
+
+
+	@Test
+	public void testAddToListIfNotInList() {
+		List<Boolean> expected = Arrays.asList(true, false, true, false);
+
+		List<Boolean> actual = new ArrayList<>();
+		List<Integer> l = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
+		List<Integer> elems = Arrays.asList(4, 1, -1, 3);
+		elems.forEach(e -> actual.add(PitchKeyTools.addToListIfNotInList(l, e)));
+		List<Integer> lUpdated = Arrays.asList(0, 1, 2, 3, 4, -1);
+		
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i), actual.get(i));
+		}
+		assertEquals(expected, actual);
+
+		assertEquals(l.size(), lUpdated.size());
+		for (int i = 0; i < l.size(); i++) {
+			assertEquals(l.get(i), lUpdated.get(i));
+		}
+		assertEquals(l, lUpdated);
 	}
 
 
