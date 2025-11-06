@@ -33,6 +33,13 @@ def add_unique_id(prefix: str, arg_xml_ids: list): # -> list
 	return arg_xml_ids
 
 
+def remove_namespace_from_tag(tag: str): # -> str
+	if not '}' in tag:
+		return tag
+	else:
+		return tag.split('}', 1)[1]
+
+
 def handle_namespaces(xml_contents: str): # -> dict
 	# There is only one namespace, whose key is an empty string -- replace the  
 	# key with something meaningful ('mei'). See
