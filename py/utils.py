@@ -7,6 +7,7 @@ from xml.dom import minidom
 
 LEN_ID = 8
 
+
 def get_tuning(tuning: ET.Element, ns: dict): # -> str
 	tuning_p_o = [(c.get('pname'), int(c.get('oct'))) for c in tuning.findall('mei:course', ns)]
 	return next((k for k, v in TUNINGS.items() if v == tuning_p_o), None)
@@ -33,13 +34,6 @@ def add_unique_id(prefix: str, arg_xml_ids: list): # -> list
 	return arg_xml_ids
 
 
-def remove_namespace_from_tag(tag: str): # -> str
-	if not '}' in tag:
-		return tag
-	else:
-		return tag.split('}', 1)[1]
-
-
 def handle_namespaces(xml_contents: str): # -> dict
 	# There is only one namespace, whose key is an empty string -- replace the  
 	# key with something meaningful ('mei'). See
@@ -55,6 +49,13 @@ def handle_namespaces(xml_contents: str): # -> dict
 	ns['xml'] = 'http://www.w3.org/XML/1998/namespace'
 
 	return ns
+
+
+def remove_namespace_from_tag(tag: str): # -> str
+	if not '}' in tag:
+		return tag
+	else:
+		return tag.split('}', 1)[1]
 
 
 def parse_tree(xml_contents: str): # -> Tuple
@@ -88,6 +89,32 @@ def get_main_MEI_elements(root: ET.Element, ns: dict): # -> tuple
 
 def collect_xml_ids(root: ET.Element, key: str): # -> list
 	return [elem.attrib[key] for elem in root.iter() if key in elem.attrib]
+
+
+def unwrap_markup_elements(element: ET.Element, markup_elements: list): # -> None
+	"""
+	Recursively unwraps markup elements inside of the given element.
+	"""
+	unwrapped = True
+	while unwrapped:
+		unwrapped = False
+
+		# Create a parent map
+		parents = {child: parent for parent in element.iter() for child in parent}
+		# Find markup elements
+		for elem in list(element.iter()):
+			if elem.tag in markup_elements and elem in parents:
+				parent = parents[elem]
+				index = list(parent).index(elem)
+
+				# Insert child at index in parent
+				for child in list(elem):
+					parent.insert(index, child)
+					index += 1 # for correct order
+
+				# Remove markup element itself
+				parent.remove(elem)
+				unwrapped = True
 
 
 def find_first_elem_after(ind: int, elems_flat: list, tag: str):

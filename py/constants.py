@@ -38,6 +38,7 @@ TC = '.tc'
 XML = '.xml'
 
 ALLOWED_FILE_FORMATS = [MEI, ASCII, TBP, TC, XML]
+MARKUP_ELEMENTS = ['damage', 'unclear', 'del', 'add', 'supplied']
 
 
 # 2. MEI
