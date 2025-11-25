@@ -169,7 +169,8 @@ public class CLInterface {
 		m.put("TENSORFLOW_SCRIPT", files.get("TENSORFLOW_SCRIPT"));
 		m.put("MEI_TEMPLATE", files.get("MEI_TEMPLATE"));
 		m.put("MODEL_PARAMETERS", files.get("MODEL_PARAMETERS"));
-
+		m.put("VERSION", files.get("VERSION"));
+		
 //		System.out.println("completed paths:");
 //		ToolBox.printMap(m);
 //		System.exit(0);
@@ -374,7 +375,7 @@ public class CLInterface {
 				cliOptsVals.put(CLInterface.TYPE, tss.getShortType());
 			}
 		}
-		
+
 		return cliOptsVals;
 	}
 

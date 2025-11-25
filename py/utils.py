@@ -1,8 +1,9 @@
 import random
 import string
 import xml.etree.ElementTree as ET
-from py.constants import *
+from datetime import date
 from io import StringIO
+from py.constants import *
 from xml.dom import minidom
 
 LEN_ID = 8
@@ -165,3 +166,10 @@ def pretty_print(elem: ET.Element) -> str:
 	pretty = '\n'.join(line for line in pretty.split('\n') if line.strip() and not line.startswith('<?xml'))
 
 	return pretty
+
+
+def get_isodate():
+	"""
+	Returns the current date in ISO format (yyyy-mm-dd).
+	""" 
+	return date.today().isoformat()

@@ -279,9 +279,8 @@ public class ToolBox {
 				e.printStackTrace();           
 			}       
 		}
-		return StringTools.crlf2lf(contents.toString());
-//		return contents.toString();
-//		return contents.toString().replace("\r\n\r\n", "\r\n");
+
+		return StringTools.crlf2lf(contents.toString()).trim();
 	}
 
 
