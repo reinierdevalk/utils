@@ -23,97 +23,137 @@ public class PythonInterface {
 	// https://norwied.wordpress.com/2012/07/23/pass-arguments-from-java-to-python-app/
 	private static final boolean VERBOSE = false;
 	private static final boolean VERBOSE_APP = false;
+	private static String python;
+	private static String pythonTensorFlow;
+	private static final String VENVPATH_WIN = "venv/Scripts/python.exe";
+	private static final String VENVPATH_UNIX = "venv/bin/python";
 
 
-	public static String selectPython(boolean useForTensorFlow) {
-		if (!CLInterface.isWin()) {
-			return "python3";
+	public static void setPython(boolean dev, String codePath) {
+		python = selectPython(dev, codePath, false);
+		pythonTensorFlow = selectPython(dev, codePath, true); // TODO remove; put venv also on CODE_PATH in dev case and always return the venv python
+	}
+
+
+	// TODO remove; also remove its call
+	public static void setPython(String s) {
+		python = s;
+	}
+
+
+	public static String getPython() {
+		return python;
+	}
+
+
+	public static String getPythonTensorFlow() {
+		return pythonTensorFlow;
+	}
+
+
+	static String selectPython(boolean dev, String codePath, boolean useForTensorFlow) {
+		// Real-word case: use python from virtual environment
+		if (!dev) {
+			if (!CLInterface.isWin()) {
+				return codePath + VENVPATH_UNIX;
+//				return StringTools.getPathString(Arrays.asList(codePath, VENVPATH_UNIX));
+			}
+			else {
+				return codePath + VENVPATH_WIN;
+//				return StringTools.getPathString(Arrays.asList(codePath, VENVPATH_WIN));
+			}
 		}
+		// Dev case: use global Python
 		else {
-			boolean python3Available = PythonInterface.isCommandAvailable("python3");
-			List<String> pythons = 
-				python3Available ? Arrays.asList("python3", "python") : Arrays.asList("python");
-			
-			try {
-				// NB the default of a Program is the one that comes first on the system PATH, 
-				// and is also the one that is used when running <program> ... in the terminal
-				//
-				// Collect all python3 (if available) and python executables visible on the PATH.
-				// `where <program>` list all <program> executables in the same order as they are on the
-				// PATH, so the default <Program> will be the first list element
-				// NB Note that python3 is tried first; if it is available, the default Python 
-				// will be the default python3 installation; else, the default python installation
-				List<String> allPythonPaths = new ArrayList<>();
-				for (String python : pythons) {
-					Process listProc = new ProcessBuilder("where", python)
-						.redirectErrorStream(true)
-						.start();
-
-					try (BufferedReader reader = new BufferedReader(
-							new InputStreamReader(listProc.getInputStream()))) {
-						String line;
-						while ((line = reader.readLine()) != null) {
-							allPythonPaths.add(line.trim());
+			if (!CLInterface.isWin()) {
+				return "python3";
+			}
+			else {
+				boolean python3Available = PythonInterface.isCommandAvailable("python3");
+				List<String> pythons = 
+					python3Available ? Arrays.asList("python3", "python") : Arrays.asList("python");
+				
+				try {
+					// NB the default of a Program is the one that comes first on the system PATH, 
+					// and is also the one that is used when running <program> ... in the terminal
+					//
+					// Collect all python3 (if available) and python executables visible on the PATH.
+					// `where <program>` list all <program> executables in the same order as they are on the
+					// PATH, so the default <Program> will be the first list element
+					// NB Note that python3 is tried first; if it is available, the default Python 
+					// will be the default python3 installation; else, the default python installation
+					List<String> allPythonPaths = new ArrayList<>();
+					for (String python : pythons) {
+						Process listProc = new ProcessBuilder("where", python)
+							.redirectErrorStream(true)
+							.start();
+	
+						try (BufferedReader reader = new BufferedReader(
+								new InputStreamReader(listProc.getInputStream()))) {
+							String line;
+							while ((line = reader.readLine()) != null) {
+								allPythonPaths.add(line.trim());
+							}
 						}
+						listProc.waitFor();
 					}
-					listProc.waitFor();
-				}
-				if (allPythonPaths.isEmpty()) {
-					if (VERBOSE) System.out.println(">>> No Python installations found on PATH.");
-					return null;
-				}
-				else {
-					String defaultPython = allPythonPaths.get(0);
-					if (VERBOSE) {
-						System.out.println(">>> One or more Python installations found on PATH:");
-						allPythonPaths.forEach(p -> System.out.println("    " + p));
-					}
-
-					// If TensorFlow is not required, return the default Python
-					if (!useForTensorFlow) {
-						if (VERBOSE) System.out.println(">>> Using default Python: " + defaultPython);
-						return defaultPython;
+					if (allPythonPaths.isEmpty()) {
+						if (VERBOSE) System.out.println(">>> No Python installations found on PATH.");
+						return null;
 					}
 					else {
-						// If TensorFlow is required, return the Python with TensorFlow (which 
-						// may not be the default Python)
-						for (String path : allPythonPaths) {
-							File pythonExe = new File(path);
-							if (!pythonExe.exists()) {
-								continue;
-							}
-
-							String absPath = pythonExe.getAbsolutePath(); 
-							Process testProc = new ProcessBuilder(
-								absPath, "-c", "import tensorflow"
-							).redirectErrorStream(true).start();
-
-							// Read and discard all output from the process to prevent the buffer from
-							// blocking execution
-							try (BufferedReader errOut = new BufferedReader(
-									new InputStreamReader(testProc.getInputStream()))) {
-								while (errOut.readLine() != null) {
-									// discard output
+						String defaultPython = allPythonPaths.get(0);
+						if (VERBOSE) {
+							System.out.println(">>> One or more Python installations found on PATH:");
+							allPythonPaths.forEach(p -> System.out.println("    " + p));
+						}
+	
+						// If TensorFlow is not required, return the default Python
+						if (!useForTensorFlow) {
+							if (VERBOSE) System.out.println(">>> Using default Python: " + defaultPython);
+							return defaultPython;
+						}
+						else {
+							// If TensorFlow is required, return the Python with TensorFlow (which 
+							// may not be the default Python)
+							for (String path : allPythonPaths) {
+								File pythonExe = new File(path);
+								if (!pythonExe.exists()) {
+									continue;
+								}
+	
+								String absPath = pythonExe.getAbsolutePath(); 
+								Process testProc = new ProcessBuilder(
+									absPath, "-c", "import tensorflow"
+								).redirectErrorStream(true).start();
+	
+								// Read and discard all output from the process to prevent the buffer from
+								// blocking execution
+								try (BufferedReader errOut = new BufferedReader(
+										new InputStreamReader(testProc.getInputStream()))) {
+									while (errOut.readLine() != null) {
+										// discard output
+									}
+								}
+	
+								int exitCode = testProc.waitFor();
+								if (exitCode == 0) {
+									if (VERBOSE)
+										System.out.println(">>> Using Python with TensorFlow: " + absPath);
+									return absPath;
 								}
 							}
-
-							int exitCode = testProc.waitFor();
-							if (exitCode == 0) {
-								if (VERBOSE)
-									System.out.println(">>> Using Python with TensorFlow: " + absPath);
-								return absPath;
-							}
+	
+							// If no Python with TensorFlow is found, return the default Python
+							if (VERBOSE)
+								System.out.println(">>> No TensorFlow installation found; using default Python.");
+							return defaultPython;
 						}
-
-						// If no Python with TensorFlow is found, return the default Python
-						if (VERBOSE)
-							System.out.println(">>> No TensorFlow installation found; using default Python.");
-						return defaultPython;
 					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
 			}
 		}
 	}

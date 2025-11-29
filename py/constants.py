@@ -24,6 +24,10 @@ VOCAL = 'v'
 YES = 'y'
 NO = 'n'
 
+# --placement
+TOP = 'top'
+BOTTOM = 'bottom'
+
 # --type
 # NB Must be the same as in formats.tbp.symbols.TabSymbol
 FLT = 'FLT'

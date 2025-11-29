@@ -19,6 +19,7 @@ import de.uos.fmt.musitech.data.score.NotationVoice;
 import de.uos.fmt.musitech.data.structure.Note;
 import external.Tablature;
 import interfaces.CLInterface;
+import interfaces.PythonInterface;
 import internal.core.Encoding;
 import internal.core.Encoding.Stage;
 import internal.core.ScorePiece;
@@ -100,6 +101,10 @@ public class PitchKeyTools {
 		// Called from diplomat.py
 		else {
 			boolean dev = args[CLInterface.DEV_IND].equals(String.valueOf(true));
+			Map<String, String> paths = CLInterface.getPaths(dev);
+			// TODO use the other PythonInterface.setPython() when it's cleaned up (now too slow)
+			PythonInterface.setPython(CLInterface.isWin() ? "python" : "python3");
+//			PythonInterface.setPython(dev, paths.get("CODE_PATH"));
 			String type = args[1];
 
 			// NB If this class is called from Python, the _call_java() function reads the stdout
@@ -128,7 +133,7 @@ public class PitchKeyTools {
 			else if (type.equals("key")) {
 				String tuning = args[2];
 				String file = args[3];
-				Map<String, String> paths = CLInterface.getPaths(dev);
+//				Map<String, String> paths = CLInterface.getPaths(dev);
 				String filePath = StringTools.getPathString(
 					Arrays.asList(paths.get("DIPLOMAT_PATH"), "in"
 				));
