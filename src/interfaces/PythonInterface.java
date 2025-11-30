@@ -25,8 +25,8 @@ public class PythonInterface {
 	private static final boolean VERBOSE_APP = false;
 	private static String python;
 	private static String pythonTensorFlow;
-	private static final String VENVPATH_WIN = "venv/Scripts/";
-	private static final String VENVPATH_UNIX = "venv/bin/";
+	private static final String VENVPATH_WIN = ".venv/Scripts/";
+	private static final String VENVPATH_UNIX = ".venv/bin/";
 
 
 	public static void setPython(boolean dev, String codePath) {
