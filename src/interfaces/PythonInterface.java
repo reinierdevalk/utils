@@ -25,8 +25,8 @@ public class PythonInterface {
 	private static final boolean VERBOSE_APP = false;
 	private static String python;
 	private static String pythonTensorFlow;
-	private static final String VENVPATH_WIN = "venv/Scripts/python.exe";
-	private static final String VENVPATH_UNIX = "venv/bin/python";
+	private static final String VENVPATH_WIN = "venv/Scripts/";
+	private static final String VENVPATH_UNIX = "venv/bin/";
 
 
 	public static void setPython(boolean dev, String codePath) {
@@ -55,12 +55,12 @@ public class PythonInterface {
 		// Real-word case: use python from virtual environment
 		if (!dev) {
 			if (!CLInterface.isWin()) {
-				return codePath + VENVPATH_UNIX;
-//				return StringTools.getPathString(Arrays.asList(codePath, VENVPATH_UNIX));
+//				return codePath + VENVPATH_UNIX + "python";
+				return StringTools.getPathString(Arrays.asList(codePath, VENVPATH_UNIX)) + "python";
 			}
 			else {
-				return codePath + VENVPATH_WIN;
-//				return StringTools.getPathString(Arrays.asList(codePath, VENVPATH_WIN));
+//				return codePath + VENVPATH_WIN + "python.exe";
+				return StringTools.getPathString(Arrays.asList(codePath, VENVPATH_WIN)) + "python.exe";
 			}
 		}
 		// Dev case: use global Python
