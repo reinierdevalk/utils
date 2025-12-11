@@ -231,11 +231,22 @@ public class CLInterface {
 
 			// Get the path to utils/ 
 			// (= F:/research/computation/software/code/eclipse/)
-			String codePath = new File(classPath)
-				.toPath()
-				.getParent()
-				.getParent()
-				.toString();
+			String codePath;
+			if (dev) {
+				codePath = new File(classPath)
+					.toPath()
+					.getParent()
+					.getParent()
+					.toString();
+			}
+			else {
+				codePath = new File(classPath)
+					.toPath()
+					.getParent()
+					.getParent()
+					.getParent()
+					.toString();
+			}
 
 			// Read config file
 			try (BufferedReader br = new BufferedReader(
