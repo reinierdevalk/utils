@@ -25,13 +25,13 @@ public class PythonInterface {
 	private static final boolean VERBOSE_APP = false;
 	private static String python;
 	private static String pythonTensorFlow;
-	private static final String VENVDIR_WIN = "/Scripts/";
+	private static final String VENVDIR_WIN = "Scripts/";
 	private static final String VENVDIR_UNIX = "bin/";
 
 
 	public static void setPython(boolean dev, String venvPath) {
 		python = selectPython(dev, venvPath, false);
-		pythonTensorFlow = selectPython(dev, null, true); // TODO remove; put venv also on CODE_PATH in dev case and always return the venv python
+		pythonTensorFlow = selectPython(dev, venvPath, true); // TODO remove; put venv also on CODE_PATH in dev case and always return the venv python
 	}
 
 
