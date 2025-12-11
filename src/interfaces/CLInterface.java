@@ -161,6 +161,9 @@ public class CLInterface {
 		m.put("FORMATS_PYTHON_PATH", StringTools.getPathString(
 			Arrays.asList(cp, paths.get("FORMATS_PYTHON_PATH"))
 		));
+		m.put("VENV_PATH", StringTools.getPathString(
+			Arrays.asList(cp, paths.get("VENV_PATH"))
+		));
 
 		// 4. Set scripts in m
 		m.put("MEI2TBP_SCRIPT", files.get("MEI2TBP_SCRIPT"));
