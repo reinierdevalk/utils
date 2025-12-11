@@ -25,8 +25,8 @@ public class PythonInterface {
 	private static final boolean VERBOSE_APP = false;
 	private static String python;
 	private static String pythonTensorFlow;
-	private static final String VENVDIR_WIN = "Scripts/";
-	private static final String VENVDIR_UNIX = "bin/";
+	private static final String VENV_SUBDIR_WIN = "Scripts/";
+	private static final String VENV_SUBDIR_UNIX = "bin/";
 
 
 	public static void setPython(boolean dev, String venvPath) {
@@ -56,11 +56,11 @@ public class PythonInterface {
 		if (!dev) {
 			if (!CLInterface.isWin()) {
 //				return codePath + VENVPATH_UNIX + "python";
-				return StringTools.getPathString(Arrays.asList(venvPath, VENVDIR_UNIX)) + "python";
+				return StringTools.getPathString(Arrays.asList(venvPath, VENV_SUBDIR_UNIX)) + "python";
 			}
 			else {
 //				return codePath + VENVPATH_WIN + "python.exe";
-				return StringTools.getPathString(Arrays.asList(venvPath, VENVDIR_WIN)) + "python.exe";
+				return StringTools.getPathString(Arrays.asList(venvPath, VENV_SUBDIR_WIN)) + "python.exe";
 			}
 		}
 		// Dev case: use global Python
