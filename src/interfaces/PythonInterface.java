@@ -25,13 +25,13 @@ public class PythonInterface {
 	private static final boolean VERBOSE_APP = false;
 	private static String python;
 	private static String pythonTensorFlow;
-	private static final String VENVPATH_WIN = ".venv/Scripts/";
-	private static final String VENVPATH_UNIX = ".venv/bin/";
+	private static final String VENVDIR_WIN = "/Scripts/";
+	private static final String VENVDIR_UNIX = "bin/";
 
 
-	public static void setPython(boolean dev, String codePath) {
-		python = selectPython(dev, codePath, false);
-		pythonTensorFlow = selectPython(dev, codePath, true); // TODO remove; put venv also on CODE_PATH in dev case and always return the venv python
+	public static void setPython(boolean dev, String venvPath) {
+		python = selectPython(dev, venvPath, false);
+		pythonTensorFlow = selectPython(dev, null, true); // TODO remove; put venv also on CODE_PATH in dev case and always return the venv python
 	}
 
 
@@ -51,16 +51,16 @@ public class PythonInterface {
 	}
 
 
-	static String selectPython(boolean dev, String codePath, boolean useForTensorFlow) {
+	static String selectPython(boolean dev, String venvPath, boolean useForTensorFlow) {
 		// Real-word case: use python from virtual environment
 		if (!dev) {
 			if (!CLInterface.isWin()) {
 //				return codePath + VENVPATH_UNIX + "python";
-				return StringTools.getPathString(Arrays.asList(codePath, VENVPATH_UNIX)) + "python";
+				return StringTools.getPathString(Arrays.asList(venvPath, VENVDIR_UNIX)) + "python";
 			}
 			else {
 //				return codePath + VENVPATH_WIN + "python.exe";
-				return StringTools.getPathString(Arrays.asList(codePath, VENVPATH_WIN)) + "python.exe";
+				return StringTools.getPathString(Arrays.asList(venvPath, VENVDIR_WIN)) + "python.exe";
 			}
 		}
 		// Dev case: use global Python

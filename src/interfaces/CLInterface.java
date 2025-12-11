@@ -94,11 +94,11 @@ public class CLInterface {
 		String cp = userDefinedPaths.get("LIB_PATH");
 
 		// 2. Read the Map from the JSON file
-		Map<String, Map<String, String>> config = StringTools.readJSONFile(
+		Map<String, Map<String, String>> pathsConfig = StringTools.readJSONFile(
 			StringTools.getPathString(Arrays.asList(cp)) + (dev ? PATHS_FILE_DEV : PATHS_FILE)		
 		);
-		Map<String, String> paths = config.get("paths");
-		Map<String, String> files = config.get("files");
+		Map<String, String> paths = pathsConfig.get("paths");
+		Map<String, String> files = pathsConfig.get("files");
 
 		// 3. Set paths in m
 		m = new LinkedHashMap<String, String>();
@@ -205,7 +205,7 @@ public class CLInterface {
 
 	/**
 	 * Gets the <code>ROOT_PATH</code>, <code>CODE_PATH</code>, and <code>EXE_PATH</code>, 
-	 * as defined by the user in <code>config.cfg</code> (located on the <code>CODE_PATH</code>.
+	 * as defined by the user in <code>config.cfg</code> (located on the <code>CODE_PATH</code>).
 	 * 
 	 * @param dev <code>true</code> if called in development mode.
 	 * 
