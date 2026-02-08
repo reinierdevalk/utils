@@ -107,7 +107,7 @@ public class PitchKeyTools {
 //			PythonInterface.setPython(dev, paths.get("CODE_PATH"));
 			String type = args[1];
 
-			// NB If this class is called from Python, the _call_java() function reads the stdout
+			// NB If this class is called from Python, the call_java() function reads the stdout
 			// returned by this class, and passes it to json.loads(). Therefore, in this class
 			// - System.out.println() (the stdout) must be used to return a json-formatted string
 			// - System.err.println() (the stderr) must be used for any debugging -- if the stdout
