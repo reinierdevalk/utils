@@ -129,7 +129,7 @@ def is_empty(elem: etree._Element): # -> bool:
 		return len(elem) == 0 and elem.text.strip() == ''
 
 
-def remove_all_empty(elem: etree._Element, exceptions: list): # -> None
+def remove_all_empty(elem: etree._Element, exceptions: list): # -> None:
 	"""
 	Recursively removes all empty elements from the given element. 
 	If the given element is in the given list of exceptions (which contains
@@ -142,6 +142,39 @@ def remove_all_empty(elem: etree._Element, exceptions: list): # -> None
 			if is_empty(e) and e.tag not in exceptions and e.getparent() is not None:
 				e.getparent().remove(e)
 				changed = True
+
+
+def remove_empty_markup(editorial: list[str], markup_elements: list[str], id_index: dict): # -> None:
+	"""
+	Recursively removes empty markup elements, starting each element with an ID 
+	in 'editorial', going up until a non-markup or non-empty element is reached.
+	"""
+	for xml_id in editorial:
+		elem = id_index.get(xml_id)
+		if elem is None:
+			continue
+		remove_empty_markup_ancestors(elem, markup_elements)
+
+
+def remove_empty_markup_ancestors(elem: etree._Element, markup_elements: list[str]): # -> None:
+	"""
+	If elem is empty, remove it and check its parent.
+	Continue up the tree while parents are empty markup elements.
+	"""
+	while elem is not None:
+		parent = elem.getparent()
+		# Stop if element is not empty
+		if not is_empty(elem):
+#		if len(elem) > 0 or elem.text:
+			break
+		# Stop if element is not a markup element
+		if elem.tag not in markup_elements:
+			break
+		# Remove the empty markup element
+		if parent is not None:
+			parent.remove(elem)
+		# Continue with parent
+		elem = parent
 
 
 def parse_root(xml_contents: str): # -> etree._Element:
