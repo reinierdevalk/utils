@@ -11,7 +11,7 @@ LEN_ID = 8
 XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace'
 
 
-def get_namespaces(root: etree._Element): # -> dict[str, str]:
+def get_namespaces_NEW(root: etree._Element): # -> dict[str, str]:
 	"""
 	Extract namespaces from XML content using lxml's nsmap.
 
@@ -23,8 +23,8 @@ def get_namespaces(root: etree._Element): # -> dict[str, str]:
 
 	return ns
 
-
-def get_namespaces_ET(xml_contents: str): # -> dict:
+# _ET
+def handle_namespaces_OLD(xml_contents: str): # -> dict:
 	# There is only one namespace, whose key is an empty string -- replace the  
 	# key with something meaningful ('mei'). See
 	# https://stackoverflow.com/questions/42320779/get-the-namespaces-from-xml-with-python-elementtree/42372404#42372404
@@ -41,36 +41,36 @@ def get_namespaces_ET(xml_contents: str): # -> dict:
 	return ns
 
 
-def get_main_MEI_elements(root: etree._Element, ns: dict): # -> tuple[etree._Element, etree._Element]:
+def get_main_MEI_elements_NEW(root: etree._Element, ns: dict): # -> tuple[etree._Element, etree._Element]:
+	meiHead = root.find('mei:meiHead', ns)
+	music = root.find('mei:music', ns)
+
+	return (meiHead, music)
+
+# _ET
+def get_main_MEI_elements_OLD(root: ET.Element, ns: dict): # -> tuple:
 	meiHead = root.find('mei:meiHead', ns)
 	music = root.find('mei:music', ns)
 
 	return (meiHead, music)
 
 
-def get_main_MEI_elements_ET(root: ET.Element, ns: dict): # -> tuple:
-	meiHead = root.find('mei:meiHead', ns)
-	music = root.find('mei:music', ns)
-
-	return (meiHead, music)
-
-
-def collect_xml_ids(root: etree._Element, ns: dict) -> list[str]:
+def collect_xml_ids_NEW(root: etree._Element, ns: dict): # -> list[str]:
 	prefix = 'xml'
 	local_name = 'id'
 	return root.xpath(f'//@{prefix}:{local_name}', namespaces=ns)
 
-
-def collect_xml_ids_ET(root: ET.Element, key: str): # -> list:
+# _ET
+def collect_xml_ids_OLD(root: ET.Element, key: str): # -> list:
 	return [elem.attrib[key] for elem in root.iter() if key in elem.attrib]
 
 
-def get_tuning(tuning: etree._Element, ns: dict): # -> str:
+def get_tuning_NEW(tuning: etree._Element, ns: dict): # -> str:
 	tuning_p_o = [(c.get('pname'), int(c.get('oct'))) for c in tuning.findall('mei:course', ns)]
 	return next((k for k, v in TUNINGS.items() if v == tuning_p_o), None)
 
-
-def get_tuning_ET(tuning: ET.Element, ns: dict): # -> str:
+# _ET
+def get_tuning_OLD(tuning: ET.Element, ns: dict): # -> str:
 	tuning_p_o = [(c.get('pname'), int(c.get('oct'))) for c in tuning.findall('mei:course', ns)]
 	return next((k for k, v in TUNINGS.items() if v == tuning_p_o), None)
 
@@ -96,12 +96,12 @@ def add_unique_id(prefix: str, arg_xml_ids: list): # -> list:
 	return arg_xml_ids
 
 
-def pretty_print(elem: etree._Element): # -> None:
+def pretty_print_NEW(elem: etree._Element): # -> None:
 	etree.indent(elem)
 	print(etree.tostring(elem, encoding='unicode'))
 
-
-def pretty_print_ET(elem: ET.Element) -> str:
+# _ET 
+def pretty_print_OLD(elem: ET.Element) -> str:
 	rough_string = ET.tostring(elem, encoding='unicode')
 	parsed = minidom.parseString(rough_string)
 
@@ -188,7 +188,7 @@ def remove_namespace_from_tag(tag: str): # -> str:
 		return tag.split('}', 1)[1]
 
 
-def parse_tree(xml_contents: str): # -> tuple[etree._ElementTree, etree._Element]:
+def parse_tree_NEW(xml_contents: str): # -> tuple[etree._ElementTree, etree._Element]:
 	"""
 	Basic structure of <mei>:
 
@@ -208,8 +208,8 @@ def parse_tree(xml_contents: str): # -> tuple[etree._ElementTree, etree._Element
 
 	return (tree, root)
 
-
-def parse_tree_ET(xml_contents: str): # -> Tuple:
+# _ET
+def parse_tree_OLD(xml_contents: str): # -> Tuple:
 	"""
 	Basic structure of <mei>:
 	
@@ -231,7 +231,7 @@ def parse_tree_ET(xml_contents: str): # -> Tuple:
 	return (tree, root)
 
 
-def unwrap_markup_elements(element: ET.Element, markup_elements: list): # -> None:
+def unwrap_markup_elements_OLD(element: ET.Element, markup_elements: list): # -> None:
 	"""
 	Recursively unwraps markup elements inside of the given element.
 	"""
@@ -269,7 +269,7 @@ def write_xml(root: ET.Element, filepath: str): # -> None:
 	)
 
 
-def print_all_elements(root: ET.Element, xml_id_key: str): # -> None:
+def print_all_elements_OLD(root: ET.Element, xml_id_key: str): # -> None:
 	count = 0
 	for elem in root.iter():
 		print(elem, elem.get(xml_id_key))

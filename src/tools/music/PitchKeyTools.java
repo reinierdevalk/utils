@@ -183,7 +183,7 @@ public class PitchKeyTools {
 				Encoding e = new Encoding(rawEncoding, ToolBox.splitExt(file)[0], Stage.RULES_CHECKED);
 				e.overwriteTuning(tuning);
 
-				System.err.print(e.getMetadata());
+//				System.err.print(e.getMetadata());
 				int key = detectKey(null, e);
 				System.out.println(key);
 			}
