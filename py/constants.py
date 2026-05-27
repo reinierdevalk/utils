@@ -47,22 +47,9 @@ ALLOWED_FILE_FORMATS = [MEI, ASCII, TBP, TC, XML]
 MARKUP_ELEMENTS = ['damage', 'unclear', 'del', 'add', 'supplied']
 
 
-# 2. MEI
+# 2. OTHER
 NOTATIONTYPES = {FLT: 'tab.lute.french',
 				 ILT: 'tab.lute.italian',
 				 SLT: 'tab.lute.spanish',
 				 GLT: 'tab.lute.german'
 				}
-
-TUNINGS = {
-		   D   : [('d', 4), ('a', 3), ('e', 3), ('c', 3), ('g', 2), ('d', 2)],
-		   E   : [('e', 4), ('b', 3), ('f#', 3), ('d', 3), ('a', 2), ('e', 2)],
-		   F   : [('f', 4), ('c', 4), ('g', 3), ('eb', 3), ('bb', 2), ('f', 2)],
-		   F6Eb: [('f', 4), ('c', 4), ('g', 3), ('eb', 3), ('bb', 2), ('eb', 2)],
-		   G5  : [('g', 4), ('d', 4), ('a', 3), ('f', 3), ('c', 3)],
-		   G   : [('g', 4), ('d', 4), ('a', 3), ('f', 3), ('c', 3), ('g', 2)], 
-		   G6F : [('g', 4), ('d', 4), ('a', 3), ('f', 3), ('c', 3), ('f', 2)], 
-		   A   : [('a', 4), ('e', 4), ('b', 3), ('g', 3), ('d', 3), ('a', 2)], 
-		   A6G : [('a', 4), ('e', 4), ('b', 3), ('g', 3), ('d', 3), ('g', 2)]
-		  }
-

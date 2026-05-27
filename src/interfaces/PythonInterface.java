@@ -21,7 +21,7 @@ public class PythonInterface {
 
 	// See https://norwied.wordpress.com/2012/03/28/call-python-script-from-java-app/ and
 	// https://norwied.wordpress.com/2012/07/23/pass-arguments-from-java-to-python-app/
-	private static final boolean VERBOSE = false;
+	private static final boolean VERBOSE = true; // must be false when running `abtab transcriber -l d`; can be true when running `abtab converter`
 	private static final boolean VERBOSE_APP = false;
 	private static String python;
 	private static String pythonTensorFlow;
@@ -270,7 +270,7 @@ public class PythonInterface {
 	public static List<String> runPythonFileAsScript(String[] cmd, boolean captureFromStdout) {
 		StringBuilder scriptOutput = new StringBuilder();
 
-		if (VERBOSE) System.out.println(">>> PythonInterface.runPythonFileAsScript() called");
+		if (VERBOSE) System.err.println(">>> PythonInterface.runPythonFileAsScript() called");
 		try {
 			// Create a Runtime instance to interface with the environment the Java application 
 			// is running in, and execute the given command to start the Python process
@@ -282,11 +282,11 @@ public class PythonInterface {
 			Thread outThread = new Thread(() -> {
 				// bfr reads the standard output of the Python process (stdout)
 				try (BufferedReader bfr = new BufferedReader(new InputStreamReader(pr.getInputStream()))) {
-					if (VERBOSE) System.out.println(">>> output received from Process (Python)");
+					if (VERBOSE) System.err.println(">>> output received from Process (Python)");
 					String line;
 					while ((line = bfr.readLine()) != null) {
 						scriptOutput.append(line).append("\n");
-						if (VERBOSE) System.out.println(line);
+						if (VERBOSE) System.err.println("output line " + line);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -297,10 +297,10 @@ public class PythonInterface {
 			Thread errThread = new Thread(() -> {
 				// bfrErr reads the standard error output of the Python process (stderr)
 				try (BufferedReader bfrErr = new BufferedReader(new InputStreamReader(pr.getErrorStream()))) {
-					if (VERBOSE) System.out.println(">>> errors received from Process (Python)");
+					if (VERBOSE) System.err.println(">>> errors received from Process (Python)");
 					String line;
 					while ((line = bfrErr.readLine()) != null) {
-						if (VERBOSE) System.err.println(line);
+						if (VERBOSE) System.err.println("error line " + line);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -319,7 +319,7 @@ public class PythonInterface {
 			outThread.join();
 			errThread.join();
 
-			if (VERBOSE) System.out.println(">>> Process exitValue: " + exitCode);
+			if (VERBOSE) System.err.println(">>> Process exitValue: " + exitCode);
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
