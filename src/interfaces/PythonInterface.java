@@ -21,7 +21,7 @@ public class PythonInterface {
 
 	// See https://norwied.wordpress.com/2012/03/28/call-python-script-from-java-app/ and
 	// https://norwied.wordpress.com/2012/07/23/pass-arguments-from-java-to-python-app/
-	private static final boolean VERBOSE = true; // must be false when running `abtab transcriber -l d`; can be true when running `abtab converter`
+	private static final boolean VERBOSE = false; // must be false when running `abtab transcriber -l d`; can be true when running `abtab converter`
 	private static final boolean VERBOSE_APP = false;
 	private static String python;
 	private static String pythonTensorFlow;
