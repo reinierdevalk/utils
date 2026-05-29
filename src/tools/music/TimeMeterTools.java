@@ -28,6 +28,10 @@ public class TimeMeterTools {
 	}
 
 
+	public static void main(String[] args) {
+	}
+
+
 	////////////////////////////////
 	//
 	//  C L A S S  M E T H O D S
@@ -203,7 +207,7 @@ public class TimeMeterTools {
 			}
 		}
 		int commonDenom = mt.getDenom() * largestMeterDenom;
-
+		
 		// 2. Express metricTime and all meters in commonDenom  	
 		// a. metricTime
 		Rational metricTimeInLargestDenom = 
@@ -217,7 +221,7 @@ public class TimeMeterTools {
 			int factor = (largestMeterDenom / currMeter[1]) * mt.getDenom();  
 			metersInLargestDenom.add(new Rational(currMeter[0] * factor, commonDenom));
 		}
-
+		
 		// 3. List for the initial meter and any following meter change points the metric time (in commonDenom).
 		// The first element of the list will be the metric time of the first full bar
 		// The last element of the list will be the metric time of the fictional bar after the last bar

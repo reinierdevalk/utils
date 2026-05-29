@@ -14,11 +14,7 @@ import java.util.List;
 import tools.text.StringTools;
 
 
-public class PythonInterface {
-	
-	public static void main(String[] args) {
-	}
-
+public class PythonInterface {	
 	// See https://norwied.wordpress.com/2012/03/28/call-python-script-from-java-app/ and
 	// https://norwied.wordpress.com/2012/07/23/pass-arguments-from-java-to-python-app/
 	private static final boolean VERBOSE = false; // must be false when running `abtab transcriber -l d`; can be true when running `abtab converter`
@@ -27,6 +23,10 @@ public class PythonInterface {
 	private static String pythonTensorFlow;
 	private static final String VENV_SUBDIR_WIN = "Scripts/";
 	private static final String VENV_SUBDIR_UNIX = "bin/";
+
+
+	public static void main(String[] args) {
+	}
 
 
 	public static void setPython(boolean dev, String venvPath) {
