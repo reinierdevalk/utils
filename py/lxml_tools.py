@@ -1,3 +1,4 @@
+import sys
 from lxml import etree
 
 XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace'
@@ -114,9 +115,9 @@ def pretty_print(elem: etree._Element) -> None:
 def print_all_elements(root: etree._Element, xml_id_key: str) -> None:
 	count = 0
 	for elem in root.iter():
-		print(elem, elem.get(xml_id_key))
+		print(elem, elem.get(xml_id_key), file=sys.stderr)
 		count += 1
-	print(f'{count} elements in total\n')
+	print(f'{count} elements in total\n', file=sys.stderr)
 
 
 def print_all_labelled_elements(root: etree._Element, xml_id_key: str) -> None:

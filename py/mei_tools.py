@@ -1,3 +1,4 @@
+from fractions import Fraction
 from lxml import etree
 
 from py.constants import *
@@ -94,6 +95,14 @@ def get_mei_keysig(key: str) -> str:
 		return key
 	else:
 		return key + 's' if int(key) > 0 else str(abs(int(key))) + 'f'
+
+
+def get_total_dur(root: etree._Element, ns: dict) -> Fraction:
+	return sum(
+		(Fraction(1, int(d)) for tg in root.findall('.//mei:tabGrp', ns)
+		if (d := tg.get('dur')) is not None),
+		Fraction(0),
+	)
 
 
 def get_octave(midi_pitch: int) -> int:
