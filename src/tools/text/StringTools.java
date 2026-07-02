@@ -285,7 +285,7 @@ public class StringTools {
 		List<String> res = new ArrayList<>();
 		for (String s : l) {
 			if (s.contains(".")) {
-				res.add(s.substring(0, s.lastIndexOf(".")));
+				res.add(ToolBox.splitExt(s)[0]);
 			}
 			else {
 				res.add(s);
@@ -304,7 +304,7 @@ public class StringTools {
 	/**
 	 * Constructs a path <code>String</code> from the given list of dir names.
 	 * The list elements are added in the order they appear in the list; a file
-	 * separator (/) is added to the end of the path.
+	 * separator (/) is added to the end of the path if there is none yet.
 	 * 
 	 * @param l
 	 * @return
@@ -318,7 +318,7 @@ public class StringTools {
 		// Replace any backward slashes (Windows)
 		pathStr = pathStr.replace("\\", "/");
 		// Add final file separator
-		if (!pathStr.equals("")) {
+		if (!pathStr.equals("") && !pathStr.endsWith("/")) {
 			pathStr += "/";
 		}
 

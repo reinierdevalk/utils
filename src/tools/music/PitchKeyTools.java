@@ -135,7 +135,7 @@ public class PitchKeyTools {
 				String file = args[3];
 //				Map<String, String> paths = CLInterface.getPaths(dev);
 				String filePath = StringTools.getPathString(
-					Arrays.asList(paths.get("DIPLOMAT_PATH"), "in"
+					Arrays.asList(paths.get("DIPLOMAT_PATH"), paths.get("IN_DIR")
 				));
 
 //				boolean mimic = false;		
@@ -153,7 +153,7 @@ public class PitchKeyTools {
 //
 //					List<Object> parsed = CLInterface.parseCLIArgs(
 //						argsAbtabMimicked, StringTools.getPathString(
-//							Arrays.asList(paths.get("DIPLOMAT_PATH"), "in")
+//							Arrays.asList(paths.get("DIPLOMAT_PATH"), paths.get("IN_DIR"))
 //						)
 //					);
 //					Map<String, String> cliOptsVals = (Map<String, String>) parsed.get(0);

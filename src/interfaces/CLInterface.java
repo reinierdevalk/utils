@@ -25,7 +25,7 @@ import tools.text.StringTools;
 
 public class CLInterface {
 	private static final String PATHS_FILE = "paths.json";
-	private static final String PATHS_FILE_DEV = "paths-dev.json";
+//	private static final String PATHS_FILE_DEV = "paths-dev.json";
 	private static final String CONFIG_FILE = "config.cfg";
 
 	public static final int DEV_IND = 0;
@@ -39,7 +39,8 @@ public class CLInterface {
 	public final static String TUNING = "-u"; // only needed in MEIExport
 	public final static String KEY = "-k"; // only needed in TestManager
 	public final static String MODE = "-m"; // only needed in TestManager
-	public final static String MODEL = "-o"; // only needed in UI
+	public final static String VOICES = "-o"; // only needed in UI
+	public final static String MODEL = "-d"; // only needed in UI
 	public final static String VERBOSE = "-v"; // only needed in UI
 
 	// TabMapper
@@ -56,6 +57,7 @@ public class CLInterface {
 	public static final String FILE = "-f";
 	public static final String FORMAT = "-a";
 
+	// Values TODO check where values are hardcoded and add them here as class vars 
 	public final static String INPUT = "i";
 	public final static String SINGLE_STAFF = "s";
 	
@@ -79,8 +81,8 @@ public class CLInterface {
 	 * @param dev <code>true</code> if called in development mode.
 	 * 
 	 * @return A {@code Map<String, String>}, containing for each key in
-	 *         <code>paths.json</code> the value (relative path) extended 
-	 *         to its full path.
+	 *         <code>paths.json</code> the value. If the value is a path,
+	 *         it is a relative path, which is extended to its full path.
 	 */
 	public static Map<String, String> getPaths(boolean dev) {
 		Map<String, String> m = null;
@@ -95,9 +97,10 @@ public class CLInterface {
 
 		// 2. Read the Map from the JSON file
 		Map<String, Map<String, String>> pathsConfig = StringTools.readJSONFile(
-			StringTools.getPathString(Arrays.asList(cp)) + (dev ? PATHS_FILE_DEV : PATHS_FILE)		
+			StringTools.getPathString(Arrays.asList(cp)) + PATHS_FILE		
 		);
 		Map<String, String> paths = pathsConfig.get("paths");
+		Map<String, String> dirs = pathsConfig.get("directories");
 		Map<String, String> files = pathsConfig.get("files");
 
 		// 3. Set paths in m
@@ -165,7 +168,32 @@ public class CLInterface {
 			Arrays.asList(cp, paths.get("VENV_PATH"))
 		));
 
-		// 4. Set scripts in m
+		// Adapt paths for development mode
+		if (dev) {
+			// The data/<tool>/ paths are on rp, but in development mode, rp already contains a 
+			// dir called data/. Rename to data_abtab/<tool>/  
+			for (String p : Arrays.asList(
+				"ANALYSER_PATH", "CONVERTER_PATH", "TABMAPPER_PATH", "DIPLOMAT_PATH", "POLYPHONIST_PATH"
+				)) {
+				m.put(p, m.get(p).replace(dirs.get("DATA_DIR"), "data_abtab/"));
+			}
+			// The lib/<repo>/.../ paths are on cp, but in development mode, cp does not contain
+			// the lib/ dirs. Rename to <repo>/.../
+			for (String p : Arrays.asList(
+				"UTILS_PYTHON_PATH", "VOICE_SEP_PYTHON_PATH", "VOICE_SEP_MATLAB_PATH", "ANALYSIS_PYTHON_PATH", 
+				"FORMATS_PYTHON_PATH"
+				)) {
+				m.put(p, m.get(p).replace(dirs.get("LIB_DIR"), ""));	
+			}
+		}
+
+		// 4. Set dirs in m
+		m.put("IN_DIR", dirs.get("IN_DIR"));
+		m.put("OUT_DIR", dirs.get("OUT_DIR"));
+		m.put("DATA_DIR", dirs.get("DATA_DIR"));
+		m.put("LIB_DIR", dirs.get("LIB_DIR"));
+
+		// 5. Set scripts in m
 		m.put("MEI2TBP_SCRIPT", files.get("MEI2TBP_SCRIPT"));
 		m.put("BEAM_SCRIPT", files.get("BEAM_SCRIPT"));
 		m.put("SCIKIT_SCRIPT", files.get("SCIKIT_SCRIPT"));
